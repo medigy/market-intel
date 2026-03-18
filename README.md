@@ -5,7 +5,7 @@ Medigy Disease State Database (MDSD) Evidence Engine. A data pipeline using surv
 ## Overview
 The **Medigy Disease State Database (MDSD)** is a data engineering initiative to provide evidence-based prioritization for clinical services. This repository contains the logic to validate "Disease States" using **actual Medicare Claims data**.
 
-Using `surveilr`, we ingest CMS datasets into a **Resource Specific Static Database (RSSD)** to enable SQL-based analysis and LLM-assisted workflows.
+Using `surveilr`, we ingest CMS datasets into a **RSSD)** to enable SQL-based analysis and LLM-assisted workflows.
 
 ## Architecture & Tools
 - **Orchestration**: `spry` (Executable Markdown blocks)
