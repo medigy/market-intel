@@ -13,7 +13,7 @@ can be generated from a single markdown source.
 
 ```bash prepare-db --descr "Delete and recreate the SQLite database used by SQLPage"
 #!/usr/bin/env -S bash
-rm -f medicare.sqlite.db                 
+rm -f resource-surveillance.sqlite.db                 
 surveilr ingest files -r medicare-ds/ 
 surveilr orchestrate transform-csv
 surveilr shell --engine rusqlite business_question_views.sql -d resource-surveillance.sqlite.db
