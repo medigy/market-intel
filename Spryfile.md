@@ -13,10 +13,10 @@ can be generated from a single markdown source.
 
 ```bash prepare-db --descr "Delete and recreate the SQLite database used by SQLPage"
 #!/usr/bin/env -S bash
-rm -f medicare.sqlite.db                  # will be re-created by DuckDB `ATTACH`
+rm -f medicare.sqlite.db                 
 surveilr ingest files -r medicare-ds/ 
 surveilr orchestrate transform-csv
-sqlite3 resource-surveillance.sqlite.db < business_question_views.sql
+surveilr shell --engine rusqlite business_question_views.sql -d resource-surveillance.sqlite.db
 ```
 
 ## Spry Axiom configuration
