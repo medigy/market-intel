@@ -1,5 +1,0 @@
-{
-  "allow_exec": false,
-  "database_url": "sqlite:./resource-surveillance.sqlite.db",
-  "port": 8080
-}
