@@ -19,6 +19,19 @@ surveilr orchestrate transform-csv
 sqlite3 resource-surveillance.sqlite.db < business_question_views.sql
 ```
 
+## Spry Axiom configuration
+
+`code DEFAULTS` is a special directive use by Spry's Axiom library to supply
+default flags to specific code blocks like `sql`, `text`, etc. allowing them to
+be interpolatable (`${...}`) and injectable (using `PARTIAL`s) by default
+instead of having to pass `--interpolate` and `--injectable` into each code
+cell. 💡 `code DEFAULTS` is necessary in Spry SQLPage playbooks to tell Axiom
+how to treat `sql` code fenced blocks.
+
+```code DEFAULTS
+sql * --interpolate --injectable
+```
+
 ## SQLPage Dev / Watch mode
 
 While you're developing, Spry's `dev-src.auto` generator should be used:
@@ -64,9 +77,8 @@ rm -rf dev-src.auto
 spry sp spc --package --conf sqlpage/sqlpage.json | sqlite3 resource-surveillance.sqlite.db
 ```
 
-## Overview page
-
-```sql index.sql { route: { caption: "Overview", description: "Executive overview of specialty, procedure, condition, and classification views." } }
+```sql PARTIAL global-layout.sql --inject **/*
+-- BEGIN: PARTIAL global-layout.sql
 SELECT
     'shell' AS component,
     'Medicare DSD Evidence Dashboard' AS title,
@@ -80,6 +92,20 @@ SELECT
     '{"title":"Conditions","link":"conditions.sql","icon":"heartbeat"}' AS menu_item,
     '{"title":"Classification QA","link":"classification.sql","icon":"binary-tree-2"}' AS menu_item,
     'Dashboard generated from heuristic specialty, condition, economic intensity, and opportunity views.' AS footer;
+
+
+SET resource_json = sqlpage.read_file_as_text('spry.d/auto/resource/${path}.auto.json');
+SET page_title  = json_extract($resource_json, '$.route.caption');
+SET page_path = json_extract($resource_json, '$.route.path');
+
+
+-- END: PARTIAL global-layout.sql
+```
+
+## Overview page
+
+```sql index.sql { route: { caption: "Overview", description: "Executive overview of specialty, procedure, condition, and classification views." } }
+
 
 SELECT
     'card' AS component,
@@ -200,19 +226,6 @@ LIMIT 12;
 ## Specialties page
 
 ```sql specialties.sql { route: { caption: "Specialties", description: "Specialty proxy utilization and economic intensity dashboard." } }
-SELECT
-    'shell' AS component,
-    COALESCE(NULLIF($specialty, ''), 'Specialty Proxy Performance') AS title,
-    'activity' AS icon,
-    'fluid' AS layout,
-    TRUE AS sidebar,
-    'index.sql' AS link,
-    '{"title":"Overview","link":"index.sql","icon":"home"}' AS menu_item,
-    '{"title":"Specialties","link":"specialties.sql","icon":"activity"}' AS menu_item,
-    '{"title":"Procedures","link":"procedures.sql","icon":"list-details"}' AS menu_item,
-    '{"title":"Conditions","link":"conditions.sql","icon":"heartbeat"}' AS menu_item,
-    '{"title":"Classification QA","link":"classification.sql","icon":"binary-tree-2"}' AS menu_item,
-    'Specialty proxies are heuristic buckets derived from HCPCS/CPT code patterns and descriptions.' AS footer;
 
 SELECT
     'form' AS component,
@@ -386,19 +399,6 @@ ORDER BY p.total_services DESC;
 ## Procedures page
 
 ```sql procedures.sql { route: { caption: "Procedures", description: "Procedure drilldown by specialty proxy with classification context." } }
-SELECT
-    'shell' AS component,
-    COALESCE(NULLIF($specialty, ''), 'Procedure Drilldown') AS title,
-    'list-details' AS icon,
-    'fluid' AS layout,
-    TRUE AS sidebar,
-    'index.sql' AS link,
-    '{"title":"Overview","link":"index.sql","icon":"home"}' AS menu_item,
-    '{"title":"Specialties","link":"specialties.sql","icon":"activity"}' AS menu_item,
-    '{"title":"Procedures","link":"procedures.sql","icon":"list-details"}' AS menu_item,
-    '{"title":"Conditions","link":"conditions.sql","icon":"heartbeat"}' AS menu_item,
-    '{"title":"Classification QA","link":"classification.sql","icon":"binary-tree-2"}' AS menu_item,
-    'Use the specialty filter to focus the page; overview mode shows the top 3 procedures per specialty.' AS footer;
 
 SELECT
     'form' AS component,
@@ -598,19 +598,6 @@ ORDER BY total_services DESC, specialty_proxy, procedure_rank;
 ## Conditions page
 
 ```sql conditions.sql { route: { caption: "Conditions", description: "Opportunity scoring dashboard and ICD mapping drilldown." } }
-SELECT
-    'shell' AS component,
-    COALESCE(NULLIF($condition_group, ''), 'Condition Opportunity Dashboard') AS title,
-    'heartbeat' AS icon,
-    'fluid' AS layout,
-    TRUE AS sidebar,
-    'index.sql' AS link,
-    '{"title":"Overview","link":"index.sql","icon":"home"}' AS menu_item,
-    '{"title":"Specialties","link":"specialties.sql","icon":"activity"}' AS menu_item,
-    '{"title":"Procedures","link":"procedures.sql","icon":"list-details"}' AS menu_item,
-    '{"title":"Conditions","link":"conditions.sql","icon":"heartbeat"}' AS menu_item,
-    '{"title":"Classification QA","link":"classification.sql","icon":"binary-tree-2"}' AS menu_item,
-    'Opportunity scoring uses proxy prevalence until CCW/CDC prevalence inputs are loaded.' AS footer;
 
 SELECT
     'form' AS component,
@@ -790,19 +777,6 @@ LIMIT CASE WHEN COALESCE($condition_group, '') = '' THEN 150 ELSE 500 END;
 ## Classification page
 
 ```sql classification.sql { route: { caption: "Classification QA", description: "Heuristic classification coverage and residual unclassified procedures." } }
-SELECT
-    'shell' AS component,
-    'Classification QA Dashboard' AS title,
-    'binary-tree-2' AS icon,
-    'fluid' AS layout,
-    TRUE AS sidebar,
-    'index.sql' AS link,
-    '{"title":"Overview","link":"index.sql","icon":"home"}' AS menu_item,
-    '{"title":"Specialties","link":"specialties.sql","icon":"activity"}' AS menu_item,
-    '{"title":"Procedures","link":"procedures.sql","icon":"list-details"}' AS menu_item,
-    '{"title":"Conditions","link":"conditions.sql","icon":"heartbeat"}' AS menu_item,
-    '{"title":"Classification QA","link":"classification.sql","icon":"binary-tree-2"}' AS menu_item,
-    'Use this page to review heuristic specialty assignment coverage and residual unclassified codes.' AS footer;
 
 SELECT
     'chart' AS component,
