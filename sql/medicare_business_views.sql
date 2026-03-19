@@ -6,6 +6,7 @@
 --   uniform_resource_ref_geo_adjustment
 --   uniform_resource_ref_hcpcs_level_two_procedures
 --   uniform_resource_ref_icd10_diagnosis
+--   uniform_resource_ref_condition_icd_mapping
 --   uniform_resource_ref_medicare_localities
 --   uniform_resource_ref_opps_price_cap
 --   uniform_resource_ref_procedure_code
@@ -92,45 +93,17 @@ WHERE procedure_rank <= 25;
 
 DROP VIEW IF EXISTS condition_to_icd_mapping;
 CREATE VIEW condition_to_icd_mapping AS
-WITH manual_seed(condition_name, icd_prefix, priority_tier, prevalence_weight, proxy_specialty_pattern) AS (
-  VALUES
-    ('Diabetes', 'E08', 1, 0.95, 'endocrin'),
-    ('Diabetes', 'E09', 1, 0.95, 'endocrin'),
-    ('Diabetes', 'E10', 1, 0.95, 'endocrin'),
-    ('Diabetes', 'E11', 1, 0.95, 'endocrin'),
-    ('Diabetes', 'E13', 1, 0.95, 'endocrin'),
-    ('Chronic Kidney Disease', 'N18', 1, 0.90, 'nephro'),
-    ('COPD', 'J44', 1, 0.88, 'pulmon'),
-    ('Asthma', 'J45', 2, 0.70, 'pulmon'),
-    ('Heart Failure', 'I50', 1, 0.93, 'cardio'),
-    ('Ischemic Heart Disease', 'I20', 2, 0.82, 'cardio'),
-    ('Ischemic Heart Disease', 'I21', 2, 0.82, 'cardio'),
-    ('Ischemic Heart Disease', 'I25', 2, 0.82, 'cardio'),
-    ('Hypertension', 'I10', 2, 0.86, 'internal'),
-    ('Atrial Fibrillation', 'I48', 2, 0.80, 'cardio'),
-    ('Obesity', 'E66', 2, 0.74, 'endocrin'),
-    ('Depression', 'F32', 2, 0.76, 'psychi'),
-    ('Depression', 'F33', 2, 0.76, 'psychi'),
-    ('Alzheimer Disease and Related Dementias', 'G30', 1, 0.84, 'neurol'),
-    ('Alzheimer Disease and Related Dementias', 'F03', 1, 0.84, 'neurol'),
-    ('Osteoarthritis', 'M15', 2, 0.72, 'orthop'),
-    ('Osteoarthritis', 'M16', 2, 0.72, 'orthop'),
-    ('Osteoarthritis', 'M17', 2, 0.72, 'orthop'),
-    ('Rheumatoid Arthritis', 'M05', 2, 0.68, 'rheumat'),
-    ('Rheumatoid Arthritis', 'M06', 2, 0.68, 'rheumat'),
-    ('Cancer (Malignant Neoplasms)', 'C', 1, 0.89, 'oncolog')
-)
 SELECT
   m.condition_name,
-  m.priority_tier,
-  m.prevalence_weight,
+  CAST(COALESCE(m.priority_tier, 0) AS INTEGER) AS priority_tier,
+  CAST(COALESCE(m.prevalence_weight, 0) AS REAL) AS prevalence_weight,
   m.proxy_specialty_pattern,
   m.icd_prefix,
   d.icd10_code,
   d.is_billable,
   d.description_short,
   d.description_long
-FROM manual_seed m
+FROM uniform_resource_ref_condition_icd_mapping m
 LEFT JOIN uniform_resource_ref_icd10_diagnosis d
   ON UPPER(COALESCE(d.icd10_code, '')) LIKE UPPER(m.icd_prefix) || '%';
 

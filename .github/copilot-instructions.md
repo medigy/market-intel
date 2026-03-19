@@ -11,5 +11,5 @@ These instructions apply to all chats in this workspace.
 86. Provide responses directly in the VS Code chat window only; do not require or route through any external client. -->
 
 ## Workspace context
-- Database path: `../resource-surveillance.sqlite.db`
+- Database path: `resource-surveillance.sqlite.db`
 - MCP server name in config: `surveilr`
