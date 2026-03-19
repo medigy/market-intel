@@ -179,7 +179,7 @@ surveilr orchestrate transform-csv
 surveilr shell sql/medicare-analytics.sql
 
 # 5. Package the SQLPage UI and load it into the database
-spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-sqlpage-dashboard.md \
+spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md \
   | sqlite3 resource-surveillance.sqlite.db
 
 echo "MMI database and SQLPage UI are ready."
