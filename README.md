@@ -1,31 +1,136 @@
-# medicare-dsd-evidence
-Medigy Disease State Database (MDSD) Evidence Engine. A data pipeline using surveilr and spry to transform raw CMS Medicare claims into actionable evidence. It quantifies disease prevalence, procedure frequency, and economic intensity to move from qualitative prioritization to data-driven commercial validation.
+# Medicare DSD Evidence
 
+This repository builds a Spry-managed SQLPage dashboard for exploring Medicare
+data from CMS public-use files.
 
-## Overview
-The **Medigy Disease State Database (MDSD)** is a data engineering initiative to provide evidence-based prioritization for clinical services. This repository contains the logic to validate "Disease States" using **actual Medicare Claims data**.
+The dashboard focuses on:
 
-Using `surveilr`, we ingest CMS datasets into a **RSSD)** to enable SQL-based analysis and LLM-assisted workflows.
+- specialty proxy utilization
+- top HCPCS/CPT procedures
+- condition opportunity scoring
+- classification QA for the HCPCS-to-specialty heuristic mapping
 
-## Architecture & Tools
-- **Orchestration**: `spry` (Executable Markdown blocks)
-- **Ingestion**: `surveilr` (Extract & Load into SQLite RSSD)
-- **Transformation**: `DuckDB` / SQLite SQL (Views and Materialized tables)
+`Spryfile.md` is the source of truth for the SQLPage routes. Spry materializes
+the executable SQL files into `dev-src.auto/`, and SQLPage serves those routes
+against `resource-surveillance.sqlite.db`.
 
-## Project Structure
-```text
-.
-├── data/               # Local data storage (Git ignored)
-│   └── raw/            # Source CSV/Parquet files from CMS
-├── msd_orchestration.md # Executable MD files (The "Layout")│    
-├── sql/                # SQL Transformation scripts
-│   ├── ddl/            # Schema definitions
-│   └── views/          # Logic for Evidence/Opportunity views
-├── scripts/            # Bash utilities for remote data fetching
-└── mdsd_evidence.rssd  # The resulting SQLite database
+## Repository layout
+
+- `Spryfile.md` — Spry playbook and embedded SQLPage routes
+- `business_question_views.sql` — derived analytical SQLite views
+- `medicare-ds/` — CMS source/reference CSV files used for ingestion
+- `dev-src.auto/` — generated SQLPage web root for local development
+- `sqlpage/sqlpage.json` — SQLPage runtime config
+- `resource-surveillance.sqlite.db` — local SQLite database
+
+## Dashboard routes
+
+The Spry playbook generates these SQLPage pages:
+
+- `index.sql` — overview / executive summary
+- `specialties.sql` — specialty proxy utilization and economic intensity
+- `procedures.sql` — top procedures and drilldowns by specialty proxy
+- `conditions.sql` — condition opportunity scoring
+- `classification.sql` — mapping coverage and unclassified code QA
+
+## Prerequisites
+
+Make sure these CLIs are available in your shell:
+
+- `spry`
+- `sqlpage`
+- `surveilr`
+- `sqlite3`
+
+## 1. Build or refresh the SQLite database
+
+Run from the repository root:
+
+```bash
+rm -f resource-surveillance.sqlite.db
+surveilr ingest files -r medicare-ds/
+surveilr orchestrate transform-csv
+surveilr shell --engine rusqlite business_question_views.sql -d resource-surveillance.sqlite.db
 ```
 
-## Getting Started
+This ingests the CSV resources and creates the derived views used by the
+dashboard, including:
 
-### 1. Prerequisites
-Ensure `surveilr` and `spry` are installed in your WSL path.
+- `procedure_specialty_proxy_map`
+- `procedure_volume_by_specialty`
+- `top_procedures_per_specialty`
+- `condition_to_icd_mapping`
+- `proxy_condition_activity`
+- `economic_intensity_index`
+- `opportunity_scoring_view`
+
+## 2. Generate the SQLPage app from Spry
+
+Materialize the SQLPage routes into `dev-src.auto/`:
+
+```bash
+spry sp spc -m Spryfile.md --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
+```
+
+To confirm the playbook parses and exposes the expected routes:
+
+```bash
+spry sp spc ls -m Spryfile.md
+```
+
+## 3. Run SQLPage
+
+Start SQLPage from the repository root with the generated web root and config:
+
+```bash
+sqlpage
+```
+
+Then open:
+
+- `http://127.0.0.1:8080/index.sql`
+
+## Development workflow
+
+Regenerate the app whenever you change `Spryfile.md`:
+
+```bash
+spry sp spc -m Spryfile.md --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
+```
+
+For watch mode:
+
+```bash
+spry sp spc -m Spryfile.md --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch
+```
+
+If you want Spry to restart SQLPage automatically after rebuilds:
+
+```bash
+spry sp spc -m Spryfile.md --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch --with-sqlpage
+```
+
+## Cleaning generated artifacts
+
+Remove generated development output:
+
+```bash
+rm -rf dev-src.auto
+```
+
+## Notes
+
+- The analytics are built against national aggregates (`Rndrng_Prvdr_Geo_Lvl = 'National'`).
+- `dev-src.auto/` is generated output and can be recreated from `Spryfile.md`.
+- `spry.d/` content inside `dev-src.auto/` is generated metadata used by Spry/SQLPage.
+
+## Typical local run
+
+```bash
+rm -f resource-surveillance.sqlite.db
+surveilr ingest files -r medicare-ds/
+surveilr orchestrate transform-csv
+surveilr shell --engine rusqlite business_question_views.sql -d resource-surveillance.sqlite.db
+spry sp spc -m Spryfile.md --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
+sqlpage
+```
