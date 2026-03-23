@@ -25,8 +25,7 @@ set -euo pipefail
 # Start from a clean database to avoid previously ingested malformed resources.
 rm -f resource-surveillance.sqlite.db
 
-surveilr ingest files -r medicare-ds/
-surveilr orchestrate transform-csv
+surveilr ingest files -r medicare-ds/ && surveilr orchestrate transform-csv 
 surveilr shell sql/medicare-analytics.sql 
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
 echo "Medicare patient analytics database and SQLPage UI are ready."

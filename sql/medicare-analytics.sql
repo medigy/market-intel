@@ -54,10 +54,11 @@ SELECT
     p.HCPCS                                                         AS hcpcs_code,
     TRIM(p.DESCRIPTION)                                             AS procedure_description,
     p."STATUS CODE"                                                 AS status_code,
-    CAST(NULLIF(TRIM(p."WORK RVU"),        '') AS REAL)             AS work_rvu,
+    CAST(NULLIF(TRIM(p."WORK RVU"),          '') AS REAL)           AS work_rvu,
     CAST(NULLIF(TRIM(p."NON-FAC PE RVU"),  '') AS REAL)             AS non_fac_pe_rvu,
     CAST(NULLIF(TRIM(p."FACILITY PE RVU"), '') AS REAL)             AS facility_pe_rvu,
     CAST(NULLIF(TRIM(p."MEDICARE PAYMENT"),'') AS REAL)             AS medicare_fee_schedule_payment,
+    -- BROAD CATEGORY (Keeps everything organized)
     CASE
         WHEN p.HCPCS BETWEEN '99202' AND '99499' THEN 'Evaluation & Management'
         WHEN p.HCPCS BETWEEN '70000' AND '79999' THEN 'Radiology / Imaging'
@@ -68,18 +69,26 @@ SELECT
         WHEN p.HCPCS GLOB '[A-Z]*'               THEN 'HCPCS Level II (DME / Drug / Other)'
         ELSE 'Unclassified'
     END                                                             AS procedure_category,
-    -- 1 = monitoring/repeat-visit procedure (key signal for interaction density)
+    
+    -- SPECIFIC SIGNAL (This is what Cline uses for the report)
     CASE
-        WHEN p.HCPCS IN ('82947','82950','82962','83036','83037')           THEN 1  -- glucose / A1c
-        WHEN p.HCPCS IN ('90935','90937','90945','90947','90999',
-                         'G0491','G0492')                                   THEN 1  -- dialysis
-        WHEN p.HCPCS IN ('93000','93005','93010','93224','93225',
-                         '93226','93227')                                   THEN 1  -- cardiac monitoring
-        WHEN p.HCPCS IN ('94010','94060','94070','94150','94250',
-                         '94640','94660')                                   THEN 1  -- pulmonary / COPD
-        WHEN p.HCPCS BETWEEN '99202' AND '99215'                           THEN 1  -- E&M office visits
-        ELSE 0
-    END                                                             AS is_monitoring_flag
+        -- Sleep Apnea (Monday Pilot)
+        WHEN p.HCPCS IN ('95800','95801','95806','95810','95811','G0398')   THEN 'Sleep Study'
+        -- COPD (Monday Pilot)
+        WHEN p.HCPCS IN ('94010','94060','94660','G0237','G0238','G0239')   THEN 'Pulmonary Function/Rehab'
+        -- Hypertension (Monday Pilot)
+        WHEN p.HCPCS IN ('93784','93788','93790')                           THEN 'BP Monitoring'
+        -- General Monitoring (Future Proofing)
+        WHEN p.HCPCS BETWEEN '99211' AND '99215'                           THEN 'Office Visit (Repeat)'
+        ELSE 'Standard Care'
+    END                                                             AS procedure_signal,
+
+    -- Keep your original binary flag for backward compatibility
+    CASE 
+        WHEN p.HCPCS BETWEEN '99202' AND '99215' THEN 1
+        WHEN p.HCPCS IN ('95810','95811','94660','93000') THEN 1
+        ELSE 0 
+    END AS is_monitoring_flag
 FROM uniform_resource_ref_procedure_code p
 WHERE p.HCPCS IS NOT NULL AND TRIM(p.HCPCS) != '';
 
@@ -94,59 +103,144 @@ CREATE INDEX idx_dim_proc_monitor  ON dim_procedure(is_monitoring_flag);
 -- Two levels: granular disease_state + rollup body_system for executive views.
 -- Note: CASE order matters — more specific codes must precede their parent prefix.
 -- -----------------------------------------------------------------------------
+
+-- DROP TABLE IF EXISTS dim_diagnosis;
+-- CREATE TABLE dim_diagnosis AS
+-- SELECT
+--     icd10_code,
+--     description_long                                AS diagnosis_description,
+--     -- SECTION 1: SPECIFIC DISEASE STATE IDENTIFICATION (Shahid's Targets)
+--     CASE
+--         -- Priority 1: Respiratory & Sleep (Voxia Core)
+--         WHEN icd10_code LIKE 'G473%'                 THEN 'Sleep Apnea'
+--         WHEN icd10_code LIKE 'P283%'                 THEN 'Sleep Apnea'
+--         WHEN icd10_code LIKE 'J44%'                  THEN 'COPD'
+--         WHEN icd10_code LIKE 'J45%'                  THEN 'Asthma'
+
+--         -- Priority 2: Cardiovascular
+--         WHEN icd10_code LIKE 'I50%'                  THEN 'Heart Failure / CHF'
+--         WHEN icd10_code LIKE 'I48%'                  THEN 'Atrial Fibrillation'
+--         WHEN icd10_code LIKE 'I25%'                  THEN 'Ischemic Heart Disease / CAD'
+--         WHEN icd10_code LIKE 'I10%'                  THEN 'Hypertension'
+--         WHEN icd10_code BETWEEN 'I60' AND 'I69'      THEN 'Stroke / Cerebrovascular Disease'
+
+--         -- Priority 3: Mental Health & Neurological
+--         WHEN icd10_code LIKE 'F32%' OR icd10_code LIKE 'F33%' THEN 'Major Depression'
+--         WHEN icd10_code LIKE 'G30%' OR icd10_code LIKE 'F01%' OR icd10_code LIKE 'F03%' THEN 'Alzheimers / Dementia'
+--         WHEN icd10_code LIKE 'G20%'                  THEN 'Parkinsons Disease'
+--         WHEN icd10_code LIKE 'G45%'                  THEN 'TIA (Stroke Precursor)'
+
+--         -- Priority 4: Renal & Metabolic
+--         WHEN icd10_code LIKE 'N186' OR icd10_code LIKE 'N185' THEN 'End-Stage Renal Disease (ESRD)'
+--         WHEN icd10_code LIKE 'N18%'                  THEN 'Chronic Kidney Disease'
+--         WHEN icd10_code LIKE 'E10%'                  THEN 'Type 1 Diabetes'
+--         WHEN icd10_code LIKE 'E11%'                  THEN 'Type 2 Diabetes'
+        
+--         -- Priority 5: Musculoskeletal & Oncology
+--         WHEN icd10_code LIKE 'M16%' OR icd10_code LIKE 'M17%' THEN 'Osteoarthritis (Hip/Knee)'
+--         WHEN icd10_code LIKE 'M80%' OR icd10_code LIKE 'M81%' THEN 'Osteoporosis'
+--         WHEN icd10_code LIKE 'C34%'                  THEN 'Lung Cancer'
+--         WHEN icd10_code LIKE 'C50%'                  THEN 'Breast Cancer'
+--         WHEN icd10_code LIKE 'C61%'                  THEN 'Prostate Cancer'
+--         WHEN icd10_code LIKE 'C18%'                  THEN 'Colon Cancer'
+--         WHEN icd10_code BETWEEN 'C00' AND 'C97'      THEN 'Cancer (Other Malignant)'
+
+--         -- SECTION 2: FALLBACK TO ICD-10 CHAPTERS (Prevents "General / Other")
+--         WHEN icd10_code GLOB '[AB]*'                 THEN 'Infectious / Parasitic Diseases'
+--         WHEN icd10_code GLOB 'D[0-4]*'               THEN 'Neoplasms (Benign/Unspecified)'
+--         WHEN icd10_code GLOB 'D[5-8]*'               THEN 'Blood / Immune Disorders'
+--         WHEN icd10_code GLOB 'E*'                    THEN 'Endocrine / Metabolic (Other)'
+--         WHEN icd10_code GLOB 'F*'                    THEN 'Mental / Behavioral (Other)'
+--         WHEN icd10_code GLOB 'G*'                    THEN 'Nervous System (Other)'
+--         WHEN icd10_code GLOB 'H[0-5]*'               THEN 'Eye / Adnexa'
+--         WHEN icd10_code GLOB 'H[6-9]*'               THEN 'Ear / Mastoid'
+--         WHEN icd10_code GLOB 'I*'                    THEN 'Circulatory (Other)'
+--         WHEN icd10_code GLOB 'J*'                    THEN 'Respiratory (Other)'
+--         WHEN icd10_code GLOB 'K*'                    THEN 'Digestive System'
+--         WHEN icd10_code GLOB 'L*'                    THEN 'Skin / Subcutaneous'
+--         WHEN icd10_code GLOB 'M*'                    THEN 'Musculoskeletal (Other)'
+--         WHEN icd10_code GLOB 'N*'                    THEN 'Genitourinary (Other)'
+--         WHEN icd10_code GLOB 'O*'                    THEN 'Pregnancy / Childbirth'
+--         WHEN icd10_code GLOB 'P*'                    THEN 'Perinatal Conditions'
+--         WHEN icd10_code GLOB 'Q*'                    THEN 'Congenital Malformations'
+--         WHEN icd10_code GLOB 'R*'                    THEN 'Symptoms / Clinical Findings (NEC)'
+--         WHEN icd10_code GLOB '[ST]*'                 THEN 'Injury / Poisoning / Trauma'
+--         WHEN icd10_code GLOB '[VWXY]*'               THEN 'External Causes of Morbidity'
+--         WHEN icd10_code GLOB 'Z*'                    THEN 'Health Status / Screenings'
+--         ELSE 'Unclassified / Special Codes'
+--     END                                             AS disease_state,
+--     -- SECTION 3: BODY SYSTEM GROUPING
+--     CASE
+--         WHEN icd10_code LIKE 'E%'                    THEN 'Endocrine & Metabolic'
+--         WHEN icd10_code LIKE 'I%'                    THEN 'Cardiovascular'
+--         WHEN icd10_code LIKE 'N%'                    THEN 'Renal & Urological'
+--         WHEN icd10_code LIKE 'J%' OR icd10_code LIKE 'G47%' OR icd10_code LIKE 'P283%' THEN 'Respiratory & Sleep'
+--         WHEN icd10_code LIKE 'G%' OR icd10_code LIKE 'F%' THEN 'Neurological & Mental Health'
+--         WHEN icd10_code LIKE 'M%'                    THEN 'Musculoskeletal'
+--         WHEN icd10_code LIKE 'C%' OR icd10_code LIKE 'D[0-4]%' THEN 'Oncology'
+--         WHEN icd10_code LIKE 'K%'                    THEN 'Digestive'
+--         WHEN icd10_code LIKE 'L%'                    THEN 'Dermatology'
+--         WHEN icd10_code LIKE 'H%'                    THEN 'Ophthalmology & Otology'
+--         WHEN icd10_code LIKE 'S%' OR icd10_code LIKE 'T%' THEN 'Injury & Trauma'
+--         ELSE 'Other Clinical'
+--     END                                             AS body_system
+-- FROM uniform_resource_ref_icd10_diagnosis
+-- WHERE icd10_code IS NOT NULL;
+
 DROP TABLE IF EXISTS dim_diagnosis;
 CREATE TABLE dim_diagnosis AS
 SELECT
     icd10_code,
     description_long                                AS diagnosis_description,
+    -- SECTION 1: SPECIFIC PILOT CONDITIONS (High Priority)
     CASE
-        WHEN icd10_code LIKE 'N186'                 THEN 'End-Stage Renal Disease (ESRD)'
-        WHEN icd10_code LIKE 'N185'                 THEN 'End-Stage Renal Disease (ESRD)'
-        WHEN icd10_code LIKE 'N18%'                 THEN 'Chronic Kidney Disease'
-        WHEN icd10_code LIKE 'E10%'                 THEN 'Type 1 Diabetes'
-        WHEN icd10_code LIKE 'E11%'                 THEN 'Type 2 Diabetes'
-        WHEN icd10_code LIKE 'E13%'                 THEN 'Diabetes - Other Specified'
-        WHEN icd10_code LIKE 'I50%'                 THEN 'Heart Failure / CHF'
-        WHEN icd10_code LIKE 'I48%'                 THEN 'Atrial Fibrillation'
-        WHEN icd10_code LIKE 'I25%'                 THEN 'Ischemic Heart Disease / CAD'
-        WHEN icd10_code LIKE 'I10%'                 THEN 'Hypertension'
-        WHEN icd10_code LIKE 'J44%'                 THEN 'COPD'
-        WHEN icd10_code LIKE 'J45%'                 THEN 'Asthma'
-        WHEN icd10_code LIKE 'G30%'                 THEN 'Alzheimers Disease'
-        WHEN icd10_code LIKE 'F01%'                 THEN 'Vascular Dementia'
-        WHEN icd10_code LIKE 'F03%'                 THEN 'Dementia - Unspecified'
-        WHEN icd10_code LIKE 'F32%'                 THEN 'Major Depressive Disorder'
-        WHEN icd10_code LIKE 'F33%'                 THEN 'Recurrent Depressive Disorder'
-        WHEN icd10_code LIKE 'G20%'                 THEN 'Parkinsons Disease'
-        WHEN icd10_code LIKE 'G45%'                 THEN 'TIA (Stroke Precursor)'
-        WHEN icd10_code BETWEEN 'I60' AND 'I699'    THEN 'Stroke / Cerebrovascular Disease'
-        WHEN icd10_code LIKE 'M17%'                 THEN 'Osteoarthritis - Knee'
-        WHEN icd10_code LIKE 'M16%'                 THEN 'Osteoarthritis - Hip'
-        WHEN icd10_code LIKE 'M80%'                 THEN 'Osteoporosis with Fracture'
-        WHEN icd10_code LIKE 'M81%'                 THEN 'Osteoporosis without Fracture'
-        WHEN icd10_code LIKE 'C34%'                 THEN 'Lung Cancer'
-        WHEN icd10_code LIKE 'C50%'                 THEN 'Breast Cancer'
-        WHEN icd10_code LIKE 'C61%'                 THEN 'Prostate Cancer'
-        WHEN icd10_code LIKE 'C18%'                 THEN 'Colon Cancer'
-        WHEN icd10_code BETWEEN 'C00' AND 'C979'    THEN 'Cancer - Malignant Neoplasm'
-        ELSE 'General / Other'
+        -- Sleep Apnea
+        WHEN icd10_code LIKE 'G47.3%' OR icd10_code LIKE 'P28.3%' THEN 'Sleep Apnea'
+        
+        --  COPD
+        WHEN icd10_code LIKE 'J44%'                               THEN 'COPD'
+        
+        --  Hypertension
+        WHEN icd10_code LIKE 'I10%'                               THEN 'Hypertension'
+        
+        -- Future Conditions (Easily add more here)
+        WHEN icd10_code LIKE 'G20%'                               THEN 'Parkinsons Disease'
+        WHEN icd10_code LIKE 'I50%'                               THEN 'Heart Failure'
+        WHEN icd10_code LIKE 'E11%'                               THEN 'Type 2 Diabetes'
+        WHEN icd10_code LIKE 'N18%'                               THEN 'Chronic Kidney Disease'
+        
+        -- SECTION 2: AUTOMATED CATCH-ALL (Ensures 0% data loss)
+        WHEN icd10_code GLOB '[AB]*'                               THEN 'Infectious Diseases'
+        WHEN icd10_code GLOB 'C*'                                 THEN 'Oncology / Cancer'
+        WHEN icd10_code GLOB 'E*'                                 THEN 'Endocrine / Metabolic'
+        WHEN icd10_code GLOB 'F*'                                 THEN 'Mental / Behavioral'
+        WHEN icd10_code GLOB 'G*'                                 THEN 'Neurological'
+        WHEN icd10_code GLOB 'I*'                                 THEN 'Cardiovascular'
+        WHEN icd10_code GLOB 'J*'                                 THEN 'Respiratory'
+        WHEN icd10_code GLOB 'M*'                                 THEN 'Musculoskeletal'
+        WHEN icd10_code GLOB 'N*'                                 THEN 'Genitourinary'
+        ELSE 'Other Chronic / Clinical'
     END                                             AS disease_state,
+
+    -- SECTION 3: SYSTEM ROLLUP (The Bridge to Specialties)
     CASE
-        WHEN icd10_code LIKE 'E1%'                              THEN 'Endocrine & Metabolic'
-        WHEN icd10_code LIKE 'I%'                               THEN 'Cardiovascular'
-        WHEN icd10_code LIKE 'N1%'                              THEN 'Renal & Urological'
-        WHEN icd10_code LIKE 'J%'                               THEN 'Respiratory'
-        WHEN icd10_code LIKE 'G%' OR icd10_code LIKE 'F%'      THEN 'Neurological & Mental Health'
-        WHEN icd10_code LIKE 'M%'                               THEN 'Musculoskeletal'
-        WHEN icd10_code LIKE 'C%'                               THEN 'Oncology'
-        ELSE 'Other'
+        WHEN icd10_code LIKE 'G47%' OR icd10_code LIKE 'J%'       THEN 'Respiratory & Sleep'
+        WHEN icd10_code LIKE 'I%'                                 THEN 'Cardiovascular'
+        WHEN icd10_code LIKE 'G%' OR icd10_code LIKE 'F%'         THEN 'Neurological & Mental Health'
+        WHEN icd10_code LIKE 'E%'                                 THEN 'Endocrine & Metabolic'
+        WHEN icd10_code LIKE 'M%'                                 THEN 'Musculoskeletal'
+        WHEN icd10_code LIKE 'N%'                                 THEN 'Renal & Urological'
+        WHEN icd10_code LIKE 'C%'                                 THEN 'Oncology'
+        ELSE 'General Medicine'
     END                                             AS body_system
 FROM uniform_resource_ref_icd10_diagnosis
 WHERE icd10_code IS NOT NULL;
 
+
 CREATE INDEX idx_dim_diag_code   ON dim_diagnosis(icd10_code);
 CREATE INDEX idx_dim_diag_state  ON dim_diagnosis(disease_state);
 CREATE INDEX idx_dim_diag_system ON dim_diagnosis(body_system);
+
 
 
 -- -----------------------------------------------------------------------------
@@ -154,50 +248,104 @@ CREATE INDEX idx_dim_diag_system ON dim_diagnosis(body_system);
 -- Normalizes CMS raw specialty strings to canonical names + domain grouping.
 -- The specialty_domain column is the bridge to disease body_system in scoring.
 -- -----------------------------------------------------------------------------
+
+-- CREATE TABLE dim_specialty AS
+-- SELECT DISTINCT
+--     Rndrng_Prvdr_Type                                           AS raw_specialty_name,
+--     CASE
+--         WHEN Rndrng_Prvdr_Type LIKE '%Internal Medicine%'       THEN 'Internal Medicine'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Family Practice%'
+--           OR Rndrng_Prvdr_Type LIKE '%Family Medicine%'         THEN 'Family Medicine'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Cardiology%'              THEN 'Cardiology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Nephrology%'              THEN 'Nephrology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Endocrinology%'           THEN 'Endocrinology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Pulmonology%'
+--           OR Rndrng_Prvdr_Type LIKE '%Pulmonary%'               THEN 'Pulmonology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Oncology%'
+--           OR Rndrng_Prvdr_Type LIKE '%Hematology%'              THEN 'Oncology / Hematology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Neurology%'               THEN 'Neurology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Orthopedic%'              THEN 'Orthopedic Surgery'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Psychiatry%'
+--           OR Rndrng_Prvdr_Type LIKE '%Psychology%'              THEN 'Psychiatry / Psychology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Ophthalmology%'           THEN 'Ophthalmology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Urology%'                 THEN 'Urology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Gastroenterology%'        THEN 'Gastroenterology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Nurse Practitioner%'      THEN 'Nurse Practitioner'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Physician Assistant%'     THEN 'Physician Assistant'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Physical Therapy%'        THEN 'Physical Therapy'
+--         ELSE Rndrng_Prvdr_Type
+--     END                                                         AS specialty_name,
+--     CASE
+--         WHEN Rndrng_Prvdr_Type LIKE '%Cardiology%'              THEN 'Cardiovascular'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Nephrology%'              THEN 'Renal & Urological'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Endocrinology%'           THEN 'Endocrine & Metabolic'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Pulmonology%'
+--           OR Rndrng_Prvdr_Type LIKE '%Pulmonary%'               THEN 'Respiratory'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Oncology%'
+--           OR Rndrng_Prvdr_Type LIKE '%Hematology%'              THEN 'Oncology'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Neurology%'
+--           OR Rndrng_Prvdr_Type LIKE '%Psychiatry%'              THEN 'Neurological & Mental Health'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Orthopedic%'              THEN 'Musculoskeletal'
+--         WHEN Rndrng_Prvdr_Type LIKE '%Internal Medicine%'
+--           OR Rndrng_Prvdr_Type LIKE '%Family%'                  THEN 'Primary Care'
+--         ELSE 'General / Other'
+--     END                                                         AS specialty_domain
+-- FROM uniform_resource_cms_provider
+-- WHERE Rndrng_Prvdr_Type IS NOT NULL;
+
+
 DROP TABLE IF EXISTS dim_specialty;
 CREATE TABLE dim_specialty AS
 SELECT DISTINCT
     Rndrng_Prvdr_Type                                           AS raw_specialty_name,
+    -- Canonical Specialty Name
     CASE
         WHEN Rndrng_Prvdr_Type LIKE '%Internal Medicine%'       THEN 'Internal Medicine'
         WHEN Rndrng_Prvdr_Type LIKE '%Family Practice%'
           OR Rndrng_Prvdr_Type LIKE '%Family Medicine%'         THEN 'Family Medicine'
-        WHEN Rndrng_Prvdr_Type LIKE '%Cardiology%'              THEN 'Cardiology'
-        WHEN Rndrng_Prvdr_Type LIKE '%Nephrology%'              THEN 'Nephrology'
-        WHEN Rndrng_Prvdr_Type LIKE '%Endocrinology%'           THEN 'Endocrinology'
+        WHEN Rndrng_Prvdr_Type LIKE '%Cardiology%'               THEN 'Cardiology'
+        WHEN Rndrng_Prvdr_Type LIKE '%Nephrology%'               THEN 'Nephrology'
+        WHEN Rndrng_Prvdr_Type LIKE '%Endocrinology%'            THEN 'Endocrinology'
         WHEN Rndrng_Prvdr_Type LIKE '%Pulmonology%'
           OR Rndrng_Prvdr_Type LIKE '%Pulmonary%'               THEN 'Pulmonology'
         WHEN Rndrng_Prvdr_Type LIKE '%Oncology%'
-          OR Rndrng_Prvdr_Type LIKE '%Hematology%'              THEN 'Oncology / Hematology'
+          OR Rndrng_Prvdr_Type LIKE '%Hematology%'               THEN 'Oncology / Hematology'
         WHEN Rndrng_Prvdr_Type LIKE '%Neurology%'               THEN 'Neurology'
-        WHEN Rndrng_Prvdr_Type LIKE '%Orthopedic%'              THEN 'Orthopedic Surgery'
+        WHEN Rndrng_Prvdr_Type LIKE '%Orthopedic%'               THEN 'Orthopedic Surgery'
         WHEN Rndrng_Prvdr_Type LIKE '%Psychiatry%'
-          OR Rndrng_Prvdr_Type LIKE '%Psychology%'              THEN 'Psychiatry / Psychology'
+          OR Rndrng_Prvdr_Type LIKE '%Psychology%'               THEN 'Psychiatry / Psychology'
         WHEN Rndrng_Prvdr_Type LIKE '%Ophthalmology%'           THEN 'Ophthalmology'
         WHEN Rndrng_Prvdr_Type LIKE '%Urology%'                 THEN 'Urology'
         WHEN Rndrng_Prvdr_Type LIKE '%Gastroenterology%'        THEN 'Gastroenterology'
-        WHEN Rndrng_Prvdr_Type LIKE '%Nurse Practitioner%'      THEN 'Nurse Practitioner'
+        WHEN Rndrng_Prvdr_Type LIKE '%Dermatology%'             THEN 'Dermatology'
+        WHEN Rndrng_Prvdr_Type LIKE '%Nurse Practitioner%'       THEN 'Nurse Practitioner'
         WHEN Rndrng_Prvdr_Type LIKE '%Physician Assistant%'     THEN 'Physician Assistant'
-        WHEN Rndrng_Prvdr_Type LIKE '%Physical Therapy%'        THEN 'Physical Therapy'
+        WHEN Rndrng_Prvdr_Type LIKE '%Physical Therapy%'         THEN 'Physical Therapy'
         ELSE Rndrng_Prvdr_Type
     END                                                         AS specialty_name,
+    
+    -- DOMAIN GROUPING (Must match dim_diagnosis.body_system exactly)
     CASE
-        WHEN Rndrng_Prvdr_Type LIKE '%Cardiology%'              THEN 'Cardiovascular'
-        WHEN Rndrng_Prvdr_Type LIKE '%Nephrology%'              THEN 'Renal & Urological'
-        WHEN Rndrng_Prvdr_Type LIKE '%Endocrinology%'           THEN 'Endocrine & Metabolic'
-        WHEN Rndrng_Prvdr_Type LIKE '%Pulmonology%'
-          OR Rndrng_Prvdr_Type LIKE '%Pulmonary%'               THEN 'Respiratory'
+        WHEN Rndrng_Prvdr_Type LIKE '%Cardiology%'               THEN 'Cardiovascular'
+        WHEN Rndrng_Prvdr_Type LIKE '%Nephrology%'               THEN 'Renal & Urological'
+        WHEN Rndrng_Prvdr_Type LIKE '%Endocrinology%'            THEN 'Endocrine & Metabolic'
+        -- CRITICAL: Match for Sleep Apnea Pilot
+        WHEN Rndrng_Prvdr_Type LIKE '%Pulmon%'                  THEN 'Respiratory & Sleep'
         WHEN Rndrng_Prvdr_Type LIKE '%Oncology%'
-          OR Rndrng_Prvdr_Type LIKE '%Hematology%'              THEN 'Oncology'
+          OR Rndrng_Prvdr_Type LIKE '%Hematology%'               THEN 'Oncology'
         WHEN Rndrng_Prvdr_Type LIKE '%Neurology%'
-          OR Rndrng_Prvdr_Type LIKE '%Psychiatry%'              THEN 'Neurological & Mental Health'
-        WHEN Rndrng_Prvdr_Type LIKE '%Orthopedic%'              THEN 'Musculoskeletal'
+          OR Rndrng_Prvdr_Type LIKE '%Psych%'                    THEN 'Neurological & Mental Health'
+        WHEN Rndrng_Prvdr_Type LIKE '%Orthopedic%'               THEN 'Musculoskeletal'
+        WHEN Rndrng_Prvdr_Type LIKE '%Gastro%'                  THEN 'Digestive'
+        WHEN Rndrng_Prvdr_Type LIKE '%Dermat%'                  THEN 'Dermatology'
+        WHEN Rndrng_Prvdr_Type LIKE '%Ophthalm%'                THEN 'Ophthalmology & Otology'
         WHEN Rndrng_Prvdr_Type LIKE '%Internal Medicine%'
           OR Rndrng_Prvdr_Type LIKE '%Family%'                  THEN 'Primary Care'
-        ELSE 'General / Other'
+        ELSE 'Other Clinical'
     END                                                         AS specialty_domain
 FROM uniform_resource_cms_provider
 WHERE Rndrng_Prvdr_Type IS NOT NULL;
+
 
 CREATE INDEX idx_dim_spec_raw    ON dim_specialty(raw_specialty_name);
 CREATE INDEX idx_dim_spec_name   ON dim_specialty(specialty_name);
@@ -249,7 +397,6 @@ CREATE INDEX idx_dim_geo_state ON dim_geography(state_abbr);
 DROP TABLE IF EXISTS fact_utilization;
 CREATE TABLE fact_utilization AS
 WITH base_geo AS (
-    -- 1. Get the raw volume from the table that definitely has HCPCS_Cd
     SELECT 
         HCPCS_Cd AS hcpcs_code,
         TRIM(UPPER(Rndrng_Prvdr_Geo_Cd)) AS state_abbr,
@@ -257,35 +404,80 @@ WITH base_geo AS (
         SUM(CAST(NULLIF(Tot_Benes, '') AS INTEGER)) AS total_beneficiaries,
         SUM(CAST(NULLIF(Tot_Srvcs, '') AS REAL)) AS total_services,
         SUM(CAST(NULLIF(Tot_Rndrng_Prvdrs, '') AS INTEGER)) AS total_rendering_providers,
-        SUM(CAST(NULLIF(Tot_Srvcs, '') AS REAL) * CAST(NULLIF(Avg_Mdcr_Pymt_Amt, '') AS REAL)) AS total_medicare_payment,
+        SUM(CAST(NULLIF(Tot_Srvcs, '') AS REAL) * CAST(NULLIF(Avg_Mdcr_Alowd_Amt, '') AS REAL)) AS total_allowed_amt,        
         SUM(
-        CAST(NULLIF(Tot_Srvcs, '') AS REAL) * CAST(NULLIF(Avg_Mdcr_Alowd_Amt, '') AS REAL)
-        ) AS total_allowed_amt    
+            CAST(NULLIF(Tot_Srvcs, '') AS REAL) * CAST(NULLIF(Avg_Mdcr_Pymt_Amt, '') AS REAL)
+        ) AS total_medicare_payment 
     FROM uniform_resource_cms_bygeography
-    -- Use UPPER to prevent case-sensitivity issues with 'State' vs 'STATE'
     WHERE UPPER(Rndrng_Prvdr_Geo_Lvl) = 'STATE'
     GROUP BY 1, 2, 3
 )
 SELECT
-    -- 2. Attribute a Specialty based on the HCPCS code range
+    -- 1. Specialty Attribution (Matches your dim_specialty logic)
     CASE 
         WHEN h.hcpcs_code BETWEEN '93000' AND '93999' THEN 'Cardiology'
+        WHEN h.hcpcs_code BETWEEN '94000' AND '94799' THEN 'Pulmonology' -- NEW: Specifically for Sleep/COPD
+        WHEN h.hcpcs_code BETWEEN '95800' AND '95811' THEN 'Sleep Medicine' -- NEW: Specifically for Sleep Apnea
         WHEN h.hcpcs_code BETWEEN '90935' AND '90999' THEN 'Nephrology'
-        WHEN h.hcpcs_code BETWEEN '99201' AND '99499' THEN 'Internal Medicine / Primary Care'
-        WHEN h.hcpcs_code BETWEEN '70010' AND '79999' THEN 'Radiology'
-        WHEN h.hcpcs_code BETWEEN '10000' AND '69999' THEN 'Surgical Specialties'
-        WHEN h.hcpcs_code LIKE 'J%' THEN 'Infusion / Oncology'
-        ELSE 'Other Specialties'
+        WHEN h.hcpcs_code BETWEEN '99201' AND '99499' THEN 'Internal Medicine'
+        ELSE 'Other Specialty'
     END AS specialty_name,
     
+    -- 2. THE BRIDGE COLUMN: This MUST match dim_diagnosis.body_system exactly
     CASE 
+        WHEN h.hcpcs_code BETWEEN '93000' AND '93999' THEN 'Cardiovascular'
+        WHEN h.hcpcs_code BETWEEN '94000' AND '94799' THEN 'Respiratory & Sleep'
+        WHEN h.hcpcs_code BETWEEN '95800' AND '95811' THEN 'Respiratory & Sleep'
+        WHEN h.hcpcs_code BETWEEN '90935' AND '90999' THEN 'Renal & Urological'
         WHEN h.hcpcs_code BETWEEN '99201' AND '99499' THEN 'Primary Care'
-        WHEN h.hcpcs_code BETWEEN '10000' AND '69999' THEN 'Surgery'
-        ELSE 'Specialty Care'
+        ELSE 'General Medicine'
     END AS specialty_domain,
     
     h.*
 FROM base_geo h;
+
+CREATE INDEX IF NOT EXISTS idx_fact_util_spec     ON fact_utilization(specialty_name);
+CREATE INDEX IF NOT EXISTS idx_fact_util_hcpcs    ON fact_utilization(hcpcs_code); 
+CREATE INDEX IF NOT EXISTS idx_fact_util_state    ON fact_utilization(state_abbr);
+CREATE INDEX IF NOT EXISTS idx_fact_util_domain   ON fact_utilization(specialty_domain);
+CREATE INDEX IF NOT EXISTS idx_fact_util_geo_spec ON fact_utilization(state_abbr, specialty_name);
+
+DROP TABLE IF EXISTS master_evidence_hub;
+
+CREATE TABLE master_evidence_hub AS
+SELECT 
+    d.disease_state,
+    d.body_system,
+    p.procedure_category,
+    p.procedure_signal,
+    f.specialty_domain AS specialty_name,
+    SUM(f.total_services) AS srvc_vol,
+    SUM(f.total_beneficiaries) AS bene_vol,
+    ROUND(CAST(SUM(f.total_services) AS FLOAT) / NULLIF(SUM(f.total_beneficiaries), 0), 2) AS interaction_density,
+    SUM(f.total_allowed_amt) AS total_spend
+FROM fact_utilization f
+-- Join against a UNIQUE list of procedures
+JOIN (
+    SELECT DISTINCT hcpcs_code, procedure_category, procedure_signal 
+    FROM dim_procedure
+) p ON f.hcpcs_code = p.hcpcs_code
+-- Join against a UNIQUE list of diagnoses
+JOIN (
+    SELECT DISTINCT body_system, disease_state 
+    FROM dim_diagnosis
+) d ON f.specialty_domain = d.body_system
+GROUP BY 1, 2, 3, 4, 5;
+
+
+-- 3. CRITICAL: Add indexes so your report queries are fast
+-- Indexing the Fact Table
+CREATE INDEX idx_fact_hcpcs ON fact_utilization(hcpcs_code);
+CREATE INDEX idx_fact_domain ON fact_utilization(specialty_domain);
+
+-- Indexing the Dimension Tables
+CREATE INDEX idx_dim_proc_hcpcs ON dim_procedure(hcpcs_code);
+
+
 
 -- DROP TABLE IF EXISTS fact_utilization;
 -- CREATE TABLE fact_utilization AS
@@ -312,12 +504,7 @@ FROM base_geo h;
 -- GROUP BY 1, 2, 3, 4, 5, 6;
 
 -- Now these indexes will work perfectly:
-CREATE INDEX IF NOT EXISTS idx_fact_util_spec     ON fact_utilization(specialty_name);
-CREATE INDEX IF NOT EXISTS idx_fact_util_hcpcs    ON fact_utilization(hcpcs_code); 
-CREATE INDEX IF NOT EXISTS idx_fact_util_state    ON fact_utilization(state_abbr);
-CREATE INDEX IF NOT EXISTS idx_fact_util_domain   ON fact_utilization(specialty_domain);
---CREATE INDEX IF NOT EXISTS idx_fact_util_place_cd ON fact_utilization(place_of_service_code);
-CREATE INDEX IF NOT EXISTS idx_fact_util_geo_spec ON fact_utilization(state_abbr, specialty_name);
+
 
 -- =============================================================================
 -- SECTION 2B: SPECIALTY MARKET DYNAMICS TABLE  [FROM ORIGINAL — PRESERVED]
@@ -358,6 +545,153 @@ JOIN global_hcpcs_totals g ON s.hcpcs_code = g.hcpcs_code;
 -- Corrected Index (using the column name we defined in the SELECT)
 CREATE INDEX IF NOT EXISTS idx_smd_spec  ON specialty_market_dynamics(specialty_name);
 CREATE INDEX IF NOT EXISTS idx_smd_hcpcs ON specialty_market_dynamics(hcpcs_code);
+
+-------------------------
+
+-- -----------------------------------------------------------------------------
+-- VIEW 6B: condition_monitoring_proxy
+-- Condition-level repeat-interaction proxy using ONLY monitoring-flagged HCPCS.
+-- Adds disease-specific relevance filters so conditions do not collapse to a
+-- single uniform value across the body-system bridge.
+-- -----------------------------------------------------------------------------
+DROP VIEW IF EXISTS condition_monitoring_proxy;
+CREATE VIEW condition_monitoring_proxy AS
+WITH disease_states AS (
+    SELECT DISTINCT disease_state, body_system
+    FROM dim_diagnosis
+    WHERE disease_state != 'General / Other'
+),
+monitoring_base AS (
+    SELECT
+        f.specialty_name,
+        f.specialty_domain,
+        f.hcpcs_code,
+        SUM(f.total_services)       AS total_services,
+        SUM(f.total_beneficiaries)  AS total_beneficiaries,
+        SUM(f.total_medicare_payment) AS total_spend
+    FROM fact_utilization f
+    JOIN dim_procedure p ON f.hcpcs_code = p.hcpcs_code
+    WHERE p.is_monitoring_flag = 1
+    GROUP BY 1, 2, 3
+),
+condition_monitoring_matches AS (
+    SELECT
+        d.disease_state,
+        d.body_system,
+        mb.specialty_name,
+        mb.specialty_domain,
+        mb.hcpcs_code,
+        COALESCE(dp.procedure_description, 'Unknown Procedure') AS procedure_description,
+        mb.total_services,
+        mb.total_beneficiaries,
+        mb.total_spend,
+        ROUND(mb.total_services * 1.0 / NULLIF(mb.total_beneficiaries, 0), 3) AS srvcs_per_beneficiary
+    FROM disease_states d
+    JOIN monitoring_base mb ON 1 = 1
+    LEFT JOIN dim_procedure dp ON mb.hcpcs_code = dp.hcpcs_code
+    WHERE (
+        -- Diabetes-focused monitoring
+        (
+            d.disease_state IN ('Type 1 Diabetes', 'Type 2 Diabetes', 'Diabetes - Other Specified')
+            AND mb.specialty_name IN ('Internal Medicine / Primary Care')
+            AND mb.hcpcs_code IN ('82947','82950','82962','83036','83037')
+        )
+        OR
+        -- Renal-focused monitoring
+        (
+            d.disease_state IN ('Chronic Kidney Disease', 'End-Stage Renal Disease (ESRD)')
+            AND mb.specialty_name IN ('Nephrology', 'Internal Medicine / Primary Care')
+            AND mb.hcpcs_code IN ('90935','90937','90945','90947','90999','G0491','G0492')
+        )
+        OR
+        -- Cardiovascular-focused monitoring
+        (
+            d.body_system = 'Cardiovascular'
+            AND mb.specialty_name IN ('Cardiology', 'Internal Medicine / Primary Care')
+            AND mb.hcpcs_code IN ('93000','93005','93010','93224','93225','93226','93227')
+        )
+        OR
+        -- Respiratory-focused monitoring
+        (
+            d.body_system = 'Respiratory'
+            AND mb.specialty_name IN ('Internal Medicine / Primary Care')
+            AND mb.hcpcs_code IN ('94010','94060','94070','94150','94250','94640','94660')
+        )
+        OR
+        -- For oncology and other chronic conditions, use office monitoring baseline,
+        -- plus oncology administration/monitoring where available.
+        (
+            d.body_system = 'Oncology'
+            AND mb.specialty_name IN ('Infusion / Oncology', 'Internal Medicine / Primary Care')
+            AND (
+                mb.hcpcs_code BETWEEN '99202' AND '99215'
+                OR mb.hcpcs_code LIKE 'J%'
+            )
+        )
+        OR
+        -- For neuro and musculoskeletal, keep repeat-visit office monitoring baseline.
+        (
+            d.body_system IN ('Neurological & Mental Health', 'Musculoskeletal')
+            AND mb.specialty_name IN ('Internal Medicine / Primary Care')
+            AND mb.hcpcs_code BETWEEN '99202' AND '99215'
+        )
+    )
+),
+condition_monitoring_agg AS (
+    SELECT
+        disease_state,
+        body_system,
+        COUNT(DISTINCT hcpcs_code)                                                 AS monitoring_hcpcs_count,
+        SUM(total_services)                                                        AS monitoring_services,
+        SUM(total_beneficiaries)                                                   AS monitoring_beneficiaries,
+        ROUND(SUM(total_services) * 1.0 / NULLIF(SUM(total_beneficiaries), 0), 3) AS monitoring_services_per_beneficiary,
+        SUM(total_spend)                                                           AS monitoring_total_spend,
+        ROUND(SUM(total_spend) * 1.0 / NULLIF(SUM(total_beneficiaries), 0), 2)    AS monitoring_spend_per_beneficiary,
+        SUM(CASE WHEN srvcs_per_beneficiary >= 4 THEN 1 ELSE 0 END)               AS high_frequency_hcpcs_count
+    FROM condition_monitoring_matches
+    GROUP BY disease_state, body_system
+)
+SELECT
+    d.disease_state,
+    d.body_system,
+    COALESCE(a.monitoring_hcpcs_count, 0)                                      AS monitoring_hcpcs_count,
+    COALESCE(a.monitoring_services, 0)                                         AS monitoring_services,
+    COALESCE(a.monitoring_beneficiaries, 0)                                    AS monitoring_beneficiaries,
+    COALESCE(a.monitoring_services_per_beneficiary, 0)                         AS monitoring_services_per_beneficiary,
+    COALESCE(a.monitoring_total_spend, 0)                                      AS monitoring_total_spend,
+    COALESCE(a.monitoring_spend_per_beneficiary, 0)                            AS monitoring_spend_per_beneficiary,
+    COALESCE(a.high_frequency_hcpcs_count, 0)                                  AS high_frequency_hcpcs_count,
+    CASE
+        WHEN COALESCE(a.monitoring_beneficiaries, 0) = 0 THEN NULL
+        ELSE RANK() OVER (
+        ORDER BY
+            COALESCE(a.monitoring_services_per_beneficiary, 0) DESC,
+            COALESCE(a.monitoring_total_spend, 0) DESC
+        )
+    END                                                                       AS interaction_rank
+FROM disease_states d
+LEFT JOIN condition_monitoring_agg a
+  ON d.disease_state = a.disease_state
+ AND d.body_system = a.body_system;
+
+DROP TABLE IF EXISTS condition_monitoring_proxy_table;
+CREATE TABLE condition_monitoring_proxy_table AS
+SELECT
+        disease_state,
+        body_system,
+        monitoring_hcpcs_count,
+        monitoring_services,
+        monitoring_beneficiaries,
+        monitoring_services_per_beneficiary,
+        monitoring_total_spend,
+        monitoring_spend_per_beneficiary,
+        high_frequency_hcpcs_count,
+        interaction_rank
+FROM condition_monitoring_proxy;
+
+CREATE INDEX IF NOT EXISTS idx_cmp_table_state ON condition_monitoring_proxy_table(disease_state);
+CREATE INDEX IF NOT EXISTS idx_cmp_table_rank  ON condition_monitoring_proxy_table(interaction_rank);
+
 
 
 -- =============================================================================
@@ -682,6 +1016,52 @@ SELECT
 FROM dim_diagnosis
 WHERE disease_state != 'General / Other'
 GROUP BY 1, 2;
+
+
+-- -----------------------------------------------------------------------------
+-- VIEW 13a: disease_procedure_bridge
+-- Makes the Disease → Procedure → Specialty relationship explicit and reusable.
+-- Links dim_diagnosis (disease_state, body_system) to fact_utilization
+-- (hcpcs_code, specialty_name, specialty_domain) via body_system ↔ specialty_domain.
+-- Consumed by opportunity_scoring_view instead of duplicating join logic there.
+-- -----------------------------------------------------------------------------
+DROP VIEW IF EXISTS disease_procedure_bridge;
+CREATE VIEW disease_procedure_bridge AS
+WITH mapping_logic AS (
+    SELECT 'Endocrine & Metabolic'       AS diag_sys, 'Endocrine & Metabolic'       AS spec_dom UNION ALL
+    SELECT 'Cardiovascular',                           'Cardiovascular'                          UNION ALL
+    SELECT 'Renal & Urological',                       'Renal & Urological'                      UNION ALL
+    SELECT 'Respiratory',                              'Respiratory'                             UNION ALL
+    SELECT 'Oncology',                                 'Oncology'                                UNION ALL
+    SELECT 'Neurological & Mental Health',             'Neurological & Mental Health'            UNION ALL
+    SELECT 'Musculoskeletal',                          'Musculoskeletal'
+)
+SELECT
+    d.disease_state,
+    d.body_system,
+    f.hcpcs_code,
+    p.procedure_description,
+    p.procedure_category,
+    f.specialty_name,
+    f.specialty_domain,
+    SUM(f.total_beneficiaries)  AS patient_volume,
+    SUM(f.total_services)       AS service_volume,
+    SUM(f.total_medicare_payment) AS total_medicare_payment,
+    ROUND(SUM(f.total_services) * 1.0 / NULLIF(SUM(f.total_beneficiaries), 0), 2) AS avg_srvcs_per_patient
+FROM (
+    SELECT DISTINCT disease_state, body_system
+    FROM dim_diagnosis
+    WHERE disease_state != 'General / Other'
+) d
+JOIN mapping_logic m ON d.body_system = m.diag_sys
+JOIN fact_utilization f ON (
+    f.specialty_domain = m.spec_dom
+    OR f.specialty_domain = 'Primary Care'
+)
+LEFT JOIN dim_procedure p ON f.hcpcs_code = p.hcpcs_code
+GROUP BY 1, 2, 3, 4, 5, 6, 7
+HAVING patient_volume >= 1;
+
 
 
 -- =============================================================================
