@@ -86,7 +86,15 @@ SELECT
     -- Keep your original binary flag for backward compatibility
     CASE 
         WHEN p.HCPCS BETWEEN '99202' AND '99215' THEN 1
-        WHEN p.HCPCS IN ('95810','95811','94660','93000') THEN 1
+        WHEN p.HCPCS IN (
+            '82947','82950','82962','83036','83037',
+            '90935','90937','90945','90947','90999',
+            '93000','93005','93010','93224','93225','93226','93227',
+            '93784','93788','93790',
+            '94010','94060','94660',
+            '95800','95801','95806','95810','95811',
+            'G0237','G0238','G0239','G0398','G0491','G0492'
+        ) THEN 1
         ELSE 0 
     END AS is_monitoring_flag
 FROM uniform_resource_ref_procedure_code p
@@ -445,28 +453,52 @@ CREATE INDEX IF NOT EXISTS idx_fact_util_geo_spec ON fact_utilization(state_abbr
 DROP TABLE IF EXISTS master_evidence_hub;
 
 CREATE TABLE master_evidence_hub AS
+WITH disease_states AS (
+    SELECT DISTINCT disease_state, body_system
+    FROM dim_diagnosis
+    WHERE disease_state != 'General / Other'
+),
+mapping_logic AS (
+    SELECT 'Endocrine & Metabolic'       AS diag_sys, 'Endocrine & Metabolic'       AS spec_dom UNION ALL
+    SELECT 'Cardiovascular',                           'Cardiovascular'                          UNION ALL
+    SELECT 'Renal & Urological',                       'Renal & Urological'                      UNION ALL
+    SELECT 'Respiratory & Sleep',                      'Respiratory & Sleep'                     UNION ALL
+    SELECT 'Oncology',                                 'Oncology'                                UNION ALL
+    SELECT 'Neurological & Mental Health',             'Neurological & Mental Health'            UNION ALL
+    SELECT 'Musculoskeletal',                          'Musculoskeletal'                         UNION ALL
+    SELECT 'General Medicine',                         'General Medicine'
+),
+procedure_lookup AS (
+    SELECT
+        hcpcs_code,
+        MAX(procedure_category) AS procedure_category,
+        MAX(procedure_signal) AS procedure_signal,
+        MAX(is_monitoring_flag) AS is_monitoring_flag
+    FROM dim_procedure
+    GROUP BY hcpcs_code
+)
 SELECT 
     d.disease_state,
     d.body_system,
     p.procedure_category,
     p.procedure_signal,
-    f.specialty_domain AS specialty_name,
+    f.specialty_name,
+    f.specialty_domain,
     SUM(f.total_services) AS srvc_vol,
     SUM(f.total_beneficiaries) AS bene_vol,
     ROUND(CAST(SUM(f.total_services) AS FLOAT) / NULLIF(SUM(f.total_beneficiaries), 0), 2) AS interaction_density,
-    SUM(f.total_allowed_amt) AS total_spend
+    SUM(f.total_allowed_amt) AS total_allowed_amt,
+    SUM(f.total_allowed_amt) AS total_spend,
+    SUM(f.total_medicare_payment) AS total_medicare_payment,
+    MAX(p.is_monitoring_flag) AS is_monitoring_flag
 FROM fact_utilization f
--- Join against a UNIQUE list of procedures
-JOIN (
-    SELECT DISTINCT hcpcs_code, procedure_category, procedure_signal 
-    FROM dim_procedure
-) p ON f.hcpcs_code = p.hcpcs_code
--- Join against a UNIQUE list of diagnoses
-JOIN (
-    SELECT DISTINCT body_system, disease_state 
-    FROM dim_diagnosis
-) d ON f.specialty_domain = d.body_system
-GROUP BY 1, 2, 3, 4, 5;
+JOIN procedure_lookup p ON f.hcpcs_code = p.hcpcs_code
+JOIN mapping_logic m ON (
+    f.specialty_domain = m.spec_dom
+    OR f.specialty_domain = 'Primary Care'
+)
+JOIN disease_states d ON d.body_system = m.diag_sys
+GROUP BY 1, 2, 3, 4, 5, 6;
 
 
 -- 3. CRITICAL: Add indexes so your report queries are fast
@@ -519,7 +551,8 @@ WITH specialty_hcpcs_totals AS (
     SELECT 
         specialty_name,
         hcpcs_code,
-        SUM(total_beneficiaries) AS specialty_hcpcs_benes -- Using benes as the volume metric
+        SUM(total_services) AS total_services,
+        SUM(total_beneficiaries) AS total_benes
     FROM fact_utilization
     GROUP BY 1, 2
 ),
@@ -527,6 +560,7 @@ global_hcpcs_totals AS (
     -- This table exists and contains the national totals
     SELECT 
         HCPCS_Cd AS hcpcs_code,
+        SUM(CAST(NULLIF(Tot_Srvcs, '') AS REAL)) AS global_services,
         SUM(CAST(NULLIF(Tot_Benes, '') AS INTEGER)) AS global_benes
     FROM uniform_resource_cms_bygeography
     WHERE UPPER(Rndrng_Prvdr_Geo_Lvl) = 'NATIONAL' 
@@ -535,10 +569,13 @@ global_hcpcs_totals AS (
 SELECT 
     s.specialty_name,
     s.hcpcs_code,
-    s.specialty_hcpcs_benes,
+    s.total_services,
+    s.total_benes,
+    g.global_services,
     g.global_benes,
-    -- Dominance: What % of the national patient base for this code belongs to this specialty?
-    ROUND(CAST(s.specialty_hcpcs_benes AS REAL) / NULLIF(g.global_benes, 0), 4) AS specialty_dominance_ratio
+    -- Dominance should use services, not beneficiaries, because beneficiary counts
+    -- are not additive across place-of-service rollups in CMS geography data.
+    ROUND(CAST(s.total_services AS REAL) / NULLIF(g.global_services, 0), 4) AS specialty_dominance_ratio
 FROM specialty_hcpcs_totals s
 JOIN global_hcpcs_totals g ON s.hcpcs_code = g.hcpcs_code;
 
@@ -561,6 +598,20 @@ WITH disease_states AS (
     FROM dim_diagnosis
     WHERE disease_state != 'General / Other'
 ),
+procedure_flags AS (
+    SELECT
+        hcpcs_code,
+        MAX(is_monitoring_flag) AS is_monitoring_flag
+    FROM dim_procedure
+    GROUP BY hcpcs_code
+),
+procedure_lookup AS (
+    SELECT
+        hcpcs_code,
+        MAX(procedure_description) AS procedure_description
+    FROM dim_procedure
+    GROUP BY hcpcs_code
+),
 monitoring_base AS (
     SELECT
         f.specialty_name,
@@ -568,9 +619,9 @@ monitoring_base AS (
         f.hcpcs_code,
         SUM(f.total_services)       AS total_services,
         SUM(f.total_beneficiaries)  AS total_beneficiaries,
-        SUM(f.total_medicare_payment) AS total_spend
+        SUM(f.total_allowed_amt) AS total_spend
     FROM fact_utilization f
-    JOIN dim_procedure p ON f.hcpcs_code = p.hcpcs_code
+    JOIN procedure_flags p ON f.hcpcs_code = p.hcpcs_code
     WHERE p.is_monitoring_flag = 1
     GROUP BY 1, 2, 3
 ),
@@ -588,52 +639,48 @@ condition_monitoring_matches AS (
         ROUND(mb.total_services * 1.0 / NULLIF(mb.total_beneficiaries, 0), 3) AS srvcs_per_beneficiary
     FROM disease_states d
     JOIN monitoring_base mb ON 1 = 1
-    LEFT JOIN dim_procedure dp ON mb.hcpcs_code = dp.hcpcs_code
+    LEFT JOIN procedure_lookup dp ON mb.hcpcs_code = dp.hcpcs_code
     WHERE (
         -- Diabetes-focused monitoring
         (
-            d.disease_state IN ('Type 1 Diabetes', 'Type 2 Diabetes', 'Diabetes - Other Specified')
-            AND mb.specialty_name IN ('Internal Medicine / Primary Care')
-            AND mb.hcpcs_code IN ('82947','82950','82962','83036','83037')
+            d.disease_state = 'Type 2 Diabetes'
+            AND mb.specialty_name = 'Internal Medicine'
+            AND mb.hcpcs_code IN ('82947','82950','82962','83036','83037','99211','99212','99213','99214','99215')
         )
         OR
         -- Renal-focused monitoring
         (
-            d.disease_state IN ('Chronic Kidney Disease', 'End-Stage Renal Disease (ESRD)')
-            AND mb.specialty_name IN ('Nephrology', 'Internal Medicine / Primary Care')
-            AND mb.hcpcs_code IN ('90935','90937','90945','90947','90999','G0491','G0492')
+            d.disease_state = 'Chronic Kidney Disease'
+            AND mb.specialty_name IN ('Nephrology', 'Internal Medicine')
+            AND mb.hcpcs_code IN ('90935','90937','90945','90947','90999','G0491','G0492','99211','99212','99213','99214','99215')
         )
         OR
         -- Cardiovascular-focused monitoring
         (
             d.body_system = 'Cardiovascular'
-            AND mb.specialty_name IN ('Cardiology', 'Internal Medicine / Primary Care')
-            AND mb.hcpcs_code IN ('93000','93005','93010','93224','93225','93226','93227')
+            AND mb.specialty_name IN ('Cardiology', 'Internal Medicine')
+            AND mb.hcpcs_code IN ('93000','93005','93010','93224','93225','93226','93227','93784','93788','93790')
         )
         OR
         -- Respiratory-focused monitoring
         (
-            d.body_system = 'Respiratory'
-            AND mb.specialty_name IN ('Internal Medicine / Primary Care')
-            AND mb.hcpcs_code IN ('94010','94060','94070','94150','94250','94640','94660')
+            d.body_system = 'Respiratory & Sleep'
+            AND mb.specialty_name IN ('Pulmonology', 'Sleep Medicine', 'Internal Medicine')
+            AND mb.hcpcs_code IN ('94010','94060','94660','95800','95801','95806','95810','95811','G0398')
         )
         OR
-        -- For oncology and other chronic conditions, use office monitoring baseline,
-        -- plus oncology administration/monitoring where available.
+        -- For oncology and other chronic conditions, use office-visit monitoring baseline.
         (
             d.body_system = 'Oncology'
-            AND mb.specialty_name IN ('Infusion / Oncology', 'Internal Medicine / Primary Care')
-            AND (
-                mb.hcpcs_code BETWEEN '99202' AND '99215'
-                OR mb.hcpcs_code LIKE 'J%'
-            )
+            AND mb.specialty_name IN ('Internal Medicine', 'Other Specialty')
+            AND mb.hcpcs_code BETWEEN '99211' AND '99215'
         )
         OR
-        -- For neuro and musculoskeletal, keep repeat-visit office monitoring baseline.
+        -- For neuro / musculoskeletal / general medicine, keep repeat-visit office baseline.
         (
-            d.body_system IN ('Neurological & Mental Health', 'Musculoskeletal')
-            AND mb.specialty_name IN ('Internal Medicine / Primary Care')
-            AND mb.hcpcs_code BETWEEN '99202' AND '99215'
+            d.body_system IN ('Neurological & Mental Health', 'Musculoskeletal', 'General Medicine')
+            AND mb.specialty_name IN ('Internal Medicine', 'Other Specialty')
+            AND mb.hcpcs_code BETWEEN '99211' AND '99215'
         )
     )
 ),
@@ -799,18 +846,24 @@ SELECT
     smd.specialty_name,
     smd.hcpcs_code,
     COALESCE(dp.procedure_description, 'Unknown Procedure') AS procedure_description,
-    total_services,
-    total_benes,
-    ROUND(specialty_dominance_ratio * 100, 1)                           AS pct_of_national_volume,
-    ROUND(CAST(total_services AS REAL) * specialty_dominance_ratio, 0)  AS weighted_dominance_score,
+    smd.total_services,
+    smd.total_benes,
+    ROUND(smd.specialty_dominance_ratio * 100, 1)                       AS pct_of_national_volume,
+    ROUND(CAST(smd.total_services AS REAL) * smd.specialty_dominance_ratio, 0)
+                                                                        AS weighted_dominance_score,
     RANK() OVER (
-        PARTITION BY specialty_name
-        ORDER BY specialty_dominance_ratio DESC
+        PARTITION BY smd.specialty_name
+        ORDER BY smd.specialty_dominance_ratio DESC
     )                                                                   AS dominance_rank
-FROM specialty_market_dynamics
-LEFT JOIN dim_procedure dp 
-    ON smd.hcpcs_code = dp.hcpcs_code
-WHERE total_benes > 500; -- Order By removed for View compatibility
+FROM specialty_market_dynamics smd
+LEFT JOIN (
+    SELECT
+        hcpcs_code,
+        MAX(procedure_description) AS procedure_description
+    FROM dim_procedure
+    GROUP BY hcpcs_code
+) dp ON smd.hcpcs_code = dp.hcpcs_code
+WHERE smd.total_benes > 500; -- Order By removed for View compatibility
 
 
 -- VIEW 5: chronic_interaction_density
@@ -823,27 +876,83 @@ WITH base_metrics AS (
         dp.procedure_description, -- Now this column exists!
         dp.procedure_category,
         dp.is_monitoring_flag,
-        s.specialty_hcpcs_benes AS total_benes,
-        -- Note: If you have a services column in 's', use it here. 
-        -- Otherwise, we assume 1:1 for this specific calculation example.
-        ROUND(CAST(s.specialty_hcpcs_benes AS REAL) / NULLIF(s.specialty_hcpcs_benes, 0), 2) AS srv_per_pat
+        s.total_services,
+        s.total_benes,
+        ROUND(CAST(s.total_services AS REAL) / NULLIF(s.total_benes, 0), 2) AS services_per_patient
     FROM specialty_market_dynamics s
-    LEFT JOIN dim_procedure dp ON s.hcpcs_code = dp.hcpcs_code
-    WHERE s.specialty_hcpcs_benes > 500
+    LEFT JOIN (
+        SELECT
+            hcpcs_code,
+            MAX(procedure_description) AS procedure_description,
+            MAX(procedure_category) AS procedure_category,
+            MAX(is_monitoring_flag) AS is_monitoring_flag
+        FROM dim_procedure
+        GROUP BY hcpcs_code
+    ) dp ON s.hcpcs_code = dp.hcpcs_code
+    WHERE s.total_benes > 500
 )
 SELECT 
     *,
     CASE
-        WHEN srv_per_pat >= 12 THEN 'High (12+ sessions/yr)'
-        WHEN srv_per_pat >= 4  THEN 'Moderate (4-11 sessions/yr)'
+        WHEN services_per_patient >= 12 THEN 'High (12+ sessions/yr)'
+        WHEN services_per_patient >= 4  THEN 'Moderate (4-11 sessions/yr)'
         ELSE 'Low (< 4 sessions/yr)'
     END AS interaction_tier
 FROM base_metrics;
+
+-- -----------------------------------------------------------------------------
+-- VIEW 5B: relevant_procedure_frequency
+-- Direct answer for: how often do the relevant CPT/HCPCS procedures appear in
+-- Medicare utilization? Uses total services + beneficiaries + frequency ratio.
+-- -----------------------------------------------------------------------------
+DROP VIEW IF EXISTS relevant_procedure_frequency;
+CREATE VIEW relevant_procedure_frequency AS
+WITH procedure_lookup AS (
+    SELECT
+        hcpcs_code,
+        MAX(procedure_description) AS procedure_description,
+        MAX(procedure_category) AS procedure_category,
+        MAX(procedure_signal) AS procedure_signal,
+        MAX(is_monitoring_flag) AS is_monitoring_flag
+    FROM dim_procedure
+    GROUP BY hcpcs_code
+),
+medicare_totals AS (
+    SELECT SUM(total_services) AS all_medicare_services
+    FROM fact_utilization
+)
+SELECT
+    f.hcpcs_code,
+    COALESCE(pl.procedure_description, 'Unknown Procedure')             AS procedure_description,
+    COALESCE(pl.procedure_category, 'Unclassified')                     AS procedure_category,
+    COALESCE(pl.procedure_signal, 'Standard Care')                      AS procedure_signal,
+    SUM(f.total_services)                                               AS total_services,
+    SUM(f.total_beneficiaries)                                          AS total_beneficiaries,
+    COUNT(DISTINCT f.state_abbr)                                        AS states_present,
+    ROUND(SUM(f.total_services) * 1.0 / NULLIF(SUM(f.total_beneficiaries), 0), 2)
+                                                                        AS services_per_beneficiary,
+    ROUND(SUM(f.total_medicare_payment), 2)                             AS total_medicare_payment,
+    ROUND(
+        100.0 * SUM(f.total_services)
+        / NULLIF((SELECT all_medicare_services FROM medicare_totals), 0)
+    , 4)                                                                AS pct_of_all_medicare_services
+FROM fact_utilization f
+JOIN procedure_lookup pl ON f.hcpcs_code = pl.hcpcs_code
+WHERE pl.is_monitoring_flag = 1
+   OR pl.procedure_signal != 'Standard Care'
+GROUP BY 1, 2, 3, 4;
 
 
 -- VIEW 6: monitoring_procedure_intensity
 DROP VIEW IF EXISTS monitoring_procedure_intensity;
 CREATE VIEW monitoring_procedure_intensity AS
+WITH procedure_flags AS (
+    SELECT
+        hcpcs_code,
+        MAX(is_monitoring_flag) AS is_monitoring_flag
+    FROM dim_procedure
+    GROUP BY hcpcs_code
+)
 SELECT
     f.specialty_name,
     f.specialty_domain,
@@ -858,7 +967,7 @@ SELECT
     SUM(CASE WHEN dp.is_monitoring_flag = 1 THEN f.total_medicare_payment ELSE 0 END) AS monitoring_spend,
     SUM(f.total_medicare_payment) AS total_spend
 FROM fact_utilization f
-LEFT JOIN dim_procedure dp ON f.hcpcs_code = dp.hcpcs_code
+LEFT JOIN procedure_flags dp ON f.hcpcs_code = dp.hcpcs_code
 GROUP BY f.specialty_name, f.specialty_domain
 HAVING total_volume > 1000;
 
@@ -1031,10 +1140,21 @@ WITH mapping_logic AS (
     SELECT 'Endocrine & Metabolic'       AS diag_sys, 'Endocrine & Metabolic'       AS spec_dom UNION ALL
     SELECT 'Cardiovascular',                           'Cardiovascular'                          UNION ALL
     SELECT 'Renal & Urological',                       'Renal & Urological'                      UNION ALL
-    SELECT 'Respiratory',                              'Respiratory'                             UNION ALL
+    SELECT 'Respiratory & Sleep',                      'Respiratory & Sleep'                     UNION ALL
     SELECT 'Oncology',                                 'Oncology'                                UNION ALL
     SELECT 'Neurological & Mental Health',             'Neurological & Mental Health'            UNION ALL
-    SELECT 'Musculoskeletal',                          'Musculoskeletal'
+    SELECT 'Musculoskeletal',                          'Musculoskeletal'                         UNION ALL
+    SELECT 'General Medicine',                         'General Medicine'
+),
+procedure_lookup AS (
+    SELECT
+        hcpcs_code,
+        MAX(procedure_description) AS procedure_description,
+        MAX(procedure_category) AS procedure_category,
+        MAX(procedure_signal) AS procedure_signal,
+        MAX(is_monitoring_flag) AS is_monitoring_flag
+    FROM dim_procedure
+    GROUP BY hcpcs_code
 )
 SELECT
     d.disease_state,
@@ -1042,10 +1162,13 @@ SELECT
     f.hcpcs_code,
     p.procedure_description,
     p.procedure_category,
+    p.procedure_signal,
+    COALESCE(p.is_monitoring_flag, 0) AS is_monitoring_flag,
     f.specialty_name,
     f.specialty_domain,
     SUM(f.total_beneficiaries)  AS patient_volume,
     SUM(f.total_services)       AS service_volume,
+    SUM(f.total_allowed_amt) AS total_allowed_amt,
     SUM(f.total_medicare_payment) AS total_medicare_payment,
     ROUND(SUM(f.total_services) * 1.0 / NULLIF(SUM(f.total_beneficiaries), 0), 2) AS avg_srvcs_per_patient
 FROM (
@@ -1058,8 +1181,8 @@ JOIN fact_utilization f ON (
     f.specialty_domain = m.spec_dom
     OR f.specialty_domain = 'Primary Care'
 )
-LEFT JOIN dim_procedure p ON f.hcpcs_code = p.hcpcs_code
-GROUP BY 1, 2, 3, 4, 5, 6, 7
+LEFT JOIN procedure_lookup p ON f.hcpcs_code = p.hcpcs_code
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 HAVING patient_volume >= 1;
 
 
@@ -1078,38 +1201,23 @@ HAVING patient_volume >= 1;
 -- -----------------------------------------------------------------------------
 DROP VIEW IF EXISTS opportunity_scoring_view;
 CREATE VIEW opportunity_scoring_view AS
-WITH mapping_logic AS (
-    -- This CTE forces a perfect match between Disease System and Specialty Domain
-    SELECT 'Endocrine & Metabolic' AS diag_sys, 'Endocrine & Metabolic' AS spec_dom UNION ALL
-    SELECT 'Cardiovascular', 'Cardiovascular' UNION ALL
-    SELECT 'Renal & Urological', 'Renal & Urological' UNION ALL
-    SELECT 'Respiratory', 'Respiratory' UNION ALL
-    SELECT 'Oncology', 'Oncology' UNION ALL
-    SELECT 'Neurological & Mental Health', 'Neurological & Mental Health' UNION ALL
-    SELECT 'Musculoskeletal', 'Musculoskeletal'
-),
-disease_specialty_bridge AS (
+WITH disease_specialty_bridge AS (
     SELECT
-        d.disease_state,
-        d.body_system,
-        f.specialty_name,
-        f.specialty_domain,
-        SUM(f.total_beneficiaries) AS patient_volume,
-        SUM(f.total_services) AS service_volume,
-        SUM(f.total_medicare_payment) AS total_spend,
-        ROUND(SUM(f.total_services) * 1.0 / NULLIF(SUM(f.total_beneficiaries),0), 2) AS avg_srvcs_per_patient,
+        dpb.disease_state,
+        dpb.body_system,
+        dpb.specialty_name,
+        dpb.specialty_domain,
+        SUM(dpb.patient_volume) AS patient_volume,
+        SUM(dpb.service_volume) AS service_volume,
+        SUM(dpb.total_allowed_amt) AS total_allowed_amt,
+        SUM(dpb.total_medicare_payment) AS total_medicare_payment,
+        ROUND(SUM(dpb.service_volume) * 1.0 / NULLIF(SUM(dpb.patient_volume),0), 2) AS avg_srvcs_per_patient,
         AVG(COALESCE(smd.specialty_dominance_ratio, 0)) AS avg_dominance_ratio
-    FROM (SELECT DISTINCT disease_state, body_system FROM dim_diagnosis WHERE disease_state != 'General / Other') d
-    JOIN mapping_logic m ON d.body_system = m.diag_sys
-    JOIN fact_utilization f ON (
-        f.specialty_domain = m.spec_dom 
-        OR f.specialty_domain = 'Primary Care'
-    )
+    FROM disease_procedure_bridge dpb
     LEFT JOIN specialty_market_dynamics smd 
-      ON f.specialty_name = smd.specialty_name 
-      AND f.hcpcs_code = smd.hcpcs_code
+      ON dpb.specialty_name = smd.specialty_name 
+      AND dpb.hcpcs_code = smd.hcpcs_code
     GROUP BY 1, 2, 3, 4
-    -- Lowered the threshold to 1 for debugging; change back to 100 later
     HAVING patient_volume >= 1
 ),
 percentile_ranks AS (
@@ -1117,7 +1225,7 @@ percentile_ranks AS (
         *,
         NTILE(100) OVER (ORDER BY patient_volume) AS vol_percentile,
         NTILE(100) OVER (ORDER BY avg_srvcs_per_patient) AS intensity_percentile,
-        NTILE(100) OVER (ORDER BY total_spend) AS econ_percentile,
+        NTILE(100) OVER (ORDER BY total_allowed_amt) AS econ_percentile,
         ROUND(avg_dominance_ratio * 10.0, 1) AS dominance_bonus
     FROM disease_specialty_bridge
 ),
@@ -1139,7 +1247,8 @@ SELECT
     patient_volume,
     service_volume,
     avg_srvcs_per_patient,
-    ROUND(total_spend / 1000000.0, 2) AS total_spend_millions,
+    ROUND(total_allowed_amt / 1000000.0, 2) AS total_allowed_spend_millions,
+    ROUND(total_medicare_payment / 1000000.0, 2) AS total_medicare_payment_millions,
     vol_percentile AS volume_score,
     intensity_percentile AS intensity_score,
     econ_percentile AS economics_score,
@@ -1194,10 +1303,10 @@ FROM final_calculation;
 
 -- F. Final Tier 1 opportunities for Manos / CCIQ
 -- SELECT disease_state, specialty_name, composite_opportunity_score, opportunity_tier,
---        patient_volume, avg_srvcs_per_patient, total_spend_millions,
+--        patient_volume, avg_srvcs_per_patient, total_allowed_spend_millions,
 --        market_concentration_pct
 -- FROM opportunity_scoring_view
--- WHERE opportunity_tier = 'Tier 1 — High Opportunity'
+-- WHERE opportunity_tier = 'Tier 1 — High'
 -- ORDER BY composite_opportunity_score DESC;
 
 -- G. State geo-targeting for Nephrology (dialysis markets)
@@ -1213,6 +1322,31 @@ FROM final_calculation;
 -- FROM part_b_drug_intensity
 -- GROUP BY specialty_name
 -- ORDER BY total_drug_spend DESC LIMIT 15;
+
+-- J. Relevant CPT/HCPCS procedures by Medicare frequency
+-- SELECT hcpcs_code, procedure_description, procedure_signal,
+--        total_services, total_beneficiaries, services_per_beneficiary,
+--        pct_of_all_medicare_services
+-- FROM relevant_procedure_frequency
+-- ORDER BY total_services DESC, services_per_beneficiary DESC LIMIT 25;
+
+-- K. Condition proxy summary: likely specialties, repeat interaction, allowed spend
+-- SELECT disease_state, specialty_name, specialty_domain,
+--        SUM(patient_volume) AS patient_volume_proxy,
+--        SUM(service_volume) AS service_volume,
+--        ROUND(SUM(service_volume) * 1.0 / NULLIF(SUM(patient_volume), 0), 2) AS avg_srvcs_per_patient,
+--        ROUND(SUM(total_allowed_amt) / 1e6, 2) AS total_allowed_spend_millions
+-- FROM disease_procedure_bridge
+-- WHERE disease_state = 'COPD'
+-- GROUP BY disease_state, specialty_name, specialty_domain
+-- ORDER BY total_allowed_spend_millions DESC;
+
+-- L. Condition monitoring detail: high-frequency diagnostic / monitoring procedures
+-- SELECT disease_state, hcpcs_code, procedure_description, specialty_name,
+--        service_volume, avg_srvcs_per_patient, total_allowed_amt
+-- FROM disease_procedure_bridge
+-- WHERE disease_state = 'COPD' AND is_monitoring_flag = 1
+-- ORDER BY service_volume DESC, avg_srvcs_per_patient DESC LIMIT 25;
 
 -- I. Office-dominant specialties — ambulatory ownership signal
 -- SELECT specialty_name, office_pct,
