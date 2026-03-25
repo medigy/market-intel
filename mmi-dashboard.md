@@ -46,6 +46,10 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
        '/' AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+     [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+     [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
        '{"link":"/","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
@@ -62,6 +66,24 @@ SELECT 'shell' AS component,
 
 ```sql index.sql { route: { caption: "Home" } }
 -- @route.description "Medicare Market Intelligence — Landing Page"
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 -- HERO
 SELECT 'hero' AS component,
@@ -168,6 +190,24 @@ SELECT
 ```sql mmi/executive-dashboard.sql { route: { caption: "Executive Dashboard" } }
 -- @route.description "Top-line Medicare market KPIs: spend, volume, and intensity by specialty"
 
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
 SELECT 'button' AS component, 'start' AS justify;
 SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
@@ -262,6 +302,24 @@ LIMIT 20;
 ```sql mmi/opportunity-scoring.sql { route: { caption: "Opportunity Scores" } }
 -- @route.description "Composite Tier 1/2/3 ranking of disease × specialty clusters"
 
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
 SELECT 'button' AS component, 'start' AS justify;
 SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
@@ -316,6 +374,24 @@ ORDER BY composite_opportunity_score DESC;
 ```sql mmi/specialty-explorer.sql { route: { caption: "Specialty Explorer" } }
 -- @route.description "Deep-dive into any specialty: top procedures, monitoring intensity, market dominance"
 
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
 -- KPIs and Deep Dive for Selected Specialty
 
 SELECT 'hero' AS component,
@@ -369,6 +445,24 @@ ORDER BY total_services DESC LIMIT 20;
 
 ```sql mmi/disease-mapping.sql { route: { caption: "Disease Mapping" } }
 -- @route.description "ICD-10 cluster coverage, interaction density, and repeat-visit tiers"
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
 SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
@@ -447,6 +541,24 @@ LIMIT 25;
 ```sql mmi/geographic-markets.sql { route: { caption: "Geographic Markets" } }
 -- @route.description "State-level patient volume and GPCI-adjusted spend by specialty"
 
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
 SELECT 'button' AS component, 'start' AS justify;
 SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
@@ -497,6 +609,24 @@ LIMIT 50;
 
 ```sql mmi/procedure-drilldown.sql { route: { caption: "Procedure Drilldown" } }
 -- @route.description "Part B drug spend, facility vs office split, DME refill velocity, surgical economics"
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
 SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
@@ -596,6 +726,24 @@ LIMIT 20;
 
 ```sql mmi/sleep-apnea-evidence.sql { route: { caption: "Evidence" } }
 -- @route.description "Evidence dashboard mapped to Voxia report references and Medicare analytical tables"
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
 SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
@@ -1833,6 +1981,24 @@ ORDER BY market_share_percentage DESC, specialized_patient_reach DESC;
 
 ```sql mmi/data-dictionary.sql { route: { caption: "Data Dictionary" } }
 -- @route.description "Schema reference for all tables, views, and the scoring methodology"
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+       '/' AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+       '{"link":"/","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
 SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
