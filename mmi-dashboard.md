@@ -1211,6 +1211,148 @@ SELECT 'text' AS component,
     'High-Cost Part B Drug Drivers & Supply Velocity' AS title,
     'References: part_b_drug_intensity, dme_supply_refill_metrics' AS contents;
 
+WITH gm AS (
+    SELECT *
+    FROM part_b_drug_intensity
+    WHERE specialty_domain = 'General Medicine'
+),
+top_total AS (
+    SELECT hcpcs_code, procedure_description, total_drug_spend, drug_spend_per_patient, total_drug_administrations
+    FROM gm
+    ORDER BY total_drug_spend DESC
+    LIMIT 1
+),
+top_spp AS (
+    SELECT hcpcs_code, procedure_description, total_drug_spend, drug_spend_per_patient, total_drug_administrations
+    FROM gm
+    ORDER BY drug_spend_per_patient DESC
+    LIMIT 1
+),
+top_volume AS (
+    SELECT hcpcs_code, procedure_description, total_drug_spend, drug_spend_per_patient, total_drug_administrations
+    FROM gm
+    ORDER BY total_drug_administrations DESC
+    LIMIT 1
+),
+j7060 AS (
+    SELECT hcpcs_code, supply_item, refill_velocity
+    FROM dme_supply_refill_metrics
+    WHERE hcpcs_code = 'J7060'
+    LIMIT 1
+),
+top_refill AS (
+    SELECT hcpcs_code, supply_item, refill_velocity
+    FROM dme_supply_refill_metrics
+    ORDER BY refill_velocity DESC
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Financial intensity in General Medicine is increasingly shaped by drug mix and replenishment cadence, not service volume alone. '
+    || 'The largest total-spend driver is '
+    || COALESCE((SELECT procedure_description FROM top_total), 'the top-ranked drug')
+    || ' ('
+    || COALESCE((SELECT hcpcs_code FROM top_total), 'N/A')
+    || ') at about $'
+    || COALESCE((SELECT printf('%,.2f', total_drug_spend / 1000000000.0) FROM top_total), '0.00')
+    || 'B total spend. '
+    || 'The highest per-patient financial intensity comes from '
+    || COALESCE((SELECT procedure_description FROM top_spp), 'the leading rare-condition agent')
+    || ' ('
+    || COALESCE((SELECT hcpcs_code FROM top_spp), 'N/A')
+    || ') at approximately $'
+    || COALESCE((SELECT printf('%,.2f', drug_spend_per_patient) FROM top_spp), '0.00')
+    || ' per patient. '
+    || 'By administration volume, '
+    || COALESCE((SELECT procedure_description FROM top_volume), 'the highest-volume drug')
+    || ' ('
+    || COALESCE((SELECT hcpcs_code FROM top_volume), 'N/A')
+    || ') leads with '
+    || COALESCE((SELECT printf('%,.0f', total_drug_administrations) FROM top_volume), '0')
+    || ' administrations, illustrating high scale with a different intensity profile. '
+    || CASE
+        WHEN (SELECT COUNT(*) FROM j7060) > 0
+            THEN 'For DME/supply engagement, J7060 ('
+                 || COALESCE((SELECT supply_item FROM j7060), 'Dextrose/Water')
+                 || ') shows refill velocity '
+                 || COALESCE((SELECT printf('%,.2f', refill_velocity) FROM j7060), '0.00')
+                 || ', supporting sustained replenishment-cycle planning.'
+        ELSE 'For DME/supply engagement, the current top refill item is '
+                 || COALESCE((SELECT hcpcs_code FROM top_refill), 'N/A')
+                 || ' ('
+                 || COALESCE((SELECT supply_item FROM top_refill), 'Top item')
+                 || ') with refill velocity '
+                 || COALESCE((SELECT printf('%,.2f', refill_velocity) FROM top_refill), '0.00')
+                 || '.'
+      END AS contents;
+
+SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
+
+WITH gm AS (
+    SELECT *
+    FROM part_b_drug_intensity
+    WHERE specialty_domain = 'General Medicine'
+),
+top_total AS (
+    SELECT hcpcs_code, total_drug_spend
+    FROM gm
+    ORDER BY total_drug_spend DESC
+    LIMIT 1
+),
+top_spp AS (
+    SELECT hcpcs_code, drug_spend_per_patient
+    FROM gm
+    ORDER BY drug_spend_per_patient DESC
+    LIMIT 1
+),
+top_volume AS (
+    SELECT hcpcs_code, total_drug_administrations
+    FROM gm
+    ORDER BY total_drug_administrations DESC
+    LIMIT 1
+),
+dme_ref AS (
+    SELECT hcpcs_code, refill_velocity
+    FROM dme_supply_refill_metrics
+    WHERE hcpcs_code = 'J7060'
+    LIMIT 1
+)
+SELECT
+    'Highest Spend / Patient Drug' AS "Drug/Item",
+    COALESCE((SELECT hcpcs_code FROM top_spp), 'N/A') AS "HCPCS",
+    'Spend Per Patient' AS "Metric Type",
+    '$' || COALESCE((SELECT printf('%,.2f', drug_spend_per_patient) FROM top_spp), '0.00') AS "Value"
+UNION ALL
+SELECT
+    'Highest Total Spend Drug',
+    COALESCE((SELECT hcpcs_code FROM top_total), 'N/A'),
+    'Total Spend',
+    '$' || COALESCE((SELECT printf('%,.2f', total_drug_spend / 1000000000.0) FROM top_total), '0.00') || 'B'
+UNION ALL
+SELECT
+    'Highest Volume Drug',
+    COALESCE((SELECT hcpcs_code FROM top_volume), 'N/A'),
+    'Volume',
+    COALESCE((SELECT printf('%,.0f', total_drug_administrations) FROM top_volume), '0') || ' Admin.'
+UNION ALL
+SELECT
+    'Refill Velocity Reference',
+    COALESCE((SELECT hcpcs_code FROM dme_ref), 'N/A'),
+    'Refill Velocity',
+    COALESCE((SELECT printf('%,.2f', refill_velocity) FROM dme_ref), 'N/A');
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    procedure_description || ' (' || hcpcs_code || ')' AS "Drug Name (HCPCS)",
+    specialty_domain AS "Specialty Domain",
+    '$' || printf('%,.0f', ROUND(total_drug_spend, 0)) AS "Total Drug Spend",
+    ROUND(patients_receiving_drug, 0) AS "Patients Receiving",
+    '$' || printf('%,.2f', ROUND(drug_spend_per_patient, 2)) AS "Spend Per Patient"
+FROM part_b_drug_intensity
+WHERE specialty_domain = 'General Medicine'
+ORDER BY drug_spend_per_patient DESC
+LIMIT 10;
+
 WITH drug_rank AS (
     SELECT
         hcpcs_code,
