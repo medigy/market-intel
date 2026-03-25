@@ -45,12 +45,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
        '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
      [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
      [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
     '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -72,12 +72,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
        '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -195,12 +195,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -209,7 +209,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
     'Executive Dashboard' AS title,
@@ -307,12 +307,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -321,7 +321,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
     'Opportunity Scoring Engine' AS title,
@@ -379,12 +379,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -451,12 +451,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -465,7 +465,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
     'Disease Mapping' AS title,
@@ -546,12 +546,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -560,7 +560,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
     'Geographic Markets' AS title,
@@ -615,12 +615,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -629,7 +629,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
     'Procedure Drilldown' AS title,
@@ -732,12 +732,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -746,7 +746,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
     'Evidence & Market Prioritization' AS title,
@@ -1987,12 +1987,12 @@ SELECT 'shell' AS component,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
-       '/' AS link,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
     '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
-       '{"link":"/","title":"Home"}' AS menu_item,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
@@ -2001,7 +2001,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
     'Data Dictionary & Pipeline Reference' AS title,
