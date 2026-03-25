@@ -992,6 +992,93 @@ SELECT 'text' AS component,
     || COALESCE((SELECT printf('%,.2f', office_cost_per_service) FROM metrics), '0.00')
     || ' in office settings.' AS contents;
 
+SELECT 'text' AS component,
+    'Comparative Specialty Benchmarks' AS title,
+    'Internal Medicine / PCP is shown alongside office-centric comparators to contextualize the relative facility footprint.' AS contents;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+WITH benchmark AS (
+    SELECT
+        CASE
+            WHEN specialty_name = 'Internal Medicine / PCP' THEN 'Internal Medicine / PCP'
+            WHEN specialty_name = 'Cardiology' AND specialty_domain = 'Primary Care' THEN 'Cardiology (Primary Care)'
+            WHEN specialty_name = 'Neurology' AND specialty_domain = 'Primary Care' THEN 'Neurology (Primary Care)'
+            WHEN specialty_name = 'Pulmonology' THEN 'Pulmonology'
+        END AS benchmark_specialty,
+        facility_spend,
+        office_spend,
+        office_pct,
+        total_services,
+        CASE
+            WHEN specialty_name = 'Internal Medicine / PCP' THEN 1
+            WHEN specialty_name = 'Cardiology' AND specialty_domain = 'Primary Care' THEN 2
+            WHEN specialty_name = 'Neurology' AND specialty_domain = 'Primary Care' THEN 3
+            WHEN specialty_name = 'Pulmonology' THEN 4
+        END AS display_order
+    FROM facility_vs_office_split
+    WHERE specialty_name = 'Internal Medicine / PCP'
+       OR (specialty_name = 'Cardiology' AND specialty_domain = 'Primary Care')
+       OR (specialty_name = 'Neurology' AND specialty_domain = 'Primary Care')
+       OR specialty_name = 'Pulmonology'
+)
+SELECT
+    benchmark_specialty AS "Specialty Name",
+    '$' || printf('%,.0f', ROUND(facility_spend, 0)) AS "Facility Spend",
+    '$' || printf('%,.0f', ROUND(office_spend, 0)) AS "Office Spend",
+    ROUND(office_pct, 1) || '%' AS "Office % of Services"
+FROM benchmark
+WHERE benchmark_specialty IS NOT NULL
+ORDER BY display_order;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+WITH benchmark AS (
+    SELECT
+        CASE
+            WHEN specialty_name = 'Internal Medicine / PCP' THEN 'Internal Medicine / PCP'
+            WHEN specialty_name = 'Cardiology' AND specialty_domain = 'Primary Care' THEN 'Cardiology (Primary Care)'
+            WHEN specialty_name = 'Neurology' AND specialty_domain = 'Primary Care' THEN 'Neurology (Primary Care)'
+            WHEN specialty_name = 'Pulmonology' THEN 'Pulmonology'
+        END AS benchmark_specialty,
+        total_services,
+        CASE
+            WHEN specialty_name = 'Internal Medicine / PCP' THEN 1
+            WHEN specialty_name = 'Cardiology' AND specialty_domain = 'Primary Care' THEN 2
+            WHEN specialty_name = 'Neurology' AND specialty_domain = 'Primary Care' THEN 3
+            WHEN specialty_name = 'Pulmonology' THEN 4
+        END AS display_order
+    FROM facility_vs_office_split
+    WHERE specialty_name = 'Internal Medicine / PCP'
+       OR (specialty_name = 'Cardiology' AND specialty_domain = 'Primary Care')
+       OR (specialty_name = 'Neurology' AND specialty_domain = 'Primary Care')
+       OR specialty_name = 'Pulmonology'
+)
+SELECT
+    benchmark_specialty AS "Specialty Name",
+    ROUND(total_services, 0) AS "Total Services"
+FROM benchmark
+WHERE benchmark_specialty IS NOT NULL
+ORDER BY display_order;
+
+WITH im AS (
+    SELECT
+        facility_services,
+        total_services,
+        facility_spend + office_spend AS total_spend
+    FROM facility_vs_office_split
+    WHERE specialty_name = 'Internal Medicine / PCP'
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Key takeaway: Internal Medicine / PCP remains a major anchor for facility-based coordination, with about '
+    || COALESCE((SELECT printf('%,.0f', facility_services) FROM im), '0')
+    || ' services delivered in facility settings. Across both settings, this specialty accounts for approximately $'
+    || COALESCE((SELECT printf('%,.1f', total_spend / 1000000000.0) FROM im), '0.0')
+    || 'B in Medicare spend and '
+    || COALESCE((SELECT printf('%,.0f', total_services) FROM im), '0')
+    || ' total services.' AS contents;
+
 SELECT 'chart' AS component,
     'Internal Medicine Service Distribution' AS title,
     'pie' AS type,
