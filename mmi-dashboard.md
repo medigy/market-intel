@@ -636,6 +636,73 @@ SELECT 'text' AS component,
     'Global Opportunity Matrix & Scoring' AS title,
     'Reference: mdsd_global_opportunity_matrix, opportunity_scoring_view' AS contents;
 
+WITH tier_summary AS (
+    SELECT
+        opportunity_tier,
+        COUNT(*) AS tier_count
+    FROM mdsd_global_opportunity_matrix
+    GROUP BY opportunity_tier
+),
+top_tier AS (
+    SELECT opportunity_tier, tier_count
+    FROM tier_summary
+    ORDER BY tier_count DESC
+    LIMIT 1
+),
+hypertension AS (
+    SELECT composite_opportunity_score, patient_volume, total_spend_millions, interaction_density
+    FROM mdsd_global_opportunity_matrix
+    WHERE disease_state = 'Hypertension'
+    LIMIT 1
+),
+copd AS (
+    SELECT composite_opportunity_score, patient_volume, total_spend_millions, interaction_density
+    FROM mdsd_global_opportunity_matrix
+    WHERE disease_state = 'COPD'
+    LIMIT 1
+),
+hf AS (
+    SELECT composite_opportunity_score, patient_volume, total_spend_millions, interaction_density
+    FROM mdsd_global_opportunity_matrix
+    WHERE disease_state = 'Heart Failure'
+    LIMIT 1
+),
+copd_model AS (
+    SELECT business_model_fit
+    FROM mdsd_interaction_model_fit
+    WHERE disease_state = 'COPD'
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'The market is currently categorized mainly into '
+    || COALESCE((SELECT opportunity_tier FROM top_tier), 'a single tier')
+    || ' opportunities ('
+    || COALESCE((SELECT tier_count FROM top_tier), 0)
+    || ' disease states), with meaningful variation in the underlying drivers. '
+    || 'Hypertension holds the highest composite opportunity score at '
+    || COALESCE((SELECT composite_opportunity_score FROM hypertension), 0)
+    || ', driven by scale: '
+    || printf('%,.0f', COALESCE((SELECT patient_volume FROM hypertension), 0))
+    || ' patients and about $'
+    || printf('%,.1f', COALESCE((SELECT total_spend_millions FROM hypertension), 0) / 1000.0)
+    || 'B total spend. '
+    || 'Conversely, COPD scores '
+    || COALESCE((SELECT composite_opportunity_score FROM copd), 0)
+    || ' with a much smaller patient base ('
+    || printf('%,.0f', COALESCE((SELECT patient_volume FROM copd), 0))
+    || ') but the highest interaction density ('
+    || COALESCE((SELECT ROUND(interaction_density, 1) FROM copd), 0)
+    || '), aligning to '
+    || COALESCE((SELECT business_model_fit FROM copd_model), 'its model-fit')
+    || '. '
+    || 'Heart Failure remains a balanced profile at score '
+    || COALESCE((SELECT composite_opportunity_score FROM hf), 0)
+    || ', with '
+    || printf('%,.0f', COALESCE((SELECT patient_volume FROM hf), 0))
+    || ' patients and interaction density '
+    || COALESCE((SELECT ROUND(interaction_density, 2) FROM hf), 0)
+    || '.' AS contents;
+
 SELECT 'chart' AS component,
     'Market Opportunity Analysis' AS title,
     'bar' AS type,
