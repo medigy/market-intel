@@ -736,6 +736,94 @@ SELECT 'text' AS component,
     'Specialty Economic Intensity & Efficiency' AS title,
     'References: mdsd_economic_intensity_proof, specialty_activity_summary' AS contents;
 
+WITH top_intensity AS (
+    SELECT
+        specialty_name,
+        specialty_domain,
+        patient_reach,
+        avg_allowed_per_patient,
+        interaction_frequency,
+        economic_intensity_index
+    FROM mdsd_economic_intensity_proof
+    ORDER BY economic_intensity_index DESC
+    LIMIT 1
+),
+internal_med AS (
+    SELECT
+        specialty_name,
+        patient_reach,
+        total_medicare_spend
+    FROM specialty_activity_summary
+    WHERE specialty_name = 'Internal Medicine / PCP'
+    LIMIT 1
+),
+pulmonology AS (
+    SELECT
+        specialty_name,
+        specialty_domain,
+        avg_cost_per_service,
+        economic_intensity_index
+    FROM specialty_economic_intensity
+    WHERE specialty_name = 'Pulmonology'
+    ORDER BY avg_cost_per_service ASC
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Economic intensity provides a metric for the financial weight of clinical interventions relative to patient reach. '
+    || 'The highest current intensity is '
+    || COALESCE((SELECT specialty_name FROM top_intensity), 'N/A')
+    || ' ('
+    || COALESCE((SELECT specialty_domain FROM top_intensity), 'N/A')
+    || ') with an Economic Intensity Index of '
+    || COALESCE((SELECT ROUND(economic_intensity_index, 2) FROM top_intensity), 0)
+    || ', supported by '
+    || COALESCE((SELECT ROUND(interaction_frequency, 2) FROM top_intensity), 0)
+    || ' services per patient and $'
+    || COALESCE((SELECT printf('%,.2f', avg_allowed_per_patient) FROM top_intensity), '0.00')
+    || ' spend per patient. '
+    || 'Internal Medicine / PCP carries major scale with '
+    || COALESCE((SELECT printf('%,.0f', patient_reach) FROM internal_med), '0')
+    || ' patients and about $'
+    || COALESCE((SELECT printf('%,.1f', total_medicare_spend / 1000000000.0) FROM internal_med), '0.0')
+    || 'B total Medicare spend. '
+    || 'Pulmonology reflects the leanest economic model in its profile, with average cost per service of $'
+    || COALESCE((SELECT printf('%,.2f', avg_cost_per_service) FROM pulmonology), '0.00')
+    || ' and economic intensity '
+    || COALESCE((SELECT ROUND(economic_intensity_index, 2) FROM pulmonology), 0)
+    || '.' AS contents;
+
+WITH top_intensity AS (
+    SELECT
+        specialty_name,
+        economic_intensity_index,
+        interaction_frequency,
+        avg_allowed_per_patient
+    FROM mdsd_economic_intensity_proof
+    ORDER BY economic_intensity_index DESC
+    LIMIT 1
+),
+top_spend AS (
+    SELECT
+        specialty_name,
+        total_medicare_spend
+    FROM specialty_activity_summary
+    ORDER BY total_medicare_spend DESC
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    COALESCE((SELECT specialty_name FROM top_intensity), 'The top specialty')
+    || ' exhibits the highest economic intensity at '
+    || COALESCE((SELECT ROUND(economic_intensity_index, 2) FROM top_intensity), 0)
+    || ', indicating a model driven by frequent ('
+    || COALESCE((SELECT ROUND(interaction_frequency, 2) FROM top_intensity), 0)
+    || ' services per patient) and high-value ($'
+    || COALESCE((SELECT printf('%,.2f', avg_allowed_per_patient) FROM top_intensity), '0.00')
+    || ' per patient) interactions. '
+    || COALESCE((SELECT specialty_name FROM top_spend), 'The leading specialty')
+    || ' manages the largest absolute Medicare spend at about $'
+    || COALESCE((SELECT printf('%,.1f', total_medicare_spend / 1000000000.0) FROM top_spend), '0.0')
+    || 'B.' AS contents;
+
 SELECT 'chart' AS component,
     'Economic Intensity Index by Specialty' AS title,
     'bar' AS type,
@@ -769,6 +857,63 @@ SELECT 'text' AS component,
     'Interaction Models & Clinical Gatekeepers' AS title,
     'Reference: mdsd_interaction_model_fit, mdsd_specialty_gatekeepers' AS contents;
 
+WITH ranked_models AS (
+    SELECT
+        disease_state,
+        interaction_ratio,
+        business_model_fit,
+        ROW_NUMBER() OVER (ORDER BY interaction_ratio DESC) AS high_rank,
+        ROW_NUMBER() OVER (ORDER BY interaction_ratio ASC) AS low_rank
+    FROM mdsd_interaction_model_fit
+),
+high_model AS (
+    SELECT disease_state, interaction_ratio, business_model_fit
+    FROM ranked_models
+    WHERE high_rank = 1
+),
+low_model AS (
+    SELECT disease_state, interaction_ratio, business_model_fit
+    FROM ranked_models
+    WHERE low_rank = 1
+),
+hf_gatekeeper AS (
+    SELECT specialty_name, market_share_percentage
+    FROM mdsd_specialty_gatekeepers
+    WHERE disease_state = 'Heart Failure'
+    ORDER BY market_share_percentage DESC
+    LIMIT 1
+),
+copd_gatekeeper AS (
+    SELECT specialty_name, market_share_percentage
+    FROM mdsd_specialty_gatekeepers
+    WHERE disease_state = 'COPD'
+    ORDER BY market_share_percentage DESC
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Interaction model fit indicates distinct business patterns based on provider-patient engagement frequency. '
+    || COALESCE((SELECT disease_state FROM high_model), 'The highest-intensity condition')
+    || ' aligns to '
+    || COALESCE((SELECT business_model_fit FROM high_model), 'a high-frequency model')
+    || ' with interaction ratio '
+    || COALESCE((SELECT ROUND(interaction_ratio, 2) FROM high_model), 0)
+    || ', signaling suitability for continuous or high-frequency digital monitoring. '
+    || COALESCE((SELECT disease_state FROM low_model), 'The lower-intensity condition')
+    || ' aligns to '
+    || COALESCE((SELECT business_model_fit FROM low_model), 'a diagnostic model')
+    || ' with interaction ratio '
+    || COALESCE((SELECT ROUND(interaction_ratio, 2) FROM low_model), 0)
+    || ', favoring periodic assessment. '
+    || 'Gatekeeper dominance remains concentrated: '
+    || COALESCE((SELECT specialty_name FROM hf_gatekeeper), 'Top specialty')
+    || ' controls '
+    || COALESCE((SELECT ROUND(market_share_percentage, 1) FROM hf_gatekeeper), 0)
+    || '% of Heart Failure gatekeeper activity, while '
+    || COALESCE((SELECT specialty_name FROM copd_gatekeeper), 'the COPD leader')
+    || ' controls '
+    || COALESCE((SELECT ROUND(market_share_percentage, 1) FROM copd_gatekeeper), 0)
+    || '% of COPD gatekeeper activity.' AS contents;
+
 SELECT 'chart' AS component,
     'Interaction Model Fit by Condition' AS title,
     'bar' AS type,
@@ -799,6 +944,53 @@ SELECT 'divider' AS component;
 SELECT 'text' AS component,
     'Facility vs. Office Service Distribution' AS title,
     'Reference: facility_vs_office_split' AS contents;
+
+WITH site_mix AS (
+    SELECT
+        SUM(facility_services) AS facility_services,
+        SUM(office_services) AS office_services,
+        SUM(total_services) AS total_services,
+        SUM(facility_spend) AS facility_spend,
+        SUM(office_spend) AS office_spend
+    FROM facility_vs_office_split
+    WHERE specialty_name LIKE '%Internal Medicine%'
+       OR specialty_name LIKE '%PCP%'
+),
+metrics AS (
+    SELECT
+        facility_services,
+        office_services,
+        total_services,
+        facility_spend,
+        office_spend,
+        CASE WHEN total_services > 0 THEN (facility_services * 100.0) / total_services ELSE 0 END AS facility_share_pct,
+        CASE WHEN total_services > 0 THEN (office_services * 100.0) / total_services ELSE 0 END AS office_share_pct,
+        CASE WHEN facility_services > 0 THEN facility_spend / facility_services ELSE 0 END AS facility_cost_per_service,
+        CASE WHEN office_services > 0 THEN office_spend / office_services ELSE 0 END AS office_cost_per_service
+    FROM site_mix
+)
+SELECT 'text' AS component,
+    'Comparing Internal Medicine / PCP economics across care settings shows that '
+    || CASE
+        WHEN COALESCE((SELECT facility_cost_per_service FROM metrics), 0) > COALESCE((SELECT office_cost_per_service FROM metrics), 0)
+            THEN 'facility-based services carry the higher cost-per-service burden'
+        WHEN COALESCE((SELECT facility_cost_per_service FROM metrics), 0) < COALESCE((SELECT office_cost_per_service FROM metrics), 0)
+            THEN 'office-based services carry the higher cost-per-service burden'
+        ELSE 'both settings are currently at similar cost-per-service levels'
+       END
+    || '. Facility services represent '
+    || COALESCE((SELECT ROUND(facility_share_pct, 1) FROM metrics), 0)
+    || '% of total volume and account for about $'
+    || COALESCE((SELECT printf('%,.2f', facility_spend / 1000000000.0) FROM metrics), '0.00')
+    || 'B in spend, while office services represent '
+    || COALESCE((SELECT ROUND(office_share_pct, 1) FROM metrics), 0)
+    || '% of volume with about $'
+    || COALESCE((SELECT printf('%,.2f', office_spend / 1000000000.0) FROM metrics), '0.00')
+    || 'B in spend. Cost-per-service is approximately $'
+    || COALESCE((SELECT printf('%,.2f', facility_cost_per_service) FROM metrics), '0.00')
+    || ' in facility settings versus $'
+    || COALESCE((SELECT printf('%,.2f', office_cost_per_service) FROM metrics), '0.00')
+    || ' in office settings.' AS contents;
 
 SELECT 'chart' AS component,
     'Internal Medicine Service Distribution' AS title,
