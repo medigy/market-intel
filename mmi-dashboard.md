@@ -50,6 +50,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/specialty-explorer.sql","title":"Specialty Explorer"}' AS menu_item,
+    '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/geographic-markets.sql","title":"Geographic Markets"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
@@ -127,6 +128,13 @@ SELECT
     '/mmi/specialty-explorer.sql' AS link,
     'stethoscope' AS icon,
     'indigo' AS color;
+
+SELECT
+    'Evidence' AS title,
+    'Consolidated evidence views and charts mapped to the Voxia prioritization report references, including opportunity matrix, gatekeepers, Pareto drug spend, and geographic concentration.' AS description,
+    '/mmi/sleep-apnea-evidence.sql' AS link,
+    'moon-stars' AS icon,
+    'cyan' AS color;
 
 SELECT
     'Disease Mapping' AS title,
@@ -596,6 +604,418 @@ SELECT
 FROM surgical_economic_metrics
 ORDER BY estimated_total_anesthesia_cost DESC
 LIMIT 20;
+```
+
+---
+
+## Evidence
+
+```sql mmi/sleep-apnea-evidence.sql { route: { caption: "Evidence" } }
+-- @route.description "Evidence dashboard mapped to Voxia report references and Medicare analytical tables"
+
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '/' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+
+SELECT 'hero' AS component,
+    'Evidence & Market Prioritization' AS title,
+    'cyan' AS color;
+
+SELECT 'divider' AS component;
+
+SELECT 'alert' AS component,
+    'Sleep Apnea row coverage in current derived evidence tables' AS title,
+    'The current snapshot has limited direct Sleep Apnea rows in mdsd_* evidence tables; visuals below use the mapped reference tables/views requested in the report to preserve analytical comparability.' AS description,
+    'warning' AS color
+WHERE (
+    SELECT COUNT(*) FROM mdsd_global_opportunity_matrix WHERE disease_state = 'Sleep Apnea'
+) = 0;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Global Opportunity Matrix & Scoring' AS title,
+    'Reference: mdsd_global_opportunity_matrix, opportunity_scoring_view' AS contents;
+
+SELECT 'chart' AS component,
+    'Market Opportunity Analysis' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Composite Opportunity Score' AS xtitle;
+
+SELECT
+    disease_state AS label,
+    ROUND(composite_opportunity_score, 2) AS value
+FROM mdsd_global_opportunity_matrix
+ORDER BY composite_opportunity_score DESC
+LIMIT 10;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    disease_state AS "Disease State",
+    opportunity_tier AS "Opportunity Tier",
+    ROUND(composite_opportunity_score, 2) AS "Composite Score",
+    patient_volume AS "Patients",
+    ROUND(interaction_density, 2) AS "Interaction Density",
+    ROUND(total_spend_millions, 2) AS "Spend ($M)",
+    ROUND(market_concentration_pct, 1) AS "Market Concentration (%)"
+FROM mdsd_global_opportunity_matrix
+ORDER BY composite_opportunity_score DESC;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Specialty Economic Intensity & Efficiency' AS title,
+    'References: mdsd_economic_intensity_proof, specialty_activity_summary' AS contents;
+
+SELECT 'chart' AS component,
+    'Economic Intensity Index by Specialty' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Economic Intensity Index' AS ytitle;
+
+SELECT
+    specialty_name AS label,
+    ROUND(economic_intensity_index, 2) AS value
+FROM mdsd_economic_intensity_proof
+ORDER BY economic_intensity_index DESC
+LIMIT 12;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    specialty_name AS "Specialty",
+    specialty_domain AS "Domain",
+    patient_reach AS "Patients",
+    ROUND(avg_allowed_per_patient, 2) AS "$/Patient",
+    ROUND(interaction_frequency, 2) AS "Interactions/Patient",
+    ROUND(economic_intensity_index, 2) AS "Intensity Index"
+FROM mdsd_economic_intensity_proof
+ORDER BY economic_intensity_index DESC
+LIMIT 20;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Interaction Models & Clinical Gatekeepers' AS title,
+    'Reference: mdsd_interaction_model_fit, mdsd_specialty_gatekeepers' AS contents;
+
+SELECT 'chart' AS component,
+    'Interaction Model Fit by Condition' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels;
+
+SELECT
+    disease_state AS series,
+    business_model_fit AS label,
+    ROUND(interaction_ratio, 2) AS value
+FROM mdsd_interaction_model_fit
+ORDER BY interaction_ratio DESC;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    disease_state AS "Disease State",
+    specialty_name AS "Gatekeeper Specialty",
+    procedure_description AS "Procedure",
+    ROUND(market_share_percentage, 1) AS "Market Share (%)",
+    specialized_patient_reach AS "Specialized Reach",
+    dominance_rank AS "Dominance Rank"
+FROM mdsd_specialty_gatekeepers
+ORDER BY market_share_percentage DESC, specialized_patient_reach DESC;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Facility vs. Office Service Distribution' AS title,
+    'Reference: facility_vs_office_split' AS contents;
+
+SELECT 'chart' AS component,
+    'Internal Medicine Service Distribution' AS title,
+    'pie' AS type,
+    TRUE AS labels;
+
+SELECT
+    'Office Services' AS label,
+    ROUND(SUM(office_services), 0) AS value
+FROM facility_vs_office_split
+WHERE specialty_name LIKE '%Internal Medicine%'
+   OR specialty_name LIKE '%PCP%'
+UNION ALL
+SELECT
+    'Facility Services' AS label,
+    ROUND(SUM(facility_services), 0) AS value
+FROM facility_vs_office_split
+WHERE specialty_name LIKE '%Internal Medicine%'
+   OR specialty_name LIKE '%PCP%';
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    specialty_name AS "Specialty",
+    specialty_domain AS "Domain",
+    ROUND(facility_services, 0) AS "Facility Services",
+    ROUND(office_services, 0) AS "Office Services",
+    ROUND(total_services, 0) AS "Total Services",
+    ROUND(office_pct, 1) AS "Office %",
+    ROUND(facility_spend / 1e9, 2) AS "Facility Spend ($B)",
+    ROUND(office_spend / 1e9, 2) AS "Office Spend ($B)",
+    ROUND(facility_spend / NULLIF(facility_services, 0), 2) AS "Facility $/Service",
+    ROUND(office_spend / NULLIF(office_services, 0), 2) AS "Office $/Service"
+FROM facility_vs_office_split
+WHERE specialty_name LIKE '%Internal Medicine%'
+   OR specialty_name LIKE '%PCP%';
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Condition Monitoring & Intensity Proof' AS title,
+    'References: condition_monitoring_proxy_table, monitoring_procedure_intensity' AS contents;
+
+SELECT 'chart' AS component,
+    'Condition Monitoring Intensity (Services per Beneficiary)' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels;
+
+SELECT
+    disease_state AS label,
+    ROUND(monitoring_services_per_beneficiary, 2) AS value
+FROM condition_monitoring_proxy_table
+ORDER BY monitoring_services_per_beneficiary DESC;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    specialty_name AS "Specialty",
+    ROUND(monitoring_volume, 0) AS "Monitoring Volume",
+    ROUND(total_volume, 0) AS "Total Volume",
+    ROUND(monitoring_pct, 1) AS "Monitoring %",
+    ROUND(monitoring_spend / 1e6, 2) AS "Monitoring Spend ($M)",
+    ROUND(total_spend / 1e6, 2) AS "Total Spend ($M)"
+FROM monitoring_procedure_intensity
+ORDER BY monitoring_pct DESC
+LIMIT 20;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'High-Cost Part B Drug Drivers & Supply Velocity' AS title,
+    'References: part_b_drug_intensity, dme_supply_refill_metrics' AS contents;
+
+WITH drug_rank AS (
+    SELECT
+        hcpcs_code,
+        procedure_description,
+        SUM(total_drug_spend) AS total_spend,
+        ROW_NUMBER() OVER (ORDER BY SUM(total_drug_spend) DESC) AS rn
+    FROM part_b_drug_intensity
+    GROUP BY hcpcs_code, procedure_description
+),
+pareto AS (
+    SELECT
+        rn,
+        hcpcs_code,
+        procedure_description,
+        total_spend,
+        SUM(total_spend) OVER (ORDER BY rn) AS cumulative_spend,
+        SUM(total_spend) OVER () AS grand_total
+    FROM drug_rank
+    WHERE rn <= 15
+)
+SELECT 'chart' AS component,
+    'Pareto Analysis of Part B Drug Spend' AS title,
+    'line' AS type,
+    TRUE AS labels,
+    'Cumulative Spend Share (%)' AS ytitle,
+    'Drug Rank' AS xtitle;
+
+WITH drug_rank AS (
+    SELECT
+        hcpcs_code,
+        procedure_description,
+        SUM(total_drug_spend) AS total_spend,
+        ROW_NUMBER() OVER (ORDER BY SUM(total_drug_spend) DESC) AS rn
+    FROM part_b_drug_intensity
+    GROUP BY hcpcs_code, procedure_description
+),
+pareto AS (
+    SELECT
+        rn,
+        hcpcs_code,
+        procedure_description,
+        total_spend,
+        SUM(total_spend) OVER (ORDER BY rn) AS cumulative_spend,
+        SUM(total_spend) OVER () AS grand_total
+    FROM drug_rank
+    WHERE rn <= 15
+)
+SELECT
+    'Cumulative Share %' AS series,
+    rn AS x,
+    ROUND((cumulative_spend * 100.0) / NULLIF(grand_total, 0), 2) AS value
+FROM pareto
+ORDER BY rn;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+WITH drug_rank AS (
+    SELECT
+        hcpcs_code,
+        procedure_description,
+        SUM(total_drug_spend) AS total_spend,
+        ROW_NUMBER() OVER (ORDER BY SUM(total_drug_spend) DESC) AS rn
+    FROM part_b_drug_intensity
+    GROUP BY hcpcs_code, procedure_description
+),
+pareto AS (
+    SELECT
+        rn,
+        hcpcs_code,
+        procedure_description,
+        total_spend,
+        SUM(total_spend) OVER (ORDER BY rn) AS cumulative_spend,
+        SUM(total_spend) OVER () AS grand_total
+    FROM drug_rank
+    WHERE rn <= 15
+)
+SELECT
+    rn AS "Rank",
+    hcpcs_code AS "HCPCS",
+    procedure_description AS "Drug Name",
+    ROUND(total_spend / 1e6, 2) AS "Drug Spend ($M)",
+    ROUND((cumulative_spend * 100.0) / NULLIF(grand_total, 0), 2) AS "Cumulative Share (%)"
+FROM pareto
+ORDER BY rn;
+
+SELECT 'chart' AS component,
+    'Supply Refill Velocity Leaders' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Units per Patient' AS xtitle;
+
+SELECT
+    hcpcs_code || ' - ' || supply_item AS label,
+    ROUND(refill_velocity, 2) AS value
+FROM dme_supply_refill_metrics
+ORDER BY refill_velocity DESC
+LIMIT 10;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Clinical Dominance & Procedure Concentration' AS title,
+    'Reference: specialty_market_concentration' AS contents;
+
+SELECT 'chart' AS component,
+    'Top Procedure Concentration by Specialty' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels;
+
+SELECT
+    specialty_name || ' | ' || hcpcs_code AS label,
+    ROUND(pct_of_national_volume, 1) AS value
+FROM specialty_market_concentration
+WHERE dominance_rank = 1
+ORDER BY pct_of_national_volume DESC
+LIMIT 15;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    specialty_name AS "Specialty",
+    hcpcs_code AS "HCPCS",
+    procedure_description AS "Procedure",
+    ROUND(total_services, 0) AS "Services",
+    ROUND(total_benes, 0) AS "Beneficiaries",
+    ROUND(pct_of_national_volume, 1) AS "Market Share (%)",
+    dominance_rank AS "Dominance Rank"
+FROM specialty_market_concentration
+ORDER BY pct_of_national_volume DESC
+LIMIT 25;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Geographic Concentration & Strategic Interaction Models' AS title,
+    'References: geographic_market_opportunity, mdsd_interaction_model_fit' AS contents;
+
+SELECT 'chart' AS component,
+    'Geographic Spend Concentration' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Total Spend ($B)' AS xtitle;
+
+SELECT
+    state_abbr AS label,
+    ROUND(SUM(state_total_spend) / 1e9, 2) AS value
+FROM geographic_market_opportunity
+GROUP BY state_abbr
+ORDER BY SUM(state_total_spend) DESC
+LIMIT 15;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    state_abbr AS "State",
+    ROUND(SUM(state_patient_volume), 0) AS "Patients",
+    ROUND(SUM(state_total_spend) / 1e9, 2) AS "Total Spend ($B)",
+    ROUND(SUM(gpci_adjusted_spend) / 1e9, 2) AS "GPCI-Adj Spend ($B)",
+    ROUND(SUM(state_total_spend) / NULLIF(SUM(state_patient_volume), 0), 2) AS "$ / Patient"
+FROM geographic_market_opportunity
+GROUP BY state_abbr
+ORDER BY SUM(state_total_spend) DESC
+LIMIT 20;
+
+SELECT 'chart' AS component,
+    'Strategic Interaction Models' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Interaction Ratio' AS ytitle;
+
+SELECT
+    disease_state AS label,
+    ROUND(interaction_ratio, 2) AS value
+FROM mdsd_interaction_model_fit
+ORDER BY interaction_ratio DESC;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Clinical Gatekeepers & Market Dominance' AS title,
+    'Reference: mdsd_specialty_gatekeepers, specialty_market_concentration' AS contents;
+
+SELECT 'chart' AS component,
+    'Gatekeeper Market Dominance' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Market Share (%)' AS ytitle;
+
+SELECT
+    specialty_name || ' - ' || disease_state AS label,
+    ROUND(market_share_percentage, 1) AS value
+FROM mdsd_specialty_gatekeepers
+ORDER BY market_share_percentage DESC, specialized_patient_reach DESC
+LIMIT 12;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    disease_state AS "Disease State",
+    specialty_name AS "Gatekeeper",
+    ROUND(market_share_percentage, 1) AS "Share (%)",
+    ROUND(specialized_patient_reach, 0) AS "Patient Reach",
+    procedure_description AS "Lead Procedure"
+FROM mdsd_specialty_gatekeepers
+ORDER BY market_share_percentage DESC, specialized_patient_reach DESC;
 ```
 
 ---
