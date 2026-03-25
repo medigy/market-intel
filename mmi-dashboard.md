@@ -620,18 +620,6 @@ SELECT 'hero' AS component,
     'Evidence & Market Prioritization' AS title,
     'cyan' AS color;
 
-SELECT 'divider' AS component;
-
-SELECT 'alert' AS component,
-    'Sleep Apnea row coverage in current derived evidence tables' AS title,
-    'The current snapshot has limited direct Sleep Apnea rows in mdsd_* evidence tables; visuals below use the mapped reference tables/views requested in the report to preserve analytical comparability.' AS description,
-    'warning' AS color
-WHERE (
-    SELECT COUNT(*) FROM mdsd_global_opportunity_matrix WHERE disease_state = 'Sleep Apnea'
-) = 0;
-
-SELECT 'divider' AS component;
-
 SELECT 'text' AS component,
     'Global Opportunity Matrix & Scoring' AS title,
     'Reference: mdsd_global_opportunity_matrix, opportunity_scoring_view' AS contents;
@@ -1285,6 +1273,45 @@ SELECT 'text' AS component,
                  || '.'
       END AS contents;
 
+WITH ds AS (
+    SELECT
+        procedure_description,
+        hcpcs_code,
+        SUM(total_drug_spend) AS total_spend,
+        ROW_NUMBER() OVER (ORDER BY SUM(total_drug_spend) DESC) AS rn
+    FROM part_b_drug_intensity
+    WHERE specialty_domain = 'General Medicine'
+    GROUP BY hcpcs_code, procedure_description
+),
+grand AS (
+    SELECT SUM(total_drug_spend) AS grand_total
+    FROM part_b_drug_intensity
+    WHERE specialty_domain = 'General Medicine'
+),
+top2 AS (SELECT * FROM ds WHERE rn <= 2)
+SELECT 'text' AS component,
+    'Pareto Insight: Drug Spend Concentration' AS title,
+    'This Pareto analysis highlights the concentration of Medicare spend within specific high-intensity drugs. '
+    || COALESCE((SELECT procedure_description FROM top2 WHERE rn = 1), 'the leading drug')
+    || ' (' || COALESCE((SELECT hcpcs_code FROM top2 WHERE rn = 1), 'N/A') || ')'
+    || ' and '
+    || COALESCE((SELECT procedure_description FROM top2 WHERE rn = 2), 'the second drug')
+    || ' (' || COALESCE((SELECT hcpcs_code FROM top2 WHERE rn = 2), 'N/A') || ')'
+    || ' represent the highest-spend drugs in General Medicine, together accounting for '
+    || printf('%.1f',
+           (
+               COALESCE((SELECT total_spend FROM top2 WHERE rn = 1), 0) +
+               COALESCE((SELECT total_spend FROM top2 WHERE rn = 2), 0)
+           ) * 100.0 / NULLIF((SELECT grand_total FROM grand), 0)
+       )
+    || '% of total Part B drug spend in this segment. '
+    || COALESCE((SELECT procedure_description FROM top2 WHERE rn = 1), 'The leading agent')
+    || ' alone accounts for over $'
+    || COALESCE((SELECT printf('%,.2f', total_spend / 1e9) FROM top2 WHERE rn = 1), '0.00')
+    || ' billion, underscoring the outsized financial impact of a narrow set of agents. '
+    || 'Understanding these drivers is critical for identifying high-margin therapeutic areas and informing formulary strategy.'
+    AS contents;
+
 WITH drug_rank AS (
     SELECT
         hcpcs_code,
@@ -1292,6 +1319,7 @@ WITH drug_rank AS (
         SUM(total_drug_spend) AS total_spend,
         ROW_NUMBER() OVER (ORDER BY SUM(total_drug_spend) DESC) AS rn
     FROM part_b_drug_intensity
+    WHERE specialty_domain = 'General Medicine'
     GROUP BY hcpcs_code, procedure_description
 ),
 pareto AS (
@@ -1310,7 +1338,7 @@ SELECT 'chart' AS component,
     'line' AS type,
     TRUE AS labels,
     'Cumulative Spend Share (%)' AS ytitle,
-    'Drug Rank' AS xtitle;
+    'Drug (HCPCS Code)' AS xtitle;
 
 WITH drug_rank AS (
     SELECT
@@ -1335,7 +1363,8 @@ pareto AS (
 )
 SELECT
     'Cumulative Share %' AS series,
-    rn AS x,
+    hcpcs_code AS x,
+    procedure_description AS label,
     ROUND((cumulative_spend * 100.0) / NULLIF(grand_total, 0), 2) AS value
 FROM pareto
 ORDER BY rn;
@@ -1708,6 +1737,85 @@ SELECT 'divider' AS component;
 SELECT 'text' AS component,
     'Clinical Gatekeepers & Market Dominance' AS title,
     'Reference: mdsd_specialty_gatekeepers, specialty_market_concentration' AS contents;
+
+WITH disease_reach AS (
+    SELECT
+        disease_state,
+        SUM(specialized_patient_reach) AS total_reach,
+        AVG(market_share_percentage) AS avg_share
+    FROM mdsd_specialty_gatekeepers
+    GROUP BY disease_state
+),
+top_disease AS (
+    SELECT disease_state, total_reach, avg_share
+    FROM disease_reach
+    ORDER BY total_reach DESC
+    LIMIT 1
+),
+second_disease AS (
+    SELECT disease_state, total_reach, avg_share
+    FROM disease_reach
+    ORDER BY total_reach DESC
+    LIMIT 1 OFFSET 1
+),
+top_gatekeeper AS (
+    SELECT disease_state, specialty_name, procedure_description, market_share_percentage, specialized_patient_reach
+    FROM mdsd_specialty_gatekeepers
+    ORDER BY market_share_percentage DESC, specialized_patient_reach DESC
+    LIMIT 1
+),
+top_state AS (
+    SELECT
+        state_abbr,
+        SUM(state_total_spend) AS state_spend
+    FROM geographic_market_opportunity
+    WHERE specialty_name IN (SELECT DISTINCT specialty_name FROM mdsd_specialty_gatekeepers)
+    GROUP BY state_abbr
+    ORDER BY SUM(state_total_spend) DESC
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Gatekeeper dynamics show concentrated clinical control and uneven opportunity distribution across diseases and regions. '
+    || COALESCE((SELECT disease_state FROM top_disease), 'Hypertension')
+    || ' leads gatekeeper opportunity with '
+    || COALESCE((SELECT printf('%,.0f', total_reach) FROM top_disease), '0')
+    || ' specialized patients at an average dominance of '
+    || COALESCE((SELECT ROUND(avg_share, 1) FROM top_disease), 0)
+    || '%, followed by '
+    || COALESCE((SELECT disease_state FROM second_disease), 'Type 2 Diabetes')
+    || ' with '
+    || COALESCE((SELECT printf('%,.0f', total_reach) FROM second_disease), '0')
+    || ' specialized patients. '
+    || 'At the procedure level, '
+    || COALESCE((SELECT specialty_name FROM top_gatekeeper), 'the leading specialty')
+    || ' anchors '
+    || COALESCE((SELECT disease_state FROM top_gatekeeper), 'the top condition')
+    || ' through '
+    || COALESCE((SELECT procedure_description FROM top_gatekeeper), 'its lead procedure')
+    || ' with '
+    || COALESCE((SELECT ROUND(market_share_percentage, 1) FROM top_gatekeeper), 0)
+    || '% share and '
+    || COALESCE((SELECT printf('%,.0f', specialized_patient_reach) FROM top_gatekeeper), '0')
+    || ' specialized patients. '
+    || 'Geographically, '
+    || COALESCE((SELECT state_abbr FROM top_state), '06')
+    || ' is the largest spend concentration for gatekeeper-led specialties at about $'
+    || COALESCE((SELECT printf('%,.2f', state_spend / 1000000000.0) FROM top_state), '0.00')
+    || 'B.' AS contents;
+
+SELECT 'chart' AS component,
+    'Market Opportunity Analysis (Gatekeeper Reach by Disease)' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Specialized Patient Reach' AS xtitle;
+
+SELECT
+    disease_state AS label,
+    ROUND(SUM(specialized_patient_reach), 0) AS value
+FROM mdsd_specialty_gatekeepers
+GROUP BY disease_state
+ORDER BY SUM(specialized_patient_reach) DESC;
 
 SELECT 'chart' AS component,
     'Gatekeeper Market Dominance' AS title,
