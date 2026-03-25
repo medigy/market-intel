@@ -189,7 +189,7 @@ echo "MMI database and SQLPage UI are ready."
 
 ```bash
 # SQLPage serves on port 9227 by default (configured in sqlpage.json)
-sqlpage --database resource-surveillance.sqlite.db
+surveilr web-ui
 ```
 
 Then open [http://localhost:9227](http://localhost:9227) in your browser.
