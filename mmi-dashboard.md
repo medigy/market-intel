@@ -1121,6 +1121,65 @@ SELECT 'text' AS component,
     'Condition Monitoring & Intensity Proof' AS title,
     'References: condition_monitoring_proxy_table, monitoring_procedure_intensity' AS contents;
 
+WITH sleep_med AS (
+    SELECT specialty_name, monitoring_pct
+    FROM monitoring_procedure_intensity
+    WHERE specialty_name = 'Sleep Medicine'
+    ORDER BY total_volume DESC
+    LIMIT 1
+),
+card_pc AS (
+    SELECT specialty_name, specialty_domain, monitoring_pct
+    FROM monitoring_procedure_intensity
+    WHERE specialty_name = 'Cardiology'
+      AND specialty_domain = 'Primary Care'
+    LIMIT 1
+),
+neuro_pc AS (
+    SELECT specialty_name, specialty_domain, monitoring_pct
+    FROM monitoring_procedure_intensity
+    WHERE specialty_name = 'Neurology'
+      AND specialty_domain = 'Primary Care'
+    LIMIT 1
+),
+hypertension AS (
+    SELECT monitoring_services, monitoring_spend_per_beneficiary
+    FROM condition_monitoring_proxy_table
+    WHERE disease_state = 'Hypertension'
+    LIMIT 1
+),
+copd AS (
+    SELECT monitoring_spend_per_beneficiary
+    FROM condition_monitoring_proxy_table
+    WHERE disease_state = 'COPD'
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Monitoring intensity identifies which diseases and specialties require the most longitudinal oversight. '
+    || COALESCE((SELECT specialty_name FROM sleep_med), 'Sleep-focused care')
+    || ' shows a high monitoring share at '
+    || COALESCE((SELECT ROUND(monitoring_pct, 1) FROM sleep_med), 0)
+    || '%, indicating that a substantial portion of service volume is tied to ongoing tracking. '
+    || COALESCE((SELECT specialty_name FROM card_pc), 'Cardiology')
+    || ' ('
+    || COALESCE((SELECT specialty_domain FROM card_pc), 'Primary Care')
+    || ') also has high monitoring reliance at '
+    || COALESCE((SELECT ROUND(monitoring_pct, 1) FROM card_pc), 0)
+    || '%, while '
+    || COALESCE((SELECT specialty_name FROM neuro_pc), 'Neurology')
+    || ' ('
+    || COALESCE((SELECT specialty_domain FROM neuro_pc), 'Primary Care')
+    || ') is at '
+    || COALESCE((SELECT ROUND(monitoring_pct, 1) FROM neuro_pc), 0)
+    || '%, suggesting a more episodic or assessment-oriented pattern in the monitored-code set. '
+    || 'At the condition level, Hypertension carries very large monitoring volume ('
+    || COALESCE((SELECT printf('%,.0f', monitoring_services) FROM hypertension), '0')
+    || ' services), but its monitoring spend per beneficiary ($'
+    || COALESCE((SELECT printf('%,.2f', monitoring_spend_per_beneficiary) FROM hypertension), '0.00')
+    || ') remains below COPD ($'
+    || COALESCE((SELECT printf('%,.2f', monitoring_spend_per_beneficiary) FROM copd), '0.00')
+    || '), reinforcing the higher-intensity economics of respiratory monitoring.' AS contents;
+
 SELECT 'chart' AS component,
     'Condition Monitoring Intensity (Services per Beneficiary)' AS title,
     'bar' AS type,
