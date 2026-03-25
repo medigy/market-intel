@@ -49,10 +49,8 @@ SELECT 'shell' AS component,
        '{"link":"/","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
-       '{"link":"/mmi/specialty-explorer.sql","title":"Specialty Explorer"}' AS menu_item,
     '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
-       '{"link":"/mmi/geographic-markets.sql","title":"Geographic Markets"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 -- END: PARTIAL global-layout.sql
@@ -123,13 +121,6 @@ SELECT
     'azure' AS color;
 
 SELECT
-    'Specialty Explorer' AS title,
-    'Deep-dive into any specialty: top procedures by volume, spend rank, monitoring intensity, and market dominance.' AS description,
-    '/mmi/specialty-explorer.sql' AS link,
-    'stethoscope' AS icon,
-    'indigo' AS color;
-
-SELECT
     'Evidence' AS title,
     'Consolidated evidence views and charts mapped to the Voxia prioritization report references, including opportunity matrix, gatekeepers, Pareto drug spend, and geographic concentration.' AS description,
     '/mmi/sleep-apnea-evidence.sql' AS link,
@@ -142,13 +133,6 @@ SELECT
     '/mmi/disease-mapping.sql' AS link,
     'virus' AS icon,
     'teal' AS color;
-
-SELECT
-    'Geographic Markets' AS title,
-    'State-level patient volume and GPCI-adjusted spend. Identifies the strongest markets per specialty.' AS description,
-    '/mmi/geographic-markets.sql' AS link,
-    'map' AS icon,
-    'cyan' AS color;
 
 SELECT
     'Procedure Drilldown' AS title,
@@ -1928,7 +1912,7 @@ SELECT 'text' AS component, 'Analytical Views Index' AS title, '' AS contents;
 
 SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
 
-SELECT * FROM (VALUES
+WITH analytical_views(view_name, purpose) AS (VALUES
     ('specialty_activity_summary',    'Executive KPIs per specialty: spend, reach, provider count, spend/patient, srvcs/patient'),
     ('specialty_economic_intensity',  'Intensity index = spend/pt × srvcs/pt; ranked within domain'),
     ('specialty_top_procedures',      'Top 10 HCPCS codes per specialty by volume; includes spend_rank alongside'),
@@ -1942,7 +1926,8 @@ SELECT * FROM (VALUES
     ('facility_vs_office_split',      'Office vs facility service and spend mix per specialty; office_pct'),
     ('disease_state_icd_coverage',    'ICD code count per disease cluster; validates mapping completeness'),
     ('opportunity_scoring_view',      'PRIMARY DELIVERABLE: Composite Tier 1/2/3 ranking of disease × specialty clusters')
-) AS t(view_name, purpose)
+)
+SELECT * FROM analytical_views
 ORDER BY 1;
 
 SELECT 'divider' AS component;
