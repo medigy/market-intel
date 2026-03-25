@@ -1285,74 +1285,6 @@ SELECT 'text' AS component,
                  || '.'
       END AS contents;
 
-SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
-
-WITH gm AS (
-    SELECT *
-    FROM part_b_drug_intensity
-    WHERE specialty_domain = 'General Medicine'
-),
-top_total AS (
-    SELECT hcpcs_code, total_drug_spend
-    FROM gm
-    ORDER BY total_drug_spend DESC
-    LIMIT 1
-),
-top_spp AS (
-    SELECT hcpcs_code, drug_spend_per_patient
-    FROM gm
-    ORDER BY drug_spend_per_patient DESC
-    LIMIT 1
-),
-top_volume AS (
-    SELECT hcpcs_code, total_drug_administrations
-    FROM gm
-    ORDER BY total_drug_administrations DESC
-    LIMIT 1
-),
-dme_ref AS (
-    SELECT hcpcs_code, refill_velocity
-    FROM dme_supply_refill_metrics
-    WHERE hcpcs_code = 'J7060'
-    LIMIT 1
-)
-SELECT
-    'Highest Spend / Patient Drug' AS "Drug/Item",
-    COALESCE((SELECT hcpcs_code FROM top_spp), 'N/A') AS "HCPCS",
-    'Spend Per Patient' AS "Metric Type",
-    '$' || COALESCE((SELECT printf('%,.2f', drug_spend_per_patient) FROM top_spp), '0.00') AS "Value"
-UNION ALL
-SELECT
-    'Highest Total Spend Drug',
-    COALESCE((SELECT hcpcs_code FROM top_total), 'N/A'),
-    'Total Spend',
-    '$' || COALESCE((SELECT printf('%,.2f', total_drug_spend / 1000000000.0) FROM top_total), '0.00') || 'B'
-UNION ALL
-SELECT
-    'Highest Volume Drug',
-    COALESCE((SELECT hcpcs_code FROM top_volume), 'N/A'),
-    'Volume',
-    COALESCE((SELECT printf('%,.0f', total_drug_administrations) FROM top_volume), '0') || ' Admin.'
-UNION ALL
-SELECT
-    'Refill Velocity Reference',
-    COALESCE((SELECT hcpcs_code FROM dme_ref), 'N/A'),
-    'Refill Velocity',
-    COALESCE((SELECT printf('%,.2f', refill_velocity) FROM dme_ref), 'N/A');
-
-SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-
-SELECT
-    procedure_description || ' (' || hcpcs_code || ')' AS "Drug Name (HCPCS)",
-    specialty_domain AS "Specialty Domain",
-    '$' || printf('%,.0f', ROUND(total_drug_spend, 0)) AS "Total Drug Spend",
-    ROUND(patients_receiving_drug, 0) AS "Patients Receiving",
-    '$' || printf('%,.2f', ROUND(drug_spend_per_patient, 2)) AS "Spend Per Patient"
-FROM part_b_drug_intensity
-WHERE specialty_domain = 'General Medicine'
-ORDER BY drug_spend_per_patient DESC
-LIMIT 10;
-
 WITH drug_rank AS (
     SELECT
         hcpcs_code,
@@ -1374,7 +1306,7 @@ pareto AS (
     WHERE rn <= 15
 )
 SELECT 'chart' AS component,
-    'Pareto Analysis of Part B Drug Spend' AS title,
+    'Pareto Analysis of Part B Drug Spend (General Medicine)' AS title,
     'line' AS type,
     TRUE AS labels,
     'Cumulative Spend Share (%)' AS ytitle,
@@ -1387,6 +1319,7 @@ WITH drug_rank AS (
         SUM(total_drug_spend) AS total_spend,
         ROW_NUMBER() OVER (ORDER BY SUM(total_drug_spend) DESC) AS rn
     FROM part_b_drug_intensity
+    WHERE specialty_domain = 'General Medicine'
     GROUP BY hcpcs_code, procedure_description
 ),
 pareto AS (
@@ -1416,6 +1349,7 @@ WITH drug_rank AS (
         SUM(total_drug_spend) AS total_spend,
         ROW_NUMBER() OVER (ORDER BY SUM(total_drug_spend) DESC) AS rn
     FROM part_b_drug_intensity
+    WHERE specialty_domain = 'General Medicine'
     GROUP BY hcpcs_code, procedure_description
 ),
 pareto AS (
@@ -1458,6 +1392,68 @@ SELECT 'text' AS component,
     'Clinical Dominance & Procedure Concentration' AS title,
     'Reference: specialty_market_concentration' AS contents;
 
+WITH card_diag AS (
+    SELECT hcpcs_code, procedure_description, ROUND(total_services, 0) AS services
+    FROM specialty_market_concentration
+    WHERE specialty_name = 'Cardiology'
+      AND hcpcs_code IN ('93000', '93010', '93015')
+      AND dominance_rank = 1
+    ORDER BY total_services DESC
+    LIMIT 1
+),
+im_visit AS (
+    SELECT hcpcs_code, procedure_description, ROUND(total_services, 0) AS services
+    FROM specialty_market_concentration
+    WHERE specialty_name = 'Internal Medicine / PCP'
+      AND hcpcs_code = '99214'
+      AND dominance_rank = 1
+    LIMIT 1
+),
+other_high AS (
+    SELECT hcpcs_code, procedure_description, ROUND(total_services, 0) AS services
+    FROM specialty_market_concentration
+    WHERE specialty_name = 'Other Specialty'
+      AND dominance_rank = 1
+    ORDER BY total_services DESC
+    LIMIT 1
+),
+pul_proc AS (
+    SELECT specialty_name, hcpcs_code, procedure_description, ROUND(pct_of_national_volume, 1) AS dominance_pct
+    FROM specialty_market_concentration
+    WHERE specialty_name = 'Pulmonology'
+      AND dominance_rank = 1
+    ORDER BY total_services DESC
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Market dominance in specific clinical domains typically reflects specialty focus and referral patterns — many procedures show near-absolute (100%) concentration. '
+    || 'Cardiology maintains dominant shares on critical diagnostics; for example, '
+    || COALESCE((SELECT procedure_description FROM card_diag), 'EKG procedures')
+    || ' ('
+    || COALESCE((SELECT hcpcs_code FROM card_diag), '93010')
+    || ') alone account for '
+    || COALESCE((SELECT printf('%,.0f', services) FROM card_diag), '0')
+    || ' services. '
+    || 'Internal Medicine / PCP similarly dominates high-volume evaluation & management visits; '
+    || COALESCE((SELECT procedure_description FROM im_visit), 'established office visit, moderate')
+    || ' ('
+    || COALESCE((SELECT hcpcs_code FROM im_visit), '99214')
+    || ') reaches '
+    || COALESCE((SELECT printf('%,.0f', services) FROM im_visit), '0')
+    || ' services nationwide. '
+    || 'Other Specialty maintains massive volume across therapeutics; the leading procedure is '
+    || COALESCE((SELECT procedure_description FROM other_high), 'a high-volume therapeutic')
+    || ' ('
+    || COALESCE((SELECT hcpcs_code FROM other_high), 'N/A')
+    || ') at '
+    || COALESCE((SELECT printf('%,.0f', services) FROM other_high), '0')
+    || ' administrations. '
+    || 'Even specialties with smaller procedural footprints achieve dominance; Pulmonology''s '
+    || COALESCE((SELECT procedure_description FROM pul_proc), 'procedure')
+    || ' demonstrates control at '
+    || COALESCE((SELECT ROUND(dominance_pct, 1) FROM pul_proc), 0)
+    || '% national share.' AS contents;
+
 SELECT 'chart' AS component,
     'Top Procedure Concentration by Specialty' AS title,
     'bar' AS type,
@@ -1491,6 +1487,141 @@ SELECT 'divider' AS component;
 SELECT 'text' AS component,
     'Geographic Concentration & Strategic Interaction Models' AS title,
     'References: geographic_market_opportunity, mdsd_interaction_model_fit' AS contents;
+
+WITH state_rank AS (
+    SELECT
+        state_abbr,
+        ROUND(SUM(state_total_spend), 0) AS total_spend,
+        ROUND(SUM(state_patient_volume), 0) AS patient_volume,
+        ROUND(SUM(state_total_spend) / NULLIF(SUM(state_patient_volume), 0), 2) AS spend_per_patient,
+        ROW_NUMBER() OVER (ORDER BY SUM(state_total_spend) DESC) AS spend_rank
+    FROM geographic_market_opportunity
+    GROUP BY state_abbr
+),
+top_1 AS (
+    SELECT state_abbr, total_spend, patient_volume, spend_per_patient
+    FROM state_rank
+    WHERE spend_rank = 1
+),
+top_2 AS (
+    SELECT state_abbr, total_spend, patient_volume, spend_per_patient
+    FROM state_rank
+    WHERE spend_rank = 2
+),
+top_3 AS (
+    SELECT state_abbr, total_spend, patient_volume, spend_per_patient
+    FROM state_rank
+    WHERE spend_rank = 3
+),
+comparison_state AS (
+    SELECT state_abbr, total_spend, patient_volume, spend_per_patient
+    FROM state_rank
+    WHERE spend_rank = 4
+)
+SELECT 'text' AS component,
+    'Geographic Opportunity Concentration: The market opportunity concentrates in high-population states, though spend per patient varies by region. '
+    || COALESCE((SELECT state_abbr FROM top_1), 'State 06')
+    || ' (California) leads at approximately $'
+    || COALESCE((SELECT printf('%,.2f', total_spend / 1000000000.0) FROM top_1), '0.00')
+    || 'B in total spend, driven by '
+    || COALESCE((SELECT printf('%,.0f', patient_volume) FROM top_1), '0')
+    || ' patients. '
+    || COALESCE((SELECT state_abbr FROM top_2), 'State 12')
+    || ' (Florida) and '
+    || COALESCE((SELECT state_abbr FROM top_3), 'State 48')
+    || ' (Texas) follow with approximately $'
+    || COALESCE((SELECT printf('%,.2f', total_spend / 1000000000.0) FROM top_2), '0.00')
+    || 'B and $'
+    || COALESCE((SELECT printf('%,.2f', total_spend / 1000000000.0) FROM top_3), '0.00')
+    || 'B respectively. '
+    || 'Regional cost variance is notable: '
+    || COALESCE((SELECT state_abbr FROM comparison_state), 'State 36')
+    || ' (New York) shows spend per patient of $'
+    || COALESCE((SELECT printf('%,.2f', spend_per_patient) FROM comparison_state), '0.00')
+    || ' compared to California''s $'
+    || COALESCE((SELECT printf('%,.2f', spend_per_patient) FROM top_1), '0.00')
+    || ', reflecting regional differences in care intensity and cost.' AS contents;
+
+SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
+
+WITH state_rank AS (
+    SELECT
+        state_abbr,
+        ROUND(SUM(state_total_spend), 0) AS total_spend,
+        ROUND(SUM(state_patient_volume), 0) AS patient_volume,
+        ROUND(SUM(state_total_spend) / NULLIF(SUM(state_patient_volume), 0), 2) AS spend_per_patient,
+        ROW_NUMBER() OVER (ORDER BY SUM(state_total_spend) DESC) AS spend_rank
+    FROM geographic_market_opportunity
+    GROUP BY state_abbr
+)
+SELECT
+    state_abbr AS "State",
+    '$' || printf('%,.0f', total_spend) AS "Total Spend",
+    printf('%,.0f', patient_volume) AS "Patient Volume",
+    '$' || printf('%,.2f', spend_per_patient) AS "Spend Per Patient"
+FROM state_rank
+WHERE spend_rank <= 3
+ORDER BY spend_rank;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Interaction Intensity & Clinical Model Fit' AS title,
+    'Understanding interaction frequency and model fit is critical for business model selection.' AS contents;
+
+WITH diagnostic_low AS (
+    SELECT disease_state, business_model_fit, interaction_ratio
+    FROM mdsd_interaction_model_fit
+    ORDER BY interaction_ratio ASC
+    LIMIT 1
+),
+saas_high AS (
+    SELECT disease_state, business_model_fit, interaction_ratio
+    FROM mdsd_interaction_model_fit
+    ORDER BY interaction_ratio DESC
+    LIMIT 1
+),
+top_refill AS (
+    SELECT hcpcs_code, supply_item, refill_velocity
+    FROM dme_supply_refill_metrics
+    ORDER BY refill_velocity DESC
+    LIMIT 1
+),
+j7042_refill AS (
+    SELECT hcpcs_code, supply_item, refill_velocity
+    FROM dme_supply_refill_metrics
+    WHERE hcpcs_code = 'J7042'
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Diagnostic models (low interaction frequency) contrast sharply with continuous care models (high interaction). '
+    || COALESCE((SELECT disease_state FROM diagnostic_low), 'Hypertension')
+    || ' exemplifies a '
+    || COALESCE((SELECT business_model_fit FROM diagnostic_low), 'Diagnostic Model')
+    || ' with interaction ratio '
+    || COALESCE((SELECT ROUND(interaction_ratio, 2) FROM diagnostic_low), 0)
+    || ', promoting periodic assessment and monitoring. '
+    || 'Conversely, '
+    || COALESCE((SELECT disease_state FROM saas_high), 'COPD')
+    || ' aligns to '
+    || COALESCE((SELECT business_model_fit FROM saas_high), 'a SaaS/continuous monitoring')
+    || ' model with interaction ratio '
+    || COALESCE((SELECT ROUND(interaction_ratio, 2) FROM saas_high), 0)
+    || '. '
+    || 'Supply velocity reinforces engagement intensity: The highest refill velocity in the data is '
+    || COALESCE((SELECT printf('%,.1f', refill_velocity) FROM top_refill), '0.0')
+    || ' ('
+    || COALESCE((SELECT hcpcs_code FROM top_refill), 'N/A')
+    || '), signaling extremely high-frequency supply consumption. '
+    || CASE
+        WHEN (SELECT COUNT(*) FROM j7042_refill) > 0
+            THEN 'For comparison, J7042 (Normal Saline) shows refill velocity '
+                 || COALESCE((SELECT printf('%,.2f', refill_velocity) FROM j7042_refill), '0.00')
+                 || ', typical of regular maintenance protocols.'
+        ELSE ''
+      END AS contents;
+
+SELECT 'divider' AS component;
 
 SELECT 'chart' AS component,
     'Geographic Spend Concentration' AS title,
@@ -1532,6 +1663,45 @@ SELECT
     ROUND(interaction_ratio, 2) AS value
 FROM mdsd_interaction_model_fit
 ORDER BY interaction_ratio DESC;
+
+SELECT 'divider' AS component;
+
+WITH volume_condition AS (
+    SELECT disease_state, patient_volume
+    FROM mdsd_global_opportunity_matrix
+    ORDER BY patient_volume DESC
+    LIMIT 1
+),
+intensity_condition AS (
+    SELECT disease_state, interaction_density
+    FROM mdsd_global_opportunity_matrix
+    ORDER BY interaction_density DESC
+    LIMIT 1
+),
+high_intensity_spec AS (
+    SELECT specialty_name, economic_intensity_index
+    FROM mdsd_economic_intensity_proof
+    ORDER BY economic_intensity_index DESC
+    LIMIT 1
+)
+SELECT 'text' AS component,
+    'Market Structure Summary: The Bifurcated Opportunity' AS title,
+    'The consolidated evidence reveals a fundamentally bifurcated market, requiring distinct entry strategies. '
+    || 'Volume-driven segments (e.g., '
+    || COALESCE((SELECT disease_state FROM volume_condition), 'Hypertension')
+    || ' with '
+    || COALESCE((SELECT printf('%,.0f', patient_volume) FROM volume_condition), '0')
+    || ' patients) thrive in large geographic markets like California and Florida, where scale drives economics. '
+    || 'Intensity-driven segments (e.g., '
+    || COALESCE((SELECT disease_state FROM intensity_condition), 'COPD')
+    || ' with interaction density '
+    || COALESCE((SELECT ROUND(interaction_density, 1) FROM intensity_condition), 0)
+    || ') prioritize specialized supply chains, rare therapeutics, and continuous monitoring. '
+    || 'Clinical dominance remains concentrated: specialty gatekeepers (e.g., '
+    || COALESCE((SELECT specialty_name FROM high_intensity_spec), 'leading high-intensity specialty')
+    || ' with intensity index '
+    || COALESCE((SELECT ROUND(economic_intensity_index, 2) FROM high_intensity_spec), 0)
+    || ') control their core procedures absolutely, creating defensible competitive positions.' AS contents;
 
 SELECT 'divider' AS component;
 
