@@ -23,7 +23,7 @@ This application surfaces the Medicare CMS analytics pipeline built from
 set -euo pipefail
 
 # Start from a clean database to avoid previously ingested malformed resources.
-rm -f resource-surveillance.sqlite.db
+rm -f resource-surveillance.sqlite.*   
 
 surveilr ingest files -r medicare-ds/ && surveilr orchestrate transform-csv 
 surveilr shell sql/medicare-analytics.sql 
@@ -92,18 +92,22 @@ SELECT 'hero' AS component,
     'azure' AS color;
 
 -- PIPELINE HEALTH CHECK
-SELECT 'big_number' AS component, 4 AS columns;
+-- SELECT 'big_number' AS component, 4 AS columns;
+
+SELECT 'card' AS component, 4 AS columns;
 
 SELECT
     'Specialties Indexed' AS title,
-    COUNT(DISTINCT specialty_name) AS value,
+    CAST(COUNT(DISTINCT specialty_name) AS TEXT) AS description,
+    '/mmi/medical-specialities.sql' AS link,
     'stethoscope' AS icon,
     'teal' AS color
 FROM dim_specialty;
 
 SELECT
     'ICD-10 Clusters Mapped' AS title,
-    COUNT(DISTINCT disease_state) AS value,
+    CAST(COUNT(DISTINCT disease_state) AS TEXT) AS description,
+    '/mmi/disease-clusters.sql' AS link,
     'virus' AS icon,
     'azure' AS color
 FROM dim_diagnosis
@@ -111,14 +115,16 @@ WHERE disease_state != 'General / Other';
 
 SELECT
     'Procedure Codes' AS title,
-    COUNT(*) AS value,
+    CAST(COUNT(*) AS TEXT) AS description,
+    '/mmi/procedures.sql' AS link,
     'clipboard-list' AS icon,
     'indigo' AS color
 FROM dim_procedure;
 
 SELECT
     'States in Scope' AS title,
-    COUNT(DISTINCT state_abbr) AS value,
+    CAST(COUNT(DISTINCT state_abbr) AS TEXT) AS description,
+    '/mmi/geography.sql' AS link,
     'map-pin' AS icon,
     'teal' AS color
 FROM dim_geography;
@@ -2114,4 +2120,114 @@ SELECT 'text' AS component,
 
 All datasets are publicly available, no login required. Download priority: Geography & Service first (smallest), then Provider & Service (largest, start early).
     ' AS contents_md;
+```
+
+## Specialty Listing
+
+```sql mmi/medical-specialities.sql { route: { caption: "Medical Specialties" } }
+-- @route.description "Detailed breakdown of medical specialties indexed in the current pipeline."
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'table' AS component, 'Indexed Specialties' AS title, true AS search;
+SELECT distinct specialty_name AS Name, specialty_domain AS Description FROM dim_specialty;
+```
+
+## Procedures
+
+```sql mmi/procedures.sql { route: { caption: "Procedure Inventory" } }
+-- @route.description "Full inventory of HCPCS/CPT codes included in the Part B dataset."
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'table' AS component, 'Available Codes' AS title, true AS search, 20 AS limit;
+SELECT hcpcs_code AS Code, procedure_description AS Label FROM dim_procedure;
+```
+
+## Geographic Scope
+
+```sql mmi/geography.sql { route: { caption: "Geographic Scope" } }
+-- @route.description "States and territories currently processed in the data pipeline."
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+
+-- A simple list of states using cards
+SELECT 'card' AS component, 6 AS columns;
+SELECT distinct state_abbr AS title, locality_name AS description, 'map-pin' AS icon FROM dim_geography;
+```
+
+## Disease Clusters
+
+```sql mmi/disease-clusters.sql { route: { caption: "ICD-10 Disease Mapping" } }
+-- @route.description "Clusters mapped for opportunity scoring, excluding General/Other categories."
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+
+SELECT 'table' AS component, 'Mapped Clusters' AS title, true AS sort, true AS search;
+SELECT distinct disease_state AS Cluster FROM dim_diagnosis WHERE disease_state != 'Other Chronic / Clinical';
 ```
