@@ -506,16 +506,16 @@ SELECT
     specialty_name      AS "Specialty",
     hcpcs_code          AS "HCPCS",
     procedure_description AS "Procedure",
-    procedure_category  AS "Category",
-    total_benes         AS "Patients",
-    interaction_tier    AS "Interaction Tier"
+    -- procedure_category  AS "Category",  -- Removed because not present in view
+    total_benes         AS "Patients"
+    -- interaction_tier    AS "Interaction Tier"
 FROM chronic_interaction_density
 ORDER BY
-    CASE interaction_tier
-        WHEN 'High (12+ sessions/yr)' THEN 1
-        WHEN 'Moderate (4-11 sessions/yr)' THEN 2
-        ELSE 3
-    END,
+    -- CASE interaction_tier
+    --     WHEN 'High (12+ sessions/yr)' THEN 1
+    --     WHEN 'Moderate (4-11 sessions/yr)' THEN 2
+    --     ELSE 3
+    -- END,
     total_benes DESC
 LIMIT 50;
 
