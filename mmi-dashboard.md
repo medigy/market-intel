@@ -54,6 +54,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
     '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -81,6 +82,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -156,6 +158,13 @@ SELECT
     'cyan' AS color;
 
 SELECT
+    'Sleep Apnea Market' AS title,
+    'Dedicated CMS sleep apnea diagnostic and DME market analysis with national totals, test mix, geography, device billing, and system friction.' AS description,
+    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
+    'bed-flat' AS icon,
+    'blue' AS color;
+
+SELECT
     'Disease Mapping' AS title,
     'ICD-10 cluster coverage, interaction density by disease, and repeat-visit tier classification.' AS description,
     '/mmi/disease-mapping.sql' AS link,
@@ -168,6 +177,53 @@ SELECT
     '/mmi/procedure-drilldown.sql' AS link,
     'pill' AS icon,
     'azure' AS color;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Sleep Apnea Snapshot' AS title,
+    'Home-page summary derived from the national diagnostic and DME queries in `sql/cms_sleep_apnea_market_analysis.sql`.' AS contents;
+
+SELECT 'card' AS component, 4 AS columns;
+
+SELECT
+    'Diagnostic Allowed' AS title,
+    '$' || printf('%,.1f', SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) / 1000000.0) || 'M' AS description,
+    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
+    'activity-heartbeat' AS icon,
+    'teal' AS color
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
+
+SELECT
+    'Diagnostic Beneficiaries' AS title,
+    printf('%,.0f', SUM(Tot_Benes)) AS description,
+    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
+    'users' AS icon,
+    'azure' AS color
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
+
+SELECT
+    'DME Allowed' AS title,
+    '$' || printf('%,.1f', SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) / 1000000.0) || 'M' AS description,
+    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
+    'device-desktop' AS icon,
+    'cyan' AS color
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
+
+SELECT
+    'Allowed vs Submitted' AS title,
+    printf('%.1f%%',
+        (SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) * 100.0)
+        / NULLIF(SUM(Tot_Suplr_Srvcs * Avg_Suplr_Sbmtd_Chrg), 0)
+    ) AS description,
+    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
+    'percentage' AS icon,
+    'indigo' AS color
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
 
 SELECT 'divider' AS component;
 
@@ -724,6 +780,320 @@ SELECT
 FROM surgical_economic_metrics
 ORDER BY estimated_total_anesthesia_cost DESC
 LIMIT 20;
+```
+
+---
+
+## CMS Sleep Apnea Market
+
+```sql mmi/cms-sleep-apnea-market-analysis.sql { route: { caption: "Sleep Apnea Market" } }
+-- @route.description "CMS sleep apnea diagnostic and DME market analysis from the dedicated SQL report"
+
+SELECT 'shell' AS component,
+       'Medicare Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)  
+    - [Medicare Durable Medical Equipment, Devices & Supplies - by Referring Provider and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-durable-medical-equipment-devices-supplies/medicare-durable-medical-equipment-devices-supplies-by-referring-provider-and-service)' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+
+SELECT 'hero' AS component,
+    'CMS Sleep Apnea Market Analysis' AS title,
+    'blue' AS color;
+
+WITH diagnostics AS (
+    SELECT
+        SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) AS total_allowed,
+        SUM(Tot_Srvcs) AS total_services,
+        SUM(Tot_Benes) AS total_beneficiaries,
+        SUM(Tot_Srvcs * Avg_Sbmtd_Chrg) AS total_submitted
+    FROM uniform_resource_diagnostics_data
+    WHERE Rndrng_Prvdr_Geo_Lvl = 'National'
+)
+SELECT 'text' AS component,
+    'The national diagnostic sleep-apnea market captures about $'
+    || printf('%,.1f', total_allowed / 1000000.0)
+    || 'M in Medicare allowed payments across '
+    || printf('%,.0f', total_services)
+    || ' billed services and '
+    || printf('%,.0f', total_beneficiaries)
+    || ' beneficiaries, against approximately $'
+    || printf('%,.1f', total_submitted / 1000000.0)
+    || 'M in submitted charges.' AS contents
+FROM diagnostics;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Part B — Diagnostic (PSG + home sleep tests)' AS title,
+    'National diagnostic query results for polysomnography (PSG) and home sleep testing.' AS contents;
+
+SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
+
+WITH diagnostics AS (
+    SELECT
+        SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) AS total_allowed,
+        SUM(Tot_Srvcs) AS total_services,
+        SUM(Tot_Benes) AS total_beneficiaries,
+        SUM(Tot_Srvcs * Avg_Sbmtd_Chrg) AS total_submitted
+    FROM uniform_resource_diagnostics_data
+    WHERE Rndrng_Prvdr_Geo_Lvl = 'National'
+)
+SELECT
+    ROUND(total_allowed, 2) AS "Total Medicare Allowed Payments",
+    total_services AS "Total Procedures Billed",
+    total_beneficiaries AS "Unique Medicare Beneficiaries",
+    ROUND(total_submitted, 2) AS "Total Submitted Charges"
+FROM diagnostics;
+
+SELECT 'card' AS component, 4 AS columns;
+
+SELECT
+    'Allowed Payments' AS title,
+    '$' || printf('%,.1f', SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) / 1000000.0) || 'M' AS description,
+    'currency-dollar' AS icon,
+    'teal' AS color
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
+
+SELECT
+    'Procedures Billed' AS title,
+    printf('%,.0f', SUM(Tot_Srvcs)) AS description,
+    'clipboard-list' AS icon,
+    'azure' AS color
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
+
+SELECT
+    'Beneficiaries' AS title,
+    printf('%,.0f', SUM(Tot_Benes)) AS description,
+    'users' AS icon,
+    'cyan' AS color
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
+
+SELECT
+    'Submitted Charges' AS title,
+    '$' || printf('%,.1f', SUM(Tot_Srvcs * Avg_Sbmtd_Chrg) / 1000000.0) || 'M' AS description,
+    'receipt-2' AS icon,
+    'indigo' AS color
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Diagnostic Procedure Mix' AS title,
+    'National procedure-level breakdown by total allowed amount and weighted allowed per test.' AS contents;
+
+SELECT 'chart' AS component,
+    'Top Diagnostic Procedures by Allowed Amount' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Allowed Amount ($)' AS xtitle;
+
+SELECT
+    HCPCS_Cd || ' — ' || HCPCS_Desc AS label,
+    SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) AS value
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National'
+GROUP BY HCPCS_Cd, HCPCS_Desc
+ORDER BY value DESC
+LIMIT 8;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS search, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    HCPCS_Cd AS "HCPCS",
+    HCPCS_Desc AS "Description",
+    SUM(Tot_Srvcs) AS "Services",
+    SUM(Tot_Benes) AS "Beneficiaries",
+    ROUND(SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) / NULLIF(SUM(Tot_Srvcs), 0), 2) AS "Weighted Allowed/Test",
+    ROUND(SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt), 2) AS "Total Allowed"
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National'
+GROUP BY HCPCS_Cd, HCPCS_Desc
+ORDER BY 6 DESC;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Test Setting Split' AS title,
+    'Compares in-lab sleep studies with home sleep testing (HST) using total allowed amount.' AS contents;
+
+SELECT 'chart' AS component,
+    'In-Lab vs Home Sleep Test Market Split' AS title,
+    'bar' AS type,
+    TRUE AS labels,
+    'Allowed Amount ($)' AS ytitle;
+
+SELECT
+    CASE
+        WHEN HCPCS_Cd IN ('95810', '95811') THEN 'In-Lab'
+        WHEN HCPCS_Cd IN ('G0398', 'G0399', 'G0400', '95800', '95806') THEN 'HST'
+        ELSE 'Other'
+    END AS label,
+    SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) AS value
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National'
+GROUP BY 1
+ORDER BY value DESC;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    HCPCS_Cd AS "HCPCS",
+    SUM(Tot_Srvcs) AS "Services",
+    SUM(Tot_Benes) AS "Beneficiaries",
+    ROUND(SUM(Tot_Srvcs) * 1.0 / NULLIF(SUM(Tot_Benes), 0), 2) AS "Interaction Density"
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National'
+GROUP BY HCPCS_Cd
+ORDER BY HCPCS_Cd;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+    'Geographic Demand' AS title,
+    'State-by-state diagnostic volumes and Medicare allowed amounts.' AS contents;
+
+SELECT 'chart' AS component,
+    'Top States by Diagnostic Allowed Amount' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Allowed Amount ($)' AS xtitle;
+
+SELECT
+    Rndrng_Prvdr_Geo_Desc AS label,
+    SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt) AS value
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'State'
+GROUP BY Rndrng_Prvdr_Geo_Desc
+ORDER BY value DESC
+LIMIT 15;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS search, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    Rndrng_Prvdr_Geo_Desc AS "State",
+    SUM(Tot_Srvcs) AS "Services",
+    SUM(Tot_Benes) AS "Beneficiaries",
+    ROUND(SUM(Tot_Srvcs * Avg_Mdcr_Alowd_Amt), 2) AS "Total Allowed"
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'State'
+GROUP BY Rndrng_Prvdr_Geo_Desc
+ORDER BY 4 DESC;
+
+SELECT 'divider' AS component;
+
+WITH dme_totals AS (
+    SELECT
+        SUM(Tot_Suplr_Srvcs) AS grand_total_services,
+        SUM(Tot_Suplr_Benes) AS grand_total_beneficiaries,
+        SUM(Tot_Suplr_Srvcs * Avg_Suplr_Sbmtd_Chrg) AS grand_total_submitted,
+        SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) AS grand_total_allowed,
+        SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Pymt_Amt) AS grand_total_payment
+    FROM uniform_resource_dme_data
+    WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471')
+)
+SELECT 'text' AS component,
+    'DME Treatment Economics' AS title,
+    'Across CPAP/BiPAP device billing, Medicare allowed about $'
+    || printf('%,.1f', grand_total_allowed / 1000000.0)
+    || 'M from $'
+    || printf('%,.1f', grand_total_submitted / 1000000.0)
+    || 'M in submitted charges, paying roughly $'
+    || printf('%,.1f', grand_total_payment / 1000000.0)
+    || 'M across '
+    || printf('%,.0f', grand_total_services)
+    || ' rental/service events.' AS contents
+FROM dme_totals;
+
+SELECT 'card' AS component, 4 AS columns;
+
+SELECT
+    'DME Allowed' AS title,
+    '$' || printf('%,.1f', SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) / 1000000.0) || 'M' AS description,
+    'device-desktop' AS icon,
+    'teal' AS color
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
+
+SELECT
+    'Medicare Payment' AS title,
+    '$' || printf('%,.1f', SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Pymt_Amt) / 1000000.0) || 'M' AS description,
+    'cash' AS icon,
+    'azure' AS color
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
+
+SELECT
+    'System Friction' AS title,
+    '$' || printf('%,.1f',
+        (SUM(Tot_Suplr_Srvcs * Avg_Suplr_Sbmtd_Chrg) - SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt)) / 1000000.0
+    ) || 'M' AS description,
+    'arrows-diff' AS icon,
+    'cyan' AS color
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
+
+SELECT
+    'Allowed / Submitted' AS title,
+    printf('%.1f%%',
+        (SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) * 100.0)
+        / NULLIF(SUM(Tot_Suplr_Srvcs * Avg_Suplr_Sbmtd_Chrg), 0)
+    ) AS description,
+    'percentage' AS icon,
+    'indigo' AS color
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
+
+SELECT 'chart' AS component,
+    'Device Billing by Allowed Amount' AS title,
+    'bar' AS type,
+    TRUE AS horizontal,
+    TRUE AS labels,
+    'Allowed Amount ($)' AS xtitle;
+
+SELECT
+    HCPCS_CD || ' — ' || HCPCS_Desc AS label,
+    SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) AS value
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471')
+GROUP BY HCPCS_CD, HCPCS_Desc
+ORDER BY value DESC;
+
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+
+SELECT
+    HCPCS_CD AS "Device Code",
+    HCPCS_Desc AS "Device Description",
+    SUM(Tot_Suplr_Srvcs) AS "Services/Rentals",
+    SUM(Tot_Suplr_Benes) AS "Beneficiaries",
+    ROUND(SUM(Tot_Suplr_Srvcs * Avg_Suplr_Sbmtd_Chrg), 2) AS "Submitted Charges",
+    ROUND(SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt), 2) AS "Allowed Amount",
+    ROUND(SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Pymt_Amt), 2) AS "Medicare Payment"
+FROM uniform_resource_dme_data
+WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471')
+GROUP BY HCPCS_CD, HCPCS_Desc
+ORDER BY 6 DESC;
 ```
 
 ---

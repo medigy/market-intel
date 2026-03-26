@@ -1,0 +1,554 @@
+"Rndrng_Prvdr_Geo_Lvl","Rndrng_Prvdr_Geo_Cd","Rndrng_Prvdr_Geo_Desc","HCPCS_Cd","HCPCS_Desc","HCPCS_Drug_Ind","Place_Of_Srvc","Tot_Rndrng_Prvdrs","Tot_Benes","Tot_Srvcs","Tot_Bene_Day_Srvcs","Avg_Sbmtd_Chrg","Avg_Mdcr_Alowd_Amt","Avg_Mdcr_Pymt_Amt","Avg_Mdcr_Stdzd_Amt"
+National,"",National,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,614,13566,13796,13783,243.25462,40.389862,30.311865,29.806862
+National,"",National,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,2987,121903,140191,139468,451.0756,143.13385,107.56175,98.02704
+National,"",National,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,1526,36730,37275,37275,230.58768,42.917465,31.987534,32.12867
+National,"",National,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,2980,51075,56999,56358,382.90332,64.30186,47.954697,47.65258
+National,"",National,"95810",Sleep study in sleep lab (6 years or older),N,F,2926,74249,75424,75410,519.11475,115.470245,87.576035,87.82828
+National,"",National,"95810",Sleep study in sleep lab (6 years or older),N,O,3412,98418,111350,110491,1616.8357,428.8337,334.39136,331.34943
+National,"",National,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,2907,79441,83686,83669,546.1599,119.18549,90.96145,91.68879
+National,"",National,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,3422,100661,118788,117772,1720.8545,444.4811,347.53873,346.80154
+National,"",National,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,F,7,23,23,23,166.30435,42.087826,30.59826,30.341305
+National,"",National,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,298,5248,5894,5866,459.25516,132.74178,101.676834,101.32849
+National,"",National,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,250,3224,3254,3254,346.8601,44.7222,33.26004,32.94488
+National,"",National,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,2568,64349,73848,73302,477.03387,71.47209,53.010406,52.972546
+National,"",National,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,F,29,349,351,351,327.72372,52.607864,39.054813,38.460796
+National,"",National,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,337,12569,13557,13472,384.91104,149.48955,116.34011,116.21284
+State,"01",Alabama,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,5,22,22,22,427.63635,130.205,93.20091,106.167274
+State,"01",Alabama,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,31,325,331,331,205.75226,41.411842,30.91145,32.22314
+State,"01",Alabama,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,37,722,749,749,412.13217,65.46773,49.019318,53.28936
+State,"01",Alabama,"95810",Sleep study in sleep lab (6 years or older),N,F,75,2715,2765,2765,435.56213,110.61796,84.21755,88.472565
+State,"01",Alabama,"95810",Sleep study in sleep lab (6 years or older),N,O,31,1034,1094,1072,1066.4874,423.2323,330.8902,373.18228
+State,"01",Alabama,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,74,3020,3190,3190,437.09778,114.48904,87.91603,92.603226
+State,"01",Alabama,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,35,1249,1344,1323,1155.1925,500.00577,391.27353,437.75528
+State,"01",Alabama,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,2,15,22,22,321.0909,143.67319,106.06909,106.06909
+State,"01",Alabama,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,13,600,656,656,402.6448,83.3302,59.65256,59.52314
+State,"02",Alaska,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,25,347,393,393,1016.1018,146.31613,112.54481,94.44453
+State,"02",Alaska,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,5,147,148,148,421.04053,58.61311,46.798447,34.38588
+State,"02",Alaska,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,15,68,74,74,626.67975,64.629326,43.637974,34.680542
+State,"02",Alaska,"95810",Sleep study in sleep lab (6 years or older),N,F,6,80,81,81,1077.2716,160.67567,126.43691,90.72531
+State,"02",Alaska,"95810",Sleep study in sleep lab (6 years or older),N,O,16,623,642,642,4035.56,615.5356,483.73926,426.23212
+State,"02",Alaska,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,5,132,153,153,1155.4509,165.61798,125.34353,90.48353
+State,"02",Alaska,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,15,449,494,494,4369.4346,615.4977,482.54633,424.4808
+State,"02",Alaska,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,6,213,319,315,1099.8081,70.45148,50.75116,50.925423
+State,"04",Arizona,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,9,68,68,68,405.69852,39.241913,25.862795,26.306177
+State,"04",Arizona,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,113,2707,3296,3296,371.69284,128.86363,99.75982,104.30449
+State,"04",Arizona,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,14,140,140,140,208.03929,42.15236,31.91957,32.70814
+State,"04",Arizona,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,41,1083,1270,1270,275.37708,51.223087,38.93156,39.589046
+State,"04",Arizona,"95810",Sleep study in sleep lab (6 years or older),N,F,33,1150,1160,1160,643.643,114.721664,87.75172,88.52064
+State,"04",Arizona,"95810",Sleep study in sleep lab (6 years or older),N,O,70,2968,3053,3053,2084.757,539.58594,421.4451,438.2419
+State,"04",Arizona,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,35,1191,1307,1307,780.94495,118.72308,91.82453,92.896545
+State,"04",Arizona,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,72,3711,4048,4048,2037.0962,552.66064,431.31323,449.44742
+State,"04",Arizona,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,18,137,233,233,433.33734,154.98944,116.66047,117.11884
+State,"04",Arizona,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,4,72,83,83,212.79518,44.127712,31.374819,31.347712
+State,"04",Arizona,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,207,2449,3275,3274,287.35718,81.50272,61.108513,60.659203
+State,"04",Arizona,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,20,345,364,364,862.4176,85.53137,65.78429,65.3175
+State,"05",Arkansas,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,4,189,190,190,134.39473,37.460052,29.067316,30.876104
+State,"05",Arkansas,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,13,68,71,71,226.07042,79.983665,63.839294,76.0145
+State,"05",Arkansas,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,6,240,240,240,167.7125,40.611168,29.704916,31.745125
+State,"05",Arkansas,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,9,365,371,371,187.31078,40.965767,29.02849,30.871159
+State,"05",Arkansas,"95810",Sleep study in sleep lab (6 years or older),N,F,21,1013,1021,1021,446.30655,109.69409,81.871704,86.815926
+State,"05",Arkansas,"95810",Sleep study in sleep lab (6 years or older),N,O,25,1452,1657,1652,821.3288,222.00623,169.68486,193.2429
+State,"05",Arkansas,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,21,1167,1204,1204,533.28406,113.84016,84.26655,89.37113
+State,"05",Arkansas,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,25,1380,1596,1592,896.7701,244.1157,188.0895,213.83788
+State,"05",Arkansas,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,8,51,52,52,221.1923,42.228268,30.923462,31.541924
+State,"05",Arkansas,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,11,63,67,67,458.14896,49.403584,36.617462,36.125374
+State,"06",California,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,21,281,288,288,273.24716,44.11059,33.97604,30.40059
+State,"06",California,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,219,11439,13373,13365,746.00195,150.80226,116.44128,95.774506
+State,"06",California,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,72,1739,1764,1764,306.9497,45.86744,34.612858,32.44367
+State,"06",California,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,275,4594,4933,4902,559.66736,86.82308,65.876755,58.316574
+State,"06",California,"95810",Sleep study in sleep lab (6 years or older),N,F,97,2408,2443,2443,569.2684,122.96836,93.146805,87.49353
+State,"06",California,"95810",Sleep study in sleep lab (6 years or older),N,O,281,12397,13863,13849,2126.781,565.7383,442.98987,381.7665
+State,"06",California,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,87,2296,2411,2410,536.52966,126.91002,96.835945,91.456245
+State,"06",California,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,295,12165,14346,14333,2329.6897,600.4908,471.07227,409.47363
+State,"06",California,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,21,539,618,614,1069.5719,150.86206,117.42658,117.26903
+State,"06",California,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,16,222,223,223,235.49165,46.460403,35.891167,35.224842
+State,"06",California,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,157,7725,10006,9994,838.18207,87.53093,65.88487,65.82403
+State,"06",California,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,17,510,540,539,648.2845,96.80102,65.00872,64.97787
+State,"08",Colorado,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,18,267,270,270,148.93333,40.541668,30.098185,29.365927
+State,"08",Colorado,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,64,1806,2214,2214,360.63956,112.20185,85.838356,85.10381
+State,"08",Colorado,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,27,886,900,900,165.44856,43.68247,31.445688,30.934055
+State,"08",Colorado,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,59,2451,2712,2711,316.00848,65.108,47.659424,47.163174
+State,"08",Colorado,"95810",Sleep study in sleep lab (6 years or older),N,F,45,1177,1200,1200,375.51526,116.78975,89.312744,88.44405
+State,"08",Colorado,"95810",Sleep study in sleep lab (6 years or older),N,O,47,981,1073,1059,953.1899,347.59946,266.91846,267.6466
+State,"08",Colorado,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,49,2163,2290,2290,438.32886,121.40859,92.66615,91.57035
+State,"08",Colorado,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,52,1969,2318,2291,1075.862,387.35727,300.6117,300.6992
+State,"08",Colorado,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,21,488,587,492,297.10123,72.98056,48.66429,48.639915
+State,"09",Connecticut,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,28,464,479,479,544.4307,155.24992,119.02094,108.88305
+State,"09",Connecticut,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,25,278,279,279,265.1828,45.511684,33.167168,31.317705
+State,"09",Connecticut,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,73,1266,1366,1366,498.51575,70.930145,53.041668,49.2177
+State,"09",Connecticut,"95810",Sleep study in sleep lab (6 years or older),N,F,26,666,669,669,651.3599,122.13434,94.18022,88.948105
+State,"09",Connecticut,"95810",Sleep study in sleep lab (6 years or older),N,O,50,1226,1255,1255,1550.6917,332.44617,260.15573,238.30452
+State,"09",Connecticut,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,24,480,526,526,855.8706,126.49011,97.68357,92.44844
+State,"09",Connecticut,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,44,727,779,779,1690.0944,337.07602,265.09,242.81909
+State,"09",Connecticut,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,3,193,194,194,203.83505,46.755207,35.50768,34.68464
+State,"09",Connecticut,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,30,299,300,300,297.51,50.3424,38.448532,38.046368
+State,"10",Delaware,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,21,1030,1119,1119,355.0818,135.9605,104.76441,104.46635
+State,"10",Delaware,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,11,380,389,389,264.36032,43.686092,32.93013,32.35391
+State,"10",Delaware,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,17,407,444,444,627.4144,68.2082,49.69002,49.03838
+State,"10",Delaware,"95810",Sleep study in sleep lab (6 years or older),N,F,11,178,179,179,749.46014,117.79481,87.581955,85.78123
+State,"10",Delaware,"95810",Sleep study in sleep lab (6 years or older),N,O,20,813,961,961,2528.487,475.56125,371.486,365.58017
+State,"10",Delaware,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,12,191,197,197,819.1123,121.86391,92.73802,91.1562
+State,"10",Delaware,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,17,569,650,650,2481.8909,547.9926,429.8582,421.93448
+State,"10",Delaware,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,11,231,234,234,742.3077,88.19034,65.753975,64.64748
+State,"11",District of Columbia,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,3,20,21,21,204.0,44.454285,35.564285,31.61
+State,"11",District of Columbia,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,14,247,257,257,463.5819,139.99347,106.46533,91.57541
+State,"11",District of Columbia,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,4,104,105,105,233.68571,81.84381,64.38876,63.501522
+State,"11",District of Columbia,"95810",Sleep study in sleep lab (6 years or older),N,F,9,121,121,121,413.36365,127.1119,99.425865,90.362976
+State,"11",District of Columbia,"95810",Sleep study in sleep lab (6 years or older),N,O,8,506,515,515,1279.7515,602.86505,474.25638,412.95905
+State,"11",District of Columbia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,8,112,113,113,834.30975,132.88443,106.27203,95.85159
+State,"11",District of Columbia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,7,334,343,343,1287.5044,589.3072,467.88644,429.9667
+State,"11",District of Columbia,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,5,170,178,178,475.66293,98.874664,74.87505,74.15904
+State,"12",Florida,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,10,218,219,219,275.08575,40.63338,31.439772,30.643608
+State,"12",Florida,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,187,19619,20473,20469,424.0181,176.98257,130.07153,105.812454
+State,"12",Florida,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,72,1963,2016,2016,193.16542,43.80117,33.391167,32.758453
+State,"12",Florida,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,205,3012,3149,3090,323.19916,68.84136,51.657963,52.485622
+State,"12",Florida,"95810",Sleep study in sleep lab (6 years or older),N,F,136,2931,2977,2977,377.0113,116.913475,90.079796,89.11115
+State,"12",Florida,"95810",Sleep study in sleep lab (6 years or older),N,O,320,10407,11931,11930,1420.3315,457.82452,358.02036,370.71127
+State,"12",Florida,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,132,2778,2934,2934,415.9292,121.02171,93.63807,92.883064
+State,"12",Florida,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,318,9584,11422,11422,1632.8264,491.15073,386.05975,398.44363
+State,"12",Florida,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,14,852,868,868,526.7573,145.75186,110.27343,109.67698
+State,"12",Florida,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,22,164,165,165,224.19394,43.803272,32.42194,32.229153
+State,"12",Florida,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,195,8047,8677,8638,404.4702,77.57619,57.034046,57.447067
+State,"12",Florida,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,10,220,231,231,1318.7164,85.657875,66.961815,65.8048
+State,"13",Georgia,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,35,701,714,714,224.50728,39.031303,28.122423,28.67311
+State,"13",Georgia,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,170,4084,4441,4424,366.6717,99.40373,76.31845,81.36515
+State,"13",Georgia,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,28,535,535,535,341.8057,40.9077,31.210018,32.929962
+State,"13",Georgia,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,87,1266,1310,1310,500.94305,79.79591,59.3709,63.581688
+State,"13",Georgia,"95810",Sleep study in sleep lab (6 years or older),N,F,72,1353,1373,1373,438.3646,112.89843,85.55853,87.84144
+State,"13",Georgia,"95810",Sleep study in sleep lab (6 years or older),N,O,118,2885,3032,3018,1521.031,403.1832,314.15018,334.51443
+State,"13",Georgia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,74,1179,1229,1228,441.21335,116.4992,89.299446,92.19529
+State,"13",Georgia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,109,2645,2838,2832,1587.9274,394.73517,309.0167,327.54428
+State,"13",Georgia,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,7,43,49,49,692.6531,161.10918,125.50082,129.39796
+State,"13",Georgia,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,120,1080,1149,1149,315.4667,76.098175,57.586674,57.78524
+State,"13",Georgia,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,6,149,202,202,419.21286,109.16446,84.32807,83.246735
+State,"15",Hawaii,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,3,140,141,141,112.23404,39.95525,31.385744,31.285248
+State,"15",Hawaii,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,5,48,48,48,195.625,45.66354,34.286457,32.10125
+State,"15",Hawaii,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,5,50,52,52,403.34885,73.14981,56.120384,55.874615
+State,"15",Hawaii,"95810",Sleep study in sleep lab (6 years or older),N,F,5,98,98,98,713.949,119.74398,92.72122,89.32439
+State,"15",Hawaii,"95810",Sleep study in sleep lab (6 years or older),N,O,9,189,200,200,1737.147,598.59406,468.2177,425.4788
+State,"15",Hawaii,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,6,247,250,250,505.44,121.298,94.83068,94.16608
+State,"15",Hawaii,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,11,288,342,342,1772.2091,594.86304,462.6058,422.20886
+State,"15",Hawaii,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,4,281,316,316,414.33545,88.84481,68.654144,68.51117
+State,"16",Idaho,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,4,68,68,68,305.32352,39.301323,22.770441,23.199852
+State,"16",Idaho,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,8,107,115,115,275.52173,82.05843,62.588608,66.202
+State,"16",Idaho,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,11,106,106,106,240.60452,38.793396,29.029434,31.323208
+State,"16",Idaho,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,15,91,91,91,330.4066,65.61604,50.11934,56.954285
+State,"16",Idaho,"95810",Sleep study in sleep lab (6 years or older),N,F,29,642,650,650,342.2798,110.44585,83.26141,86.62405
+State,"16",Idaho,"95810",Sleep study in sleep lab (6 years or older),N,O,19,353,370,370,843.01746,342.0566,265.468,286.56116
+State,"16",Idaho,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,27,866,906,906,360.20215,115.77906,87.787895,90.80893
+State,"16",Idaho,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,15,283,310,310,888.24725,360.38916,279.60913,300.58768
+State,"16",Idaho,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,F,2,16,16,16,163.0,39.13375,27.044374,27.0525
+State,"16",Idaho,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,5,77,77,77,437.35065,43.535454,30.142986,29.625065
+State,"16",Idaho,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,18,1061,1073,1073,156.33923,44.633858,33.690598,33.443905
+State,"16",Idaho,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,5,49,49,49,85.591835,39.076122,29.840204,30.119797
+State,"17",Illinois,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,63,1833,1869,1869,275.42642,41.055542,30.902697,29.889187
+State,"17",Illinois,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,147,9956,10533,10416,233.4446,143.8631,109.639015,105.68003
+State,"17",Illinois,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,104,2250,2278,2278,287.91113,43.321815,32.26229,32.073315
+State,"17",Illinois,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,116,1697,1889,1882,442.6995,55.086468,40.540688,41.23465
+State,"17",Illinois,"95810",Sleep study in sleep lab (6 years or older),N,F,176,4029,4084,4084,731.63165,117.16867,88.940636,87.82975
+State,"17",Illinois,"95810",Sleep study in sleep lab (6 years or older),N,O,146,3569,4300,4272,1870.864,399.40482,312.0264,309.94006
+State,"17",Illinois,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,174,4668,4900,4900,832.5597,121.35522,92.36881,91.36643
+State,"17",Illinois,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,145,3896,4735,4693,2080.964,415.16324,323.09332,320.69485
+State,"17",Illinois,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,3,190,197,197,340.86295,207.4508,154.12148,153.74132
+State,"17",Illinois,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,36,624,629,629,496.57925,45.170303,33.156246,32.870605
+State,"17",Illinois,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,161,2372,2914,2876,327.2619,58.198868,43.38733,43.60101
+State,"17",Illinois,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,F,2,20,20,20,162.6015,41.419,33.141,32.452
+State,"17",Illinois,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,10,6443,6785,6785,253.96832,215.86449,170.15622,170.30977
+State,"18",Indiana,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,22,329,331,331,173.61632,38.010452,28.479063,29.905256
+State,"18",Indiana,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,42,751,769,769,202.67215,59.5464,44.492577,47.509518
+State,"18",Indiana,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,44,1080,1092,1092,138.34467,41.48279,30.848965,32.12425
+State,"18",Indiana,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,80,916,1003,1001,248.27701,49.45368,35.08756,37.59731
+State,"18",Indiana,"95810",Sleep study in sleep lab (6 years or older),N,F,94,2652,2685,2685,507.4219,111.29667,83.2652,86.96328
+State,"18",Indiana,"95810",Sleep study in sleep lab (6 years or older),N,O,64,1790,2118,2113,1022.5385,238.63687,184.62259,199.12386
+State,"18",Indiana,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,93,2718,2852,2852,529.0046,115.58135,87.035,90.751884
+State,"18",Indiana,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,60,1545,1900,1894,1101.5717,246.15778,190.15338,204.03362
+State,"18",Indiana,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,8,263,265,265,172.44905,45.53449,33.999058,33.493736
+State,"18",Indiana,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,8,217,218,218,638.81195,42.113396,31.699724,31.583761
+State,"18",Indiana,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,72,1496,1647,1544,346.58228,57.71624,41.976055,41.7798
+State,"18",Indiana,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,14,437,443,441,158.28668,44.04801,31.979279,31.975597
+State,"19",Iowa,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,6,214,214,214,242.48505,38.042336,28.628645,29.982758
+State,"19",Iowa,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,30,1154,1195,1194,483.10175,110.46951,83.55814,91.844345
+State,"19",Iowa,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,10,997,1001,1001,235.3172,41.284527,30.351639,31.825575
+State,"19",Iowa,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,14,103,109,109,365.47705,70.08009,49.173668,53.032753
+State,"19",Iowa,"95810",Sleep study in sleep lab (6 years or older),N,F,24,922,945,945,598.273,111.38262,84.08627,87.67998
+State,"19",Iowa,"95810",Sleep study in sleep lab (6 years or older),N,O,20,752,860,859,1385.6359,392.5645,301.09027,331.61987
+State,"19",Iowa,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,25,1471,1536,1536,590.8864,115.41256,88.0374,91.862045
+State,"19",Iowa,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,22,1257,1606,1606,1218.9664,340.15656,263.25653,288.68546
+State,"19",Iowa,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,2,61,61,61,395.93442,117.838196,91.668526,91.668526
+State,"19",Iowa,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,14,969,1052,1052,287.16306,54.45653,40.011444,40.081207
+State,"19",Iowa,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,2,153,153,153,494.90195,82.09935,54.465424,54.43418
+State,"20",Kansas,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,7,434,439,439,251.20865,38.47524,29.303782,30.222984
+State,"20",Kansas,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,15,535,542,542,425.06216,126.9814,88.335144,97.699265
+State,"20",Kansas,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,19,540,541,541,257.64688,41.56573,29.711535,30.949722
+State,"20",Kansas,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,32,777,783,783,337.7716,62.43884,46.127205,49.413616
+State,"20",Kansas,"95810",Sleep study in sleep lab (6 years or older),N,F,26,817,826,826,588.57587,112.37129,81.57661,84.2826
+State,"20",Kansas,"95810",Sleep study in sleep lab (6 years or older),N,O,23,575,587,587,1432.6818,359.29196,277.16135,305.6525
+State,"20",Kansas,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,24,1224,1306,1306,524.5142,116.721504,88.07706,90.64741
+State,"20",Kansas,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,26,828,877,877,1546.9862,380.29364,294.88977,321.684
+State,"20",Kansas,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,5,100,100,100,141.9,43.2633,30.3869,30.0731
+State,"20",Kansas,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,16,1015,1059,1059,511.61755,58.87303,41.48816,41.219273
+State,"20",Kansas,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,1,32,32,32,450.0,42.910313,29.225,29.225
+State,"21",Kentucky,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,17,141,146,145,248.61815,88.178696,67.33562,76.032875
+State,"21",Kentucky,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,30,735,755,755,163.15572,40.924675,30.444199,32.207775
+State,"21",Kentucky,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,54,1296,1481,1481,198.03412,44.592384,33.821194,36.109352
+State,"21",Kentucky,"95810",Sleep study in sleep lab (6 years or older),N,F,64,1605,1629,1629,384.75256,110.89713,83.31004,87.14084
+State,"21",Kentucky,"95810",Sleep study in sleep lab (6 years or older),N,O,47,633,701,701,1303.0157,269.99075,209.17877,232.0811
+State,"21",Kentucky,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,60,1757,1815,1815,408.3062,115.27329,87.47568,91.27502
+State,"21",Kentucky,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,44,794,933,932,1636.1672,273.13644,212.98035,233.84781
+State,"21",Kentucky,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,59,1789,2521,2495,351.7293,83.43991,61.660923,61.38998
+State,"21",Kentucky,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,2,42,83,83,325.90363,83.62916,64.15831,64.62024
+State,"22",Louisiana,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,10,103,104,104,286.77884,38.627018,26.378077,27.283653
+State,"22",Louisiana,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,88,1525,1669,1669,575.1414,97.196945,74.209305,82.11396
+State,"22",Louisiana,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,16,278,290,290,166.02069,40.867275,30.292068,32.11193
+State,"22",Louisiana,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,36,341,378,378,310.54706,47.45513,34.74307,37.58815
+State,"22",Louisiana,"95810",Sleep study in sleep lab (6 years or older),N,F,38,1175,1189,1189,576.2953,112.67775,85.93832,88.47748
+State,"22",Louisiana,"95810",Sleep study in sleep lab (6 years or older),N,O,31,893,1077,1068,1382.7126,344.33743,266.89963,297.77997
+State,"22",Louisiana,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,41,1270,1324,1324,627.3279,116.86861,90.32676,92.97538
+State,"22",Louisiana,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,37,1082,1407,1406,1472.5645,350.79865,272.46255,305.37854
+State,"22",Louisiana,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,3,12,12,12,539.3333,134.70084,101.7975,105.045
+State,"22",Louisiana,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,29,947,956,956,402.4745,57.54131,43.814716,43.984486
+State,"23",Maine,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,6,148,148,148,102.21149,37.752434,28.290945,29.385675
+State,"23",Maine,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,3,180,182,182,353.14285,45.28802,35.465935,36.774944
+State,"23",Maine,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,17,214,215,215,163.15512,41.601814,30.864466,31.994652
+State,"23",Maine,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,11,371,379,379,381.4934,78.2128,56.24327,56.37786
+State,"23",Maine,"95810",Sleep study in sleep lab (6 years or older),N,F,15,347,349,349,417.2321,114.34066,88.163124,89.17868
+State,"23",Maine,"95810",Sleep study in sleep lab (6 years or older),N,O,10,340,347,347,621.3242,220.20787,166.3612,168.81308
+State,"23",Maine,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,17,282,294,294,448.78912,116.31197,87.99531,91.2149
+State,"23",Maine,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,13,351,370,370,630.6626,208.83124,164.00774,166.068
+State,"23",Maine,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,4,358,361,361,403.4632,54.64806,39.46457,39.177616
+State,"23",Maine,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,6,129,133,133,153.82887,117.30519,87.939926,85.88707
+State,"24",Maryland,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,17,337,345,345,165.19217,41.87287,32.19322,30.384695
+State,"24",Maryland,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,127,27849,28182,28181,371.87323,170.9961,125.0702,107.735214
+State,"24",Maryland,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,16,354,361,361,222.19113,44.196148,33.489307,32.591248
+State,"24",Maryland,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,79,1482,1636,1630,373.68356,84.811584,65.01804,62.20188
+State,"24",Maryland,"95810",Sleep study in sleep lab (6 years or older),N,F,45,1619,1640,1640,420.39996,121.470474,93.023224,88.426
+State,"24",Maryland,"95810",Sleep study in sleep lab (6 years or older),N,O,72,2712,3062,3029,1833.0286,567.34076,446.09692,411.0724
+State,"24",Maryland,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,43,1137,1183,1183,662.084,124.83451,95.58731,91.76913
+State,"24",Maryland,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,73,2318,2750,2697,1893.876,606.2905,477.83798,441.94376
+State,"24",Maryland,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,4,36,36,36,384.19446,149.29778,105.53639,104.312775
+State,"24",Maryland,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,25,842,893,893,438.3382,83.473495,64.080444,63.962734
+State,"25",Massachusetts,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,20,601,610,610,177.93242,42.716557,32.25895,29.980017
+State,"25",Massachusetts,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,54,4002,5837,5700,481.7645,105.33157,80.03891,72.29276
+State,"25",Massachusetts,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,46,1728,1746,1746,239.73622,44.98762,33.3893,31.905499
+State,"25",Massachusetts,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,46,1164,1181,1180,253.76207,59.71293,43.466274,41.519806
+State,"25",Massachusetts,"95810",Sleep study in sleep lab (6 years or older),N,F,104,2554,2599,2599,508.46463,121.91349,93.73026,88.98511
+State,"25",Massachusetts,"95810",Sleep study in sleep lab (6 years or older),N,O,54,1358,1477,1440,1642.8032,511.49127,399.20337,374.01007
+State,"25",Massachusetts,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,101,2263,2379,2379,557.6185,126.8636,98.85484,93.439026
+State,"25",Massachusetts,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,49,991,1135,1103,1650.233,504.21494,394.2375,369.47986
+State,"25",Massachusetts,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,1,21,22,22,700.0,378.78592,287.99045,287.99045
+State,"25",Massachusetts,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,15,197,197,197,527.52966,45.73086,35.58269,35.38538
+State,"25",Massachusetts,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,55,2093,2420,2401,694.0263,79.27574,58.619873,58.8138
+State,"25",Massachusetts,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,3,35,36,36,464.8611,176.87971,131.43611,131.43611
+State,"26",Michigan,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,21,357,362,362,143.56491,39.375637,29.73279,30.01257
+State,"26",Michigan,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,51,772,809,809,294.28577,112.389244,85.11036,87.9375
+State,"26",Michigan,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,64,789,803,803,161.45517,42.647884,30.754372,31.16086
+State,"26",Michigan,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,122,1665,1780,1780,294.35648,74.197556,55.042995,57.364864
+State,"26",Michigan,"95810",Sleep study in sleep lab (6 years or older),N,F,129,2428,2473,2473,417.0562,114.87632,86.281715,87.03535
+State,"26",Michigan,"95810",Sleep study in sleep lab (6 years or older),N,O,111,2511,2593,2558,983.4406,367.13333,284.88907,295.5635
+State,"26",Michigan,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,135,2745,2879,2879,410.86157,118.81955,89.817184,90.8984
+State,"26",Michigan,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,120,2992,3220,3164,1068.0266,403.13553,313.19952,324.5519
+State,"26",Michigan,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,6,13,14,14,359.84143,154.87714,109.61143,109.39214
+State,"26",Michigan,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,12,16,16,16,238.39062,42.79625,29.85,29.604376
+State,"26",Michigan,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,97,2185,2237,2237,343.8721,63.70627,46.375652,46.150105
+State,"26",Michigan,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,19,181,191,191,798.7801,48.168953,33.879635,33.99377
+State,"27",Minnesota,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,27,218,225,225,350.8972,39.189865,25.681377,26.073067
+State,"27",Minnesota,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,62,458,474,474,589.8043,125.190674,90.86808,89.99036
+State,"27",Minnesota,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,27,434,443,443,187.29082,41.943024,30.338984,31.337517
+State,"27",Minnesota,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,44,599,623,609,223.63107,47.82276,34.103,34.80623
+State,"27",Minnesota,"95810",Sleep study in sleep lab (6 years or older),N,F,70,856,864,864,665.39685,114.16028,86.87949,88.1374
+State,"27",Minnesota,"95810",Sleep study in sleep lab (6 years or older),N,O,62,1366,1562,1514,1651.8254,444.4207,345.63278,341.9843
+State,"27",Minnesota,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,67,1287,1352,1352,704.7249,119.195915,91.53532,92.10125
+State,"27",Minnesota,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,61,923,1145,1107,1867.9568,426.77863,333.84863,329.62628
+State,"27",Minnesota,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,4,16,16,16,256.75,43.51125,27.31125,27.480625
+State,"27",Minnesota,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,87,489,602,600,411.20456,58.098522,42.838737,42.654434
+State,"27",Minnesota,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,F,3,25,25,25,392.0,86.0604,59.73,58.3984
+State,"27",Minnesota,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,41,381,397,394,1154.7333,185.89816,146.27705,143.37575
+State,"28",Mississippi,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,10,141,141,141,198.2766,37.56929,28.757446,30.470425
+State,"28",Mississippi,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,21,679,686,685,869.4162,126.173164,94.869255,109.971794
+State,"28",Mississippi,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,19,538,548,548,247.66788,40.923195,30.982208,32.72834
+State,"28",Mississippi,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,27,309,318,318,385.63437,50.82541,37.36629,41.10519
+State,"28",Mississippi,"95810",Sleep study in sleep lab (6 years or older),N,F,29,1743,1769,1769,765.99274,110.00056,82.88367,87.586006
+State,"28",Mississippi,"95810",Sleep study in sleep lab (6 years or older),N,O,27,1061,1127,1127,2459.8357,437.61987,337.23798,387.7687
+State,"28",Mississippi,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,30,1775,1851,1851,798.59766,114.66883,87.54576,91.84669
+State,"28",Mississippi,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,32,1176,1311,1311,2645.907,465.32095,364.0695,417.4946
+State,"28",Mississippi,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,6,42,50,48,307.2562,72.0944,54.973,54.9732
+State,"29",Missouri,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,11,320,327,327,218.1153,39.616085,29.385534,29.424404
+State,"29",Missouri,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,26,982,1624,1623,374.24042,133.66306,101.43958,105.53319
+State,"29",Missouri,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,50,1050,1065,1065,183.64128,42.062374,31.027803,31.82647
+State,"29",Missouri,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,67,1220,1304,1284,252.43068,46.712746,34.01411,35.473076
+State,"29",Missouri,"95810",Sleep study in sleep lab (6 years or older),N,F,101,2393,2446,2446,480.1178,113.328156,84.81925,86.566666
+State,"29",Missouri,"95810",Sleep study in sleep lab (6 years or older),N,O,70,1244,1383,1370,1331.9467,309.25623,237.37805,251.54073
+State,"29",Missouri,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,101,3086,3288,3285,519.40753,116.94844,87.526794,89.788284
+State,"29",Missouri,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,81,1433,1731,1708,1345.2455,299.01434,231.99501,247.00113
+State,"29",Missouri,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,24,336,338,338,232.02159,43.238224,30.631657,30.30278
+State,"29",Missouri,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,50,1111,1200,1199,364.82516,47.45064,33.507057,33.368034
+State,"29",Missouri,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,14,101,180,101,191.55556,64.75806,49.972557,48.833332
+State,"30",Montana,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,7,79,86,86,350.5156,124.34686,94.20663,98.880585
+State,"30",Montana,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,11,207,214,214,267.17786,42.86874,33.365234,33.51799
+State,"30",Montana,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,6,137,140,140,151.90894,48.255787,35.453213,36.696785
+State,"30",Montana,"95810",Sleep study in sleep lab (6 years or older),N,F,12,251,258,258,366.69968,117.09035,87.95275,86.667595
+State,"30",Montana,"95810",Sleep study in sleep lab (6 years or older),N,O,16,761,813,813,1132.0393,409.34464,318.61526,319.10492
+State,"30",Montana,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,12,373,392,392,371.44122,121.63691,93.65044,92.120384
+State,"30",Montana,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,15,932,1052,1052,1084.9496,394.5082,308.03583,307.88776
+State,"30",Montana,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,7,175,186,186,251.77866,66.721344,47.009945,48.058117
+State,"31",Nebraska,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,4,137,137,137,110.07161,38.528248,28.592993,29.437008
+State,"31",Nebraska,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,13,502,556,556,248.83566,113.98018,80.47376,87.48369
+State,"31",Nebraska,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,15,971,983,983,200.18855,41.225117,29.83476,31.335249
+State,"31",Nebraska,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,22,545,549,549,108.527794,42.19878,31.194153,32.980675
+State,"31",Nebraska,"95810",Sleep study in sleep lab (6 years or older),N,F,25,705,709,709,300.68945,111.05092,83.458885,87.27815
+State,"31",Nebraska,"95810",Sleep study in sleep lab (6 years or older),N,O,11,139,143,143,1071.4579,357.07455,278.01257,301.61078
+State,"31",Nebraska,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,27,1416,1512,1512,304.89743,115.22975,87.547325,91.4606
+State,"31",Nebraska,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,13,243,263,263,1566.2872,402.23984,310.78033,330.58502
+State,"31",Nebraska,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,1,23,24,24,406.0,35.118332,28.11,27.452084
+State,"31",Nebraska,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,4,35,35,35,172.8,43.28,32.645714,33.424572
+State,"31",Nebraska,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,17,1057,1061,1061,296.59216,76.678345,57.178814,57.1567
+State,"31",Nebraska,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,F,1,16,17,17,111.0,38.831177,22.107647,21.588823
+State,"32",Nevada,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,55,1440,1597,1532,604.3629,144.45268,111.16698,111.342186
+State,"32",Nevada,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,25,391,397,397,617.03864,87.28731,66.80184,66.80728
+State,"32",Nevada,"95810",Sleep study in sleep lab (6 years or older),N,F,2,240,261,261,273.50192,114.483025,85.48031,86.40207
+State,"32",Nevada,"95810",Sleep study in sleep lab (6 years or older),N,O,56,1883,1990,1989,1865.2037,569.56464,445.83722,452.4608
+State,"32",Nevada,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,4,211,234,234,305.08047,119.73868,88.58603,88.99581
+State,"32",Nevada,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,55,2299,2567,2567,1991.028,589.2473,460.85486,470.6788
+State,"32",Nevada,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,3,172,174,174,439.7862,71.76615,54.34885,59.556725
+State,"32",Nevada,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,18,541,849,835,853.649,92.799225,67.40063,67.571815
+State,"33",New Hampshire,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,3,23,24,24,391.60834,40.234585,32.1175,31.619583
+State,"33",New Hampshire,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,5,50,50,50,256.36,46.5526,37.1058,36.8158
+State,"33",New Hampshire,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,10,135,135,135,213.77629,43.692665,33.01837,32.56726
+State,"33",New Hampshire,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,11,76,77,77,232.8961,46.762466,35.302986,36.61727
+State,"33",New Hampshire,"95810",Sleep study in sleep lab (6 years or older),N,F,20,580,594,594,619.5909,116.64389,91.14806,90.47394
+State,"33",New Hampshire,"95810",Sleep study in sleep lab (6 years or older),N,O,12,444,449,449,827.6971,116.7743,87.13617,86.37888
+State,"33",New Hampshire,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,18,519,544,544,612.4375,121.205,93.12057,92.2807
+State,"33",New Hampshire,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,11,379,397,397,943.82117,121.17267,92.24383,91.41015
+State,"33",New Hampshire,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,25,90,96,96,594.2708,298.27374,230.70198,236.10292
+State,"33",New Hampshire,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,5,216,218,218,239.76147,45.205643,35.817616,35.379173
+State,"33",New Hampshire,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,21,804,808,808,467.18564,44.95583,33.559914,33.778427
+State,"33",New Hampshire,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,3,12,12,12,925.0,79.831665,65.69666,72.5475
+State,"34",New Jersey,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,38,1944,1986,1986,228.23706,43.00494,32.90383,30.370302
+State,"34",New Jersey,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,142,2936,3492,3467,623.02734,132.99538,102.77418,90.85828
+State,"34",New Jersey,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,43,983,1000,1000,216.53754,46.34272,35.81103,33.22853
+State,"34",New Jersey,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,123,2255,2972,2958,512.7507,57.627506,44.439148,40.556435
+State,"34",New Jersey,"95810",Sleep study in sleep lab (6 years or older),N,F,115,1937,1966,1966,682.45465,123.76009,96.5338,90.20628
+State,"34",New Jersey,"95810",Sleep study in sleep lab (6 years or older),N,O,87,1455,1641,1625,2938.1956,473.76056,371.98477,327.58264
+State,"34",New Jersey,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,111,1878,1950,1950,677.11633,128.2947,99.707504,93.14935
+State,"34",New Jersey,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,86,1359,1582,1562,3101.289,497.98468,393.55966,346.4672
+State,"34",New Jersey,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,9,420,444,444,251.74483,113.81979,86.354095,85.224846
+State,"34",New Jersey,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,50,1635,1867,1832,438.22745,76.91313,59.02285,58.78143
+State,"34",New Jersey,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,3,24,27,27,475.55554,100.09,79.755554,79.70481
+State,"35",New Mexico,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,8,274,327,327,483.09454,120.75967,89.04498,96.178444
+State,"35",New Mexico,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,8,367,373,373,168.5764,42.640377,31.612118,31.884155
+State,"35",New Mexico,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,16,143,240,164,558.2502,52.042667,38.179,40.963333
+State,"35",New Mexico,"95810",Sleep study in sleep lab (6 years or older),N,F,8,273,276,276,354.77774,114.52848,89.19395,89.976776
+State,"35",New Mexico,"95810",Sleep study in sleep lab (6 years or older),N,O,20,664,862,702,1606.633,348.2512,269.40836,292.3321
+State,"35",New Mexico,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,7,575,607,607,376.76474,118.921745,92.80015,93.496544
+State,"35",New Mexico,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,22,846,1124,950,1787.3553,390.80673,302.5983,329.60916
+State,"35",New Mexico,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,1,65,66,66,140.0,71.488785,55.508636,55.508636
+State,"35",New Mexico,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,5,65,66,66,317.46606,84.40985,60.359695,61.27091
+State,"36",New York,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,23,306,308,308,445.23886,43.865974,33.352825,30.165098
+State,"36",New York,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,240,5216,6222,6132,623.5591,134.72577,103.82859,90.45924
+State,"36",New York,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,59,1458,1475,1475,272.42654,46.072773,35.416744,33.050232
+State,"36",New York,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,186,2745,2880,2847,549.15326,72.65266,54.327328,48.373837
+State,"36",New York,"95810",Sleep study in sleep lab (6 years or older),N,F,117,2776,2801,2801,692.14594,124.45168,95.91186,89.03617
+State,"36",New York,"95810",Sleep study in sleep lab (6 years or older),N,O,197,4332,4690,4685,2158.0022,459.94345,361.00876,320.23083
+State,"36",New York,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,120,1992,2043,2043,679.9196,128.68481,100.70537,93.77639
+State,"36",New York,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,190,3724,4252,4251,2458.9868,491.29572,386.8779,342.09183
+State,"36",New York,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,35,443,450,450,205.05907,101.84627,80.83456,79.7954
+State,"36",New York,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,13,292,296,296,202.63835,44.688244,33.947197,33.736183
+State,"36",New York,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,103,1773,1828,1826,445.03934,65.08909,49.143036,48.609413
+State,"36",New York,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,22,1103,1162,1162,545.4957,79.63945,62.042496,61.60291
+State,"37",North Carolina,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,8,52,52,52,158.8077,38.328655,29.406923,30.589231
+State,"37",North Carolina,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,44,901,956,956,385.1388,107.57073,81.3439,86.64862
+State,"37",North Carolina,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,28,543,553,553,186.0528,42.323093,32.68047,33.1515
+State,"37",North Carolina,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,116,1766,1854,1852,287.6768,52.759945,39.06325,41.30452
+State,"37",North Carolina,"95810",Sleep study in sleep lab (6 years or older),N,F,113,2587,2609,2609,605.26825,112.39359,84.50405,87.27877
+State,"37",North Carolina,"95810",Sleep study in sleep lab (6 years or older),N,O,142,4007,4376,4364,1436.4603,420.86398,329.08755,349.459
+State,"37",North Carolina,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,118,2206,2340,2340,644.668,116.82015,88.74491,91.37296
+State,"37",North Carolina,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,149,3522,3963,3954,1565.9082,437.2131,341.94226,365.00513
+State,"37",North Carolina,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,34,790,806,806,253.86972,54.61541,40.701614,40.20109
+State,"37",North Carolina,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,67,1455,1618,1618,692.8732,66.182175,48.771748,48.626717
+State,"37",North Carolina,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,13,116,168,168,302.8506,57.848392,43.712975,43.684406
+State,"38",North Dakota,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,2,45,45,45,180.8,39.49311,26.550888,26.716444
+State,"38",North Dakota,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,4,137,210,138,221.6762,77.44133,55.51419,55.258858
+State,"38",North Dakota,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,2,19,19,19,167.0,43.094738,32.68421,32.51263
+State,"38",North Dakota,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,2,13,13,13,102.53846,42.37077,33.77077,34.28
+State,"38",North Dakota,"95810",Sleep study in sleep lab (6 years or older),N,F,9,326,329,329,448.09424,115.52614,86.38857,86.33051
+State,"38",North Dakota,"95810",Sleep study in sleep lab (6 years or older),N,O,9,491,597,510,665.26636,219.1033,168.42032,168.50908
+State,"38",North Dakota,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,9,399,419,419,496.92603,119.459595,88.7111,89.030716
+State,"38",North Dakota,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,9,596,771,647,697.75745,230.25676,178.31903,178.57225
+State,"38",North Dakota,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,2,45,45,45,173.26666,42.437557,33.069332,33.050888
+State,"38",North Dakota,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,7,56,56,56,264.73215,52.27268,41.088036,40.892677
+State,"38",North Dakota,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,16,197,212,212,167.26414,42.590237,31.008867,30.502123
+State,"39",Ohio,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,16,115,116,116,363.2131,38.880344,29.958103,30.625
+State,"39",Ohio,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,15,404,475,475,652.2147,104.39749,79.34655,86.70482
+State,"39",Ohio,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,129,2579,2630,2630,301.29547,42.022793,31.294024,32.148846
+State,"39",Ohio,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,87,682,704,691,252.03345,57.51405,41.89585,44.13858
+State,"39",Ohio,"95810",Sleep study in sleep lab (6 years or older),N,F,179,4280,4345,4344,462.15686,112.93308,85.6038,87.95509
+State,"39",Ohio,"95810",Sleep study in sleep lab (6 years or older),N,O,137,2904,3241,3241,1370.5773,245.88097,187.9134,201.86504
+State,"39",Ohio,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,181,4150,4338,4337,524.1451,117.109245,88.98074,91.43509
+State,"39",Ohio,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,140,3111,3555,3555,1535.2653,296.72903,229.81873,247.75523
+State,"39",Ohio,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,89,1440,1519,1505,391.07245,86.80498,65.55279,65.56865
+State,"39",Ohio,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,9,202,339,324,521.23895,255.5354,203.41899,199.80667
+State,"39",Ohio,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,8,140,184,184,641.13043,161.92201,120.54484,119.69288
+State,"40",Oklahoma,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,7,57,58,58,134.97896,38.56,30.24362,31.073965
+State,"40",Oklahoma,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,12,471,915,915,242.36502,131.53491,101.89773,111.056984
+State,"40",Oklahoma,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,28,810,824,824,154.8907,41.30381,30.536942,31.944284
+State,"40",Oklahoma,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,23,485,589,589,230.9907,54.806858,41.12491,44.338573
+State,"40",Oklahoma,"95810",Sleep study in sleep lab (6 years or older),N,F,37,1969,2010,1997,292.6357,111.9347,84.971375,88.009674
+State,"40",Oklahoma,"95810",Sleep study in sleep lab (6 years or older),N,O,22,957,1008,1008,658.5691,256.845,196.66634,215.3909
+State,"40",Oklahoma,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,36,2598,2776,2765,300.5804,116.38797,88.59847,91.502304
+State,"40",Oklahoma,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,27,1408,1620,1620,791.8062,257.58728,199.33171,218.52773
+State,"40",Oklahoma,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,7,101,106,106,550.48114,58.729717,44.964436,44.62755
+State,"41",Oregon,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,12,217,220,220,133.45454,39.696228,28.25959,28.214273
+State,"41",Oregon,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,39,780,907,907,463.61734,109.304474,83.39043,84.80112
+State,"41",Oregon,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,13,381,385,385,146.05455,42.550934,30.586884,30.996338
+State,"41",Oregon,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,29,394,418,418,169.05785,48.5383,34.001484,33.556507
+State,"41",Oregon,"95810",Sleep study in sleep lab (6 years or older),N,F,29,831,839,839,403.61655,115.73529,86.2114,86.27801
+State,"41",Oregon,"95810",Sleep study in sleep lab (6 years or older),N,O,45,1367,1418,1418,1460.2238,472.36017,367.135,370.9739
+State,"41",Oregon,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,28,874,942,942,406.9103,119.96414,88.85078,88.987434
+State,"41",Oregon,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,47,1740,1871,1871,1585.3899,495.18137,386.40042,391.0962
+State,"41",Oregon,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,5,20,20,20,183.75,44.44,30.2415,29.9395
+State,"41",Oregon,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,50,1377,1511,1509,353.1199,73.93623,54.59796,53.818066
+State,"41",Oregon,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,F,1,86,86,86,224.0,40.69686,31.44349,30.71965
+State,"41",Oregon,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,10,55,55,55,849.34546,77.29364,43.216362,42.358547
+State,"42",Pennsylvania,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,45,807,820,820,143.30202,39.50739,29.651354,29.864378
+State,"42",Pennsylvania,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,182,4848,5563,5544,421.02078,112.482285,85.99964,85.44057
+State,"42",Pennsylvania,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,87,2887,2914,2914,253.51236,43.034122,32.190273,32.22004
+State,"42",Pennsylvania,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,91,1897,1932,1932,210.69673,53.072895,40.06518,39.557144
+State,"42",Pennsylvania,"95810",Sleep study in sleep lab (6 years or older),N,F,190,4565,4634,4634,443.4842,117.020805,87.93967,86.952736
+State,"42",Pennsylvania,"95810",Sleep study in sleep lab (6 years or older),N,O,115,1891,2053,1981,1106.4001,342.80392,265.7361,269.16882
+State,"42",Pennsylvania,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,194,4226,4392,4392,473.632,119.91176,90.93346,91.050705
+State,"42",Pennsylvania,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,109,2360,2589,2517,1263.516,366.9247,284.7364,288.83698
+State,"42",Pennsylvania,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,25,253,254,254,656.8268,148.5278,113.71366,114.55933
+State,"42",Pennsylvania,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,11,14,14,14,510.57144,82.39714,58.74643,57.889286
+State,"42",Pennsylvania,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,193,4182,4382,4356,412.0503,60.983486,44.63422,44.45401
+State,"42",Pennsylvania,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,17,460,468,468,193.1733,46.875237,36.69895,36.57919
+State,"44",Rhode Island,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,4,654,668,668,276.16183,126.78922,94.930405,91.71199
+State,"44",Rhode Island,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,4,227,231,231,140.04329,41.782597,32.12437,33.169003
+State,"44",Rhode Island,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,10,166,170,170,229.54706,76.07929,56.68341,55.089645
+State,"44",Rhode Island,"95810",Sleep study in sleep lab (6 years or older),N,F,7,111,111,111,857.00903,114.96558,90.43225,91.19784
+State,"44",Rhode Island,"95810",Sleep study in sleep lab (6 years or older),N,O,8,147,158,158,1388.7848,506.03754,394.66843,377.17532
+State,"44",Rhode Island,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,9,91,94,94,921.78723,118.6216,94.515854,95.65
+State,"44",Rhode Island,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,9,160,177,177,1526.0452,529.578,414.85126,395.95102
+State,"44",Rhode Island,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,7,37,38,38,326.0263,70.07132,53.982895,55.599472
+State,"44",Rhode Island,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,1,33,33,33,450.0,237.81879,180.06393,180.06393
+State,"45",South Carolina,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,11,92,92,92,179.85239,38.41663,29.6725,30.715218
+State,"45",South Carolina,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,35,771,809,809,473.76404,127.87244,96.927155,104.28394
+State,"45",South Carolina,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,34,1002,1005,1005,164.83475,41.4242,30.29394,31.703583
+State,"45",South Carolina,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,61,1117,1180,1180,282.07123,56.98174,42.590847,44.81772
+State,"45",South Carolina,"95810",Sleep study in sleep lab (6 years or older),N,F,49,1265,1285,1285,481.11203,111.517715,85.0586,88.416725
+State,"45",South Carolina,"95810",Sleep study in sleep lab (6 years or older),N,O,69,2529,3279,3277,1334.6809,351.06308,272.97983,297.48422
+State,"45",South Carolina,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,48,1269,1330,1330,514.1444,114.96752,88.325874,92.38404
+State,"45",South Carolina,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,69,2462,3303,3299,1418.5382,363.89252,283.44727,309.47028
+State,"45",South Carolina,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,7,113,114,114,310.57895,137.38745,105.954735,107.38386
+State,"45",South Carolina,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,37,1551,1593,1593,393.44492,69.66698,51.840553,51.4212
+State,"45",South Carolina,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,1,64,64,64,760.0,99.09406,63.355312,63.355312
+State,"46",South Dakota,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,12,82,84,84,105.35441,42.445953,28.565952,30.23488
+State,"46",South Dakota,"95810",Sleep study in sleep lab (6 years or older),N,F,12,509,516,516,607.92334,114.12589,85.451706,86.68176
+State,"46",South Dakota,"95810",Sleep study in sleep lab (6 years or older),N,O,9,325,329,329,196.70714,136.98364,100.479515,104.04392
+State,"46",South Dakota,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,12,667,696,696,713.944,118.60964,89.61488,90.720184
+State,"46",South Dakota,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,11,546,573,573,178.71957,135.03548,100.800644,103.61148
+State,"46",South Dakota,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,4,15,15,15,211.8,46.38933,37.047333,36.593334
+State,"46",South Dakota,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,18,1222,1237,1237,110.25401,43.299183,31.938108,31.745974
+State,"47",Tennessee,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,9,207,210,210,124.47686,37.936478,28.425428,29.884237
+State,"47",Tennessee,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,24,552,590,590,363.32004,118.13663,87.42832,98.89881
+State,"47",Tennessee,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,43,783,788,788,218.78154,41.291866,31.442398,32.86683
+State,"47",Tennessee,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,102,1917,2143,2143,399.96497,52.522305,38.540398,41.946133
+State,"47",Tennessee,"95810",Sleep study in sleep lab (6 years or older),N,F,67,2281,2343,2343,402.82797,111.17468,85.39091,89.07134
+State,"47",Tennessee,"95810",Sleep study in sleep lab (6 years or older),N,O,90,2948,3500,3500,1639.4908,371.96527,289.1718,320.8542
+State,"47",Tennessee,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,68,2255,2342,2342,408.9533,115.05719,89.19943,93.20258
+State,"47",Tennessee,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,88,3025,3667,3667,1729.9921,395.32254,307.92145,341.80942
+State,"47",Tennessee,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,32,431,484,484,306.24976,60.28789,45.519917,45.595825
+State,"48",Texas,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,45,1270,1302,1289,292.92664,39.095284,29.723171,30.316574
+State,"48",Texas,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,447,9736,13754,13603,456.13992,124.64799,95.593285,97.828476
+State,"48",Texas,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,74,1487,1528,1528,242.39948,42.266464,31.607481,32.252174
+State,"48",Texas,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,260,4770,6570,6219,401.2524,65.03276,48.944283,50.155193
+State,"48",Texas,"95810",Sleep study in sleep lab (6 years or older),N,F,169,3331,3381,3381,440.8143,114.48054,86.81146,87.8444
+State,"48",Texas,"95810",Sleep study in sleep lab (6 years or older),N,O,298,8854,10632,10432,1476.9978,376.2738,292.34094,301.00873
+State,"48",Texas,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,159,4106,4343,4343,476.42264,118.70707,91.12105,92.23829
+State,"48",Texas,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,284,9680,11825,11558,1620.5588,394.72162,308.24313,319.32693
+State,"48",Texas,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,17,290,494,485,406.69635,143.5205,110.31281,109.76846
+State,"48",Texas,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,125,1841,2144,2136,686.3116,72.65157,54.33566,54.368565
+State,"48",Texas,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,21,443,558,558,277.653,66.82712,51.033672,50.050285
+State,"49",Utah,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,13,145,147,147,434.0834,84.74864,63.939182,68.149254
+State,"49",Utah,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,17,1156,1175,1175,144.10204,42.004887,30.228765,31.144289
+State,"49",Utah,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,22,773,1001,1001,292.49008,62.272446,44.226902,46.374596
+State,"49",Utah,"95810",Sleep study in sleep lab (6 years or older),N,F,23,624,627,627,377.0924,113.36812,83.82123,85.85848
+State,"49",Utah,"95810",Sleep study in sleep lab (6 years or older),N,O,27,1116,1237,1237,1178.3418,417.7666,324.98184,346.20242
+State,"49",Utah,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,21,1233,1347,1347,299.7589,117.02388,87.11329,89.772156
+State,"49",Utah,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,30,1334,1596,1596,1169.4515,410.39096,321.2489,343.56992
+State,"49",Utah,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,2,92,100,100,433.68,115.6282,86.078,86.9264
+State,"49",Utah,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,26,471,503,503,357.85663,82.59123,60.905983,61.198112
+State,"50",Vermont,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,1,28,28,28,259.0,39.33,31.39,31.61
+State,"50",Vermont,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,5,65,65,65,237.81538,42.552616,28.785538,29.240768
+State,"50",Vermont,"95810",Sleep study in sleep lab (6 years or older),N,F,6,214,217,217,807.51385,114.185486,85.55922,86.88037
+State,"50",Vermont,"95810",Sleep study in sleep lab (6 years or older),N,O,4,76,78,77,5566.9614,515.1772,400.08704,411.3414
+State,"50",Vermont,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,5,209,220,220,826.02386,118.63777,89.657906,90.84018
+State,"50",Vermont,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,2,34,34,34,6403.9707,567.7785,439.95822,444.21
+State,"50",Vermont,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,1,39,39,39,124.0,42.64359,30.284103,31.71282
+State,"50",Vermont,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,3,79,79,79,682.6076,86.13886,68.12823,68.09101
+State,"51",Virginia,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,12,210,217,217,277.92313,40.341427,30.006453,29.531244
+State,"51",Virginia,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,85,2666,2763,2763,482.2022,136.83629,103.92333,103.03236
+State,"51",Virginia,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,35,811,824,824,171.99245,41.45977,29.951262,31.264284
+State,"51",Virginia,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,82,1642,1799,1799,520.7258,84.6417,62.155914,62.455875
+State,"51",Virginia,"95810",Sleep study in sleep lab (6 years or older),N,F,69,2620,2652,2652,432.2693,115.87337,88.12665,87.97101
+State,"51",Virginia,"95810",Sleep study in sleep lab (6 years or older),N,O,108,3902,4067,4067,1554.6769,533.8777,417.27847,405.7327
+State,"51",Virginia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,66,2395,2522,2522,438.98904,119.67846,91.57278,91.85794
+State,"51",Virginia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,106,3235,3527,3527,1694.4396,566.58374,445.93948,434.58255
+State,"51",Virginia,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,1,87,87,87,492.09,148.87311,115.04448,115.04448
+State,"51",Virginia,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,38,869,889,889,298.93723,71.25379,52.46237,53.20225
+State,"51",Virginia,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,4,62,62,62,128.32484,43.789516,33.80742,33.23758
+State,"53",Washington,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,15,495,501,501,133.29158,40.368683,29.421198,29.070438
+State,"53",Washington,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,26,189,229,221,431.6374,117.29537,88.96546,90.70336
+State,"53",Washington,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,39,944,956,956,170.5226,44.11843,32.398514,31.746685
+State,"53",Washington,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,33,325,343,343,340.66043,54.26519,39.069126,36.990555
+State,"53",Washington,"95810",Sleep study in sleep lab (6 years or older),N,F,77,2253,2294,2294,399.06784,119.66291,88.236725,85.35733
+State,"53",Washington,"95810",Sleep study in sleep lab (6 years or older),N,O,63,1693,1930,1929,1601.9722,498.30667,389.1649,368.96478
+State,"53",Washington,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,72,2024,2149,2149,392.11966,122.60303,92.088806,90.322586
+State,"53",Washington,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,55,1386,1738,1734,1690.9421,476.51105,373.285,356.9955
+State,"53",Washington,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,17,77,77,77,302.4026,45.06117,34.52026,34.467663
+State,"53",Washington,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,97,2713,3567,3473,382.21063,67.70859,50.487156,50.483788
+State,"53",Washington,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,F,9,124,125,125,125.792,41.29872,28.32504,28.452
+State,"53",Washington,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,30,428,434,434,449.79547,57.78378,43.741844,43.696705
+State,"54",West Virginia,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,4,37,47,47,440.2936,108.03915,83.73851,96.87425
+State,"54",West Virginia,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,26,345,346,346,183.96503,40.54867,31.031214,33.190346
+State,"54",West Virginia,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,34,488,502,502,306.97144,54.80492,40.60924,43.834583
+State,"54",West Virginia,"95810",Sleep study in sleep lab (6 years or older),N,F,31,489,493,493,651.98553,112.43191,88.04012,90.756935
+State,"54",West Virginia,"95810",Sleep study in sleep lab (6 years or older),N,O,30,624,687,686,1201.3829,329.26434,258.10217,291.81366
+State,"54",West Virginia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,34,626,639,639,686.8934,115.28313,90.72859,94.68529
+State,"54",West Virginia,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,29,696,753,752,1357.7063,358.8073,281.66458,318.66617
+State,"54",West Virginia,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,7,53,53,53,596.7547,113.02736,78.68774,78.23264
+State,"54",West Virginia,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,4,100,103,103,989.8236,93.183205,71.41116,73.60505
+State,"55",Wisconsin,"95800","Sleep study including heart rate, breathing, and sleep time",N,F,24,577,581,581,625.89844,38.849155,28.9721,29.584974
+State,"55",Wisconsin,"95800","Sleep study including heart rate, breathing, and sleep time",N,O,26,618,879,874,618.8656,89.39533,66.487305,68.96523
+State,"55",Wisconsin,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,F,46,853,864,864,487.42316,41.726955,31.14198,32.196053
+State,"55",Wisconsin,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,48,791,841,830,531.87115,48.772865,35.983925,37.154305
+State,"55",Wisconsin,"95810",Sleep study in sleep lab (6 years or older),N,F,76,1540,1554,1554,1325.7317,113.29719,85.77237,87.5766
+State,"55",Wisconsin,"95810",Sleep study in sleep lab (6 years or older),N,O,68,894,1030,1030,1848.1982,201.78069,153.4557,162.13232
+State,"55",Wisconsin,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,79,1616,1694,1694,1417.1943,117.39035,90.33699,92.3765
+State,"55",Wisconsin,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,64,1267,1543,1543,1826.9097,198.3493,150.79851,158.61134
+State,"55",Wisconsin,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,2,29,38,38,1194.7368,200.58868,160.44894,170.95895
+State,"55",Wisconsin,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,F,24,222,224,224,536.8929,43.542053,31.728214,31.077456
+State,"55",Wisconsin,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,69,1965,2465,2456,641.971,47.92201,33.45735,33.522003
+State,"55",Wisconsin,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,F,2,63,63,63,987.0,85.84,68.71,67.11
+State,"55",Wisconsin,G0400,"Home sleep test (hst) with type iv portable monitor, unattended; minimum of 3 channels",N,O,1,34,68,68,650.0,177.20912,131.77911,131.77911
+State,"56",Wyoming,"95810",Sleep study in sleep lab (6 years or older),N,F,1,46,46,46,271.0,118.23174,94.18261,91.906525
+State,"56",Wyoming,"95810",Sleep study in sleep lab (6 years or older),N,O,3,96,96,96,1750.0054,603.6698,473.99542,475.33585
+State,"56",Wyoming,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,1,68,75,75,281.0,122.73053,89.608,87.41347
+State,"56",Wyoming,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,4,135,138,138,2258.985,627.0047,487.15137,493.22037
+State,"56",Wyoming,G0398,"Home sleep study test (hst) with type ii portable monitor, unattended; minimum of 7 channels: eeg, eog, emg, ecg/heart rate, airflow, respiratory effort and oxygen saturation",N,O,1,26,26,26,232.5,167.42885,117.53154,117.53154
+State,"56",Wyoming,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,4,111,111,111,399.6689,77.91351,57.85117,57.674774
+State,"66",Guam,"95810",Sleep study in sleep lab (6 years or older),N,O,1,27,48,27,1003.125,348.02353,269.78375,239.92209
+State,"66",Guam,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,1,18,36,19,1065.0,354.44055,273.42862,243.5825
+State,"72",Puerto Rico,"95806","Sleep study including heart rate, breathing, airflow, and effort",N,O,3,43,45,45,141.11978,89.215775,69.44067,71.18222
+State,"72",Puerto Rico,"95810",Sleep study in sleep lab (6 years or older),N,F,3,38,39,39,120.63,113.25256,87.832306,89.83128
+State,"72",Puerto Rico,"95810",Sleep study in sleep lab (6 years or older),N,O,10,73,73,73,618.35614,595.0963,461.85138,469.52835
+State,"72",Puerto Rico,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,F,3,75,77,77,125.18052,116.74182,83.741165,86.51389
+State,"72",Puerto Rico,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,15,254,261,261,647.55646,626.3945,482.61206,486.6597
+State,"72",Puerto Rico,G0399,"Home sleep test (hst) with type iii portable monitor, unattended; minimum of 4 channels: 2 respiratory movement/airflow, 1 ecg/heart rate and 1 oxygen saturation",N,O,1,28,29,29,150.0,88.35862,70.401726,70.401726
+State,"78",Virgin Islands,"95810",Sleep study in sleep lab (6 years or older),N,O,4,83,85,84,1569.3481,599.5398,464.4334,470.288
+State,"78",Virgin Islands,"95811",Sleep study in sleep lab with continuous airway pressure (6 years or older),N,O,4,58,61,61,1608.1101,621.9443,483.2487,494.39853
+
+
+
+
+
+
