@@ -1,6 +1,6 @@
-# Medicare Market Intelligence (MMI)
+# Medigy Market Intelligence (MMI)
 
-A CMS Medicare Part B analytics pipeline built with `surveilr` and `spry` that transforms raw public datasets into a navigable SQLPage business intelligence application. Designed to identify high-opportunity disease-specialty clusters for **Manos Health** and **CCIQ** through evidence-based commercial validation.
+A CMS Medigy Part B analytics pipeline built with `surveilr` and `spry` that transforms raw public datasets into a navigable SQLPage business intelligence application. Designed to identify high-opportunity disease-specialty clusters for **Manos Health** and **CCIQ** through evidence-based commercial validation.
 
 > **Note:** Source code is on the main branch. `cms_provider.csv` is used by the pipeline but excluded from the repository due to file size.
 
@@ -8,7 +8,7 @@ A CMS Medicare Part B analytics pipeline built with `surveilr` and `spry` that t
 
 ## Table of Contents
 
-- [Medicare Market Intelligence (MMI)](#medicare-market-intelligence-mmi)
+- [Medigy Market Intelligence (MMI)](#medigy-market-intelligence-mmi)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Architecture](#architecture)
@@ -43,7 +43,6 @@ The pipeline ingests CMS public datasets, builds a normalized star schema in SQL
 
 The primary deliverable is `opportunity_scoring_view`: a composite Tier 1/2/3 ranking of every disease-state × specialty combination, scored on patient volume, interaction intensity, and economic weight.
 
-**Clients:** Manos Health & CCIQ  
 **Dataset vintage:** CMS 2023  
 **Database engine:** SQLite (surveilr RSSD)
 
@@ -91,8 +90,6 @@ The following tools must be installed and available on your `PATH`:
 
 - [`surveilr`](https://www.surveilr.com)
 - [`spry`](https://github.com/netspective-labs/spry)
-- `sqlite3`
-- `sqlpage`
 
 ---
 

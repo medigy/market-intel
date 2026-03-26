@@ -5,7 +5,7 @@ sqlpage-conf:
   allow_exec: true
   port: 9227
 ---
-# Medicare Market Intelligence — SQLPage Application
+# Medigy Market Intelligence — SQLPage Application
 
 This application surfaces the Medicare CMS analytics pipeline built from
 `medicare_analytics_final.sql` through a navigable SQLPage UI.
@@ -14,7 +14,6 @@ This application surfaces the Medicare CMS analytics pipeline built from
 - Star schema: `dim_procedure`, `dim_diagnosis`, `dim_specialty`, `dim_geography`
 - Core fact: `fact_utilization` + `specialty_market_dynamics`
 - 13 analytical views + opportunity scoring engine
-- Clients: **Manos Health** & **CCIQ**
 
 ---
 
@@ -41,7 +40,7 @@ Global shell injected into every page.
 
 -- BEGIN: PARTIAL global-layout.sql
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -66,10 +65,10 @@ SELECT 'shell' AS component,
 ## Home Page
 
 ```sql index.sql { route: { caption: "Home" } }
--- @route.description "Medicare Market Intelligence — Landing Page"
+-- @route.description "Medigy Market Intelligence — Landing Page"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -89,8 +88,8 @@ SELECT 'shell' AS component,
 
 -- HERO
 SELECT 'hero' AS component,
-    'Medicare Market Intelligence' AS title,
-    'CMS Part B analytics for identifying high-opportunity disease-specialty clusters. Built for Manos Health & CCIQ.' AS description,
+    'Medigy Market Intelligence' AS title,
+    'CMS Part B analytics for identifying high-opportunity disease-specialty clusters.' AS description,
     'azure' AS color;
 
 -- PIPELINE HEALTH CHECK
@@ -253,7 +252,7 @@ SELECT
 -- @route.description "Top-line Medicare market KPIs: spend, volume, and intensity by specialty"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -365,7 +364,7 @@ LIMIT 20;
 -- @route.description "Composite Tier 1/2/3 ranking of disease × specialty clusters"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -437,7 +436,7 @@ ORDER BY composite_opportunity_score DESC;
 -- @route.description "Deep-dive into any specialty: top procedures, monitoring intensity, market dominance"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -509,7 +508,7 @@ ORDER BY total_services DESC LIMIT 20;
 -- @route.description "ICD-10 cluster coverage, interaction density, and repeat-visit tiers"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -604,7 +603,7 @@ LIMIT 25;
 -- @route.description "State-level patient volume and GPCI-adjusted spend by specialty"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -673,7 +672,7 @@ LIMIT 50;
 -- @route.description "Part B drug spend, facility vs office split, DME refill velocity, surgical economics"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -790,7 +789,7 @@ LIMIT 20;
 -- @route.description "CMS sleep apnea diagnostic and DME market analysis from the dedicated SQL report"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -1104,7 +1103,7 @@ ORDER BY 6 DESC;
 -- @route.description "Evidence dashboard mapped to Voxia report references and Medicare analytical tables"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -2359,7 +2358,7 @@ ORDER BY market_share_percentage DESC, specialized_patient_reach DESC;
 -- @route.description "Schema reference for all tables, views, and the scoring methodology"
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -2497,7 +2496,7 @@ All datasets are publicly available, no login required. Download priority: Geogr
 ```sql mmi/medical-specialities.sql { route: { caption: "Medical Specialties" } }
 -- @route.description "Detailed breakdown of medical specialties indexed in the current pipeline."
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -2524,7 +2523,7 @@ SELECT distinct specialty_name AS Name, specialty_domain AS Description FROM dim
 -- @route.description "Full inventory of HCPCS/CPT codes included in the Part B dataset."
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -2551,7 +2550,7 @@ SELECT hcpcs_code AS Code, procedure_description AS Label FROM dim_procedure;
 -- @route.description "States and territories currently processed in the data pipeline."
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
@@ -2580,7 +2579,7 @@ SELECT distinct state_abbr AS title, locality_name AS description, 'map-pin' AS 
 -- @route.description "Clusters mapped for opportunity scoring, excluding General/Other categories."
 
 SELECT 'shell' AS component,
-       'Medicare Market Intelligence' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
