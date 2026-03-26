@@ -1,6 +1,6 @@
 # Medigy Market Intelligence (MMI)
 
-A CMS Medigy Part B analytics pipeline built with `surveilr` and `spry` that transforms raw public datasets into a navigable SQLPage business intelligence application. Designed to identify high-opportunity disease-specialty clusters for **Manos Health** and **CCIQ** through evidence-based commercial validation.
+A CMS Medigy Part B analytics pipeline built with `surveilr` and `spry` that transforms raw public datasets into a navigable SQLPage business intelligence application. Designed to identify high-opportunity disease-specialty clusters through evidence-based commercial validation.
 
 > **Note:** Source code is on the main branch. `cms_provider.csv` is used by the pipeline but excluded from the repository due to file size.
 
