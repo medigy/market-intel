@@ -25,7 +25,7 @@ set -euo pipefail
 rm -f resource-surveillance.sqlite.*   
 
 surveilr ingest files -r medicare-ds/ && surveilr orchestrate transform-csv 
-surveilr shell sql/medicare-analytics.sql 
+surveilr shell sql/medigy-analytics.sql 
 surveilr shell sql/copd/01_schema.sql 
 surveilr shell sql/copd/02_data_load.sql
 surveilr shell sql/copd/03_queries_pft.sql
@@ -79,25 +79,25 @@ SELECT 'shell' AS component,
 -- @route.description "Medigy Market Intelligence — Landing Page"
 
 SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon,
-       'fluid' AS layout,
-       true AS fixed_top_menu,
+    'Medigy Market Intelligence' AS title,
+    NULL AS icon,
+    'fluid' AS layout,
+    true AS fixed_top_menu,
     CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
+    '/footer-links.js' AS javascript,
     '**CMS Latest Dataset and Resources (2023)**  
     - [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
     - [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
     '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
-       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
-       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
-       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
-       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
-       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+    '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+    '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+    '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+    '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+    '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+    '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+    '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+    '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+    '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 -- HERO
 SELECT 'hero' AS component,
