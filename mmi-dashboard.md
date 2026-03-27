@@ -1,3 +1,99 @@
+## COPD PFT Diagnostic Evidence
+
+```sql mmi/copd-pft-diagnostic-evidence.sql { route: { caption: "COPD PFT Diagnostic Evidence" } }
+-- @route.description "Pulmonary Function Test (PFT) diagnostic evidence and analytics for COPD."
+
+SELECT 'shell' AS component,
+       'COPD PFT Diagnostic Evidence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS COPD Dataset and Resources (2023)**  
+    [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-pft-diagnostic-evidence.sql","title":"COPD PFT Diagnostic Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+
+SELECT 'hero' AS component,
+    'COPD PFT Diagnostic Evidence' AS title,
+    'Pulmonary Function Test (PFT) diagnostic evidence and analytics for COPD.' AS description,
+    'teal' AS color;
+
+-- National Top-Line KPIs
+SELECT 'text' AS component, 'National Top-Line KPIs' AS title, 'National summary of total allowed payments, submitted charges, payments, and service volume for COPD PFTs.' AS contents;
+SELECT 'chart' AS component, 'National Payments Breakdown' AS title, 'bar' AS type, TRUE AS labels;
+SELECT 'Total Allowed' AS label, total_allowed AS value FROM (SELECT ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS total_allowed FROM copd_pft WHERE geo_level = 'National')
+UNION ALL SELECT 'Total Submitted', total_submitted FROM (SELECT ROUND(SUM(avg_sbmtd_chrg * tot_srvcs), 2) AS total_submitted FROM copd_pft WHERE geo_level = 'National')
+UNION ALL SELECT 'Total Payment', total_payment FROM (SELECT ROUND(SUM(avg_mdcr_pymt_amt * tot_srvcs), 2) AS total_payment FROM copd_pft WHERE geo_level = 'National');
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS total_allowed, ROUND(SUM(avg_sbmtd_chrg * tot_srvcs), 2) AS total_submitted, ROUND(SUM(avg_mdcr_pymt_amt * tot_srvcs), 2) AS total_payment, SUM(tot_srvcs) AS total_services, SUM(tot_rndrng_prvdrs) AS total_providers_sum, ROUND(SUM(avg_sbmtd_chrg * tot_srvcs) / SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS system_markup_x, ROUND(SUM(avg_sbmtd_chrg * tot_srvcs) - SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS billing_friction FROM copd_pft WHERE geo_level = 'National';
+
+-- Unique Beneficiaries
+SELECT 'text' AS component, 'Unique Beneficiaries Estimate' AS title, 'Approximate count of unique beneficiaries for COPD PFTs (max per code).' AS contents;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT SUM(max_benes_per_code) AS approx_unique_beneficiaries FROM (SELECT hcpcs_cd, MAX(tot_benes) AS max_benes_per_code FROM copd_pft WHERE geo_level = 'National' GROUP BY hcpcs_cd);
+
+-- Average Allowed Per Procedure
+SELECT 'text' AS component, 'Average Allowed Per Procedure' AS title, 'Average allowed amount per PFT procedure (all codes combined).' AS contents;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs) / SUM(tot_srvcs), 2) AS avg_allowed_per_procedure FROM copd_pft WHERE geo_level = 'National';
+
+-- Procedure-Level Breakdown
+SELECT 'text' AS component, 'Procedure-Level Breakdown' AS title, 'Breakdown of PFT procedure volumes, allowed amounts, and average payments by code.' AS contents;
+SELECT 'chart' AS component, 'PFT Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
+SELECT hcpcs_cd AS label, total_services AS value FROM (SELECT p.hcpcs_cd, SUM(p.tot_srvcs) AS total_services FROM copd_pft p WHERE geo_level = 'National' GROUP BY p.hcpcs_cd ORDER BY total_services DESC);
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT p.hcpcs_cd, MAX(p.hcpcs_desc) AS description, SUM(p.tot_srvcs) AS total_services, ROUND(SUM(p.tot_srvcs) * 100.0 / (SELECT SUM(tot_srvcs) FROM copd_pft WHERE geo_level = 'National'), 1) AS pct_volume, MAX(p.tot_benes) AS beneficiaries_approx, ROUND(SUM(p.avg_mdcr_alowd_amt * p.tot_srvcs), 2) AS total_allowed, ROUND(SUM(p.avg_mdcr_alowd_amt * p.tot_srvcs) / SUM(p.tot_srvcs), 2) AS avg_allowed_per_test, ROUND(SUM(p.avg_sbmtd_chrg * p.tot_srvcs) / SUM(p.tot_srvcs), 2) AS avg_submitted_per_test, ROUND(SUM(p.avg_sbmtd_chrg * p.tot_srvcs) / SUM(p.avg_mdcr_alowd_amt * p.tot_srvcs), 2) AS markup_x, ROUND(SUM(p.tot_srvcs) * 1.0 / MAX(p.tot_benes), 2) AS interaction_density FROM copd_pft p WHERE geo_level = 'National' GROUP BY p.hcpcs_cd ORDER BY total_services DESC;
+
+-- Facility vs Office Split
+SELECT 'text' AS component, 'Facility vs Office Split' AS title, 'Comparison of PFT service volume and allowed amounts between facility and office settings.' AS contents;
+SELECT 'chart' AS component, 'PFT Services by Setting' AS title, 'bar' AS type, TRUE AS labels;
+SELECT CASE place_of_srvc WHEN 'F' THEN 'Facility' ELSE 'Office/Non-Facility' END AS label, SUM(tot_srvcs) AS value FROM copd_pft WHERE geo_level = 'National' GROUP BY place_of_srvc;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT hcpcs_cd, place_of_srvc, tot_srvcs, tot_benes, avg_mdcr_alowd_amt AS avg_allowed, avg_sbmtd_chrg AS avg_submitted, ROUND(avg_sbmtd_chrg / avg_mdcr_alowd_amt, 2) AS markup_x FROM copd_pft WHERE geo_level = 'National' ORDER BY hcpcs_cd, place_of_srvc;
+```
+### COPD PFT National Top-Line KPIs
+SELECT 'text' AS component, 'COPD PFT National Top-Line KPIs' AS title, 'National summary of total allowed payments, submitted charges, payments, and service volume for COPD PFTs.' AS contents;
+SELECT 'chart' AS component, 'National Payments Breakdown' AS title, 'bar' AS type, TRUE AS labels;
+SELECT 'Total Allowed' AS label, total_allowed AS value FROM (SELECT ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS total_allowed FROM copd_pft WHERE geo_level = 'National')
+UNION ALL SELECT 'Total Submitted', total_submitted FROM (SELECT ROUND(SUM(avg_sbmtd_chrg * tot_srvcs), 2) AS total_submitted FROM copd_pft WHERE geo_level = 'National')
+UNION ALL SELECT 'Total Payment', total_payment FROM (SELECT ROUND(SUM(avg_mdcr_pymt_amt * tot_srvcs), 2) AS total_payment FROM copd_pft WHERE geo_level = 'National');
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS total_allowed, ROUND(SUM(avg_sbmtd_chrg * tot_srvcs), 2) AS total_submitted, ROUND(SUM(avg_mdcr_pymt_amt * tot_srvcs), 2) AS total_payment, SUM(tot_srvcs) AS total_services, SUM(tot_rndrng_prvdrs) AS total_providers_sum, ROUND(SUM(avg_sbmtd_chrg * tot_srvcs) / SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS system_markup_x, ROUND(SUM(avg_sbmtd_chrg * tot_srvcs) - SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS billing_friction FROM copd_pft WHERE geo_level = 'National';
+
+### COPD PFT Procedure-Level Breakdown
+SELECT 'text' AS component, 'COPD PFT Procedure-Level Breakdown' AS title, 'Breakdown of PFT procedure volumes, allowed amounts, and average payments by code.' AS contents;
+SELECT 'chart' AS component, 'PFT Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
+SELECT hcpcs_cd AS label, total_services AS value FROM (SELECT p.hcpcs_cd, SUM(p.tot_srvcs) AS total_services FROM copd_pft p WHERE geo_level = 'National' GROUP BY p.hcpcs_cd ORDER BY total_services DESC);
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT p.hcpcs_cd, MAX(p.hcpcs_desc) AS description, SUM(p.tot_srvcs) AS total_services, ROUND(SUM(p.tot_srvcs) * 100.0 / (SELECT SUM(tot_srvcs) FROM copd_pft WHERE geo_level = 'National'), 1) AS pct_volume, MAX(p.tot_benes) AS beneficiaries_approx, ROUND(SUM(p.avg_mdcr_alowd_amt * p.tot_srvcs), 2) AS total_allowed, ROUND(SUM(p.avg_mdcr_alowd_amt * p.tot_srvcs) / SUM(p.tot_srvcs), 2) AS avg_allowed_per_test, ROUND(SUM(p.avg_sbmtd_chrg * p.tot_srvcs) / SUM(p.tot_srvcs), 2) AS avg_submitted_per_test, ROUND(SUM(p.avg_sbmtd_chrg * p.tot_srvcs) / SUM(p.avg_mdcr_alowd_amt * p.tot_srvcs), 2) AS markup_x, ROUND(SUM(p.tot_srvcs) * 1.0 / MAX(p.tot_benes), 2) AS interaction_density FROM copd_pft p WHERE geo_level = 'National' GROUP BY p.hcpcs_cd ORDER BY total_services DESC;
+
+### COPD PFT Facility vs Office Split
+SELECT 'text' AS component, 'COPD PFT Facility vs Office Split' AS title, 'Comparison of PFT service volume and allowed amounts between facility and office settings.' AS contents;
+SELECT 'chart' AS component, 'PFT Services by Setting' AS title, 'bar' AS type, TRUE AS labels;
+SELECT CASE place_of_srvc WHEN 'F' THEN 'Facility' ELSE 'Office/Non-Facility' END AS label, SUM(tot_srvcs) AS value FROM copd_pft WHERE geo_level = 'National' GROUP BY place_of_srvc;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT hcpcs_cd, place_of_srvc, tot_srvcs, tot_benes, avg_mdcr_alowd_amt AS avg_allowed, avg_sbmtd_chrg AS avg_submitted, ROUND(avg_sbmtd_chrg / avg_mdcr_alowd_amt, 2) AS markup_x FROM copd_pft WHERE geo_level = 'National' ORDER BY hcpcs_cd, place_of_srvc;
+
+### COPD PFT Top 10 States by Total Allowed
+SELECT 'text' AS component, 'COPD PFT Top 10 States by Total Allowed' AS title, 'Top 10 states by total allowed amount for COPD PFTs.' AS contents;
+SELECT 'chart' AS component, 'Top 10 States by PFT Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels;
+SELECT state, total_allowed AS value FROM (SELECT geo_desc AS state, ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS total_allowed FROM copd_pft WHERE geo_level = 'State' GROUP BY geo_desc ORDER BY total_allowed DESC LIMIT 10);
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT geo_desc AS state, SUM(tot_srvcs) AS total_services, SUM(tot_benes) AS total_benes, SUM(tot_rndrng_prvdrs) AS total_providers, ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs), 2) AS total_allowed, ROUND(SUM(avg_sbmtd_chrg * tot_srvcs), 2) AS total_submitted, ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs) / SUM(tot_srvcs), 2) AS avg_allowed_per_test FROM copd_pft WHERE geo_level = 'State' GROUP BY geo_desc ORDER BY total_allowed DESC LIMIT 10;
 
 ## Medigy Market Intelligence — COPD Evidence
 
@@ -18,7 +114,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
-       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+    '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+    '{"link": "/mmi/copd-pft-diagnostic-evidence.sql","title":"COPD PFT Diagnostic Evidence"}' AS menu_item,
        '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
@@ -35,58 +132,58 @@ SELECT 'hero' AS component,
 -- PFT National Summary
 SELECT 'text' AS component, 'Pulmonary Function Test (PFT) National Summary' AS title, 'National-level summary of Pulmonary Function Test (PFT) procedure volumes, allowed amounts, and average payments per test.' AS contents;
 SELECT 'chart' AS component, 'PFT Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
-SELECT hcpcs_cd AS label, total_services AS value FROM vw_pft_national ORDER BY total_services DESC;
+SELECT hcpcs_cd AS label, total_services AS value FROM pft_national ORDER BY total_services DESC;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS search, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_pft_national;
+SELECT * FROM pft_national;
 
 -- PFT State Summary
 SELECT 'text' AS component, 'PFT State Summary' AS title, 'State-level breakdown of PFT volumes, allowed amounts, provider counts, and office vs facility mix.' AS contents;
 SELECT 'chart' AS component, 'Top 10 States by PFT Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels;
-SELECT state AS label, total_allowed AS value FROM vw_pft_state ORDER BY total_allowed DESC LIMIT 10;
+SELECT state AS label, total_allowed AS value FROM pft_state ORDER BY total_allowed DESC LIMIT 10;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_pft_state ORDER BY total_allowed DESC LIMIT 20;
+SELECT * FROM pft_state ORDER BY total_allowed DESC LIMIT 20;
 
 -- E&M National Summary
 SELECT 'text' AS component, 'E&M National Summary' AS title, 'National summary of Evaluation & Management (E&M) visit volumes, allowed amounts, and average payments per visit.' AS contents;
 SELECT 'chart' AS component, 'E&M Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
-SELECT hcpcs_cd AS label, total_services AS value FROM vw_em_national ORDER BY total_services DESC;
+SELECT hcpcs_cd AS label, total_services AS value FROM em_national ORDER BY total_services DESC;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_em_national;
+SELECT * FROM em_national;
 
 -- E&M State Summary
 SELECT 'text' AS component, 'E&M State Summary' AS title, 'State-level breakdown of E&M visit volumes, allowed amounts, and complexity mix.' AS contents;
 SELECT 'chart' AS component, 'Top 10 States by E&M Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels;
-SELECT state AS label, total_allowed AS value FROM vw_em_state ORDER BY total_allowed DESC LIMIT 10;
+SELECT state AS label, total_allowed AS value FROM em_state ORDER BY total_allowed DESC LIMIT 10;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_em_state ORDER BY total_allowed DESC LIMIT 20;
+SELECT * FROM em_state ORDER BY total_allowed DESC LIMIT 20;
 
 -- Oxygen DME National Summary
 SELECT 'text' AS component, 'Oxygen DME National Summary' AS title, 'National summary of oxygen DME (Durable Medical Equipment) rental months, claims, allowed amounts, and per-patient economics.' AS contents;
 SELECT 'chart' AS component, 'Oxygen DME Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
-SELECT hcpcs_cd AS label, total_rental_months AS value FROM vw_o2_national ORDER BY total_rental_months DESC;
+SELECT hcpcs_cd AS label, total_rental_months AS value FROM o2_national ORDER BY total_rental_months DESC;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_o2_national;
+SELECT * FROM o2_national;
 
 -- Oxygen DME State Summary
 SELECT 'text' AS component, 'Oxygen DME State Summary' AS title, 'State-level summary of oxygen DME rental months, allowed amounts, rural share, and provider counts.' AS contents;
 SELECT 'chart' AS component, 'Top 10 States by Oxygen DME Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels;
-SELECT state AS label, total_allowed AS value FROM vw_o2_state ORDER BY total_allowed DESC LIMIT 10;
+SELECT state AS label, total_allowed AS value FROM o2_state ORDER BY total_allowed DESC LIMIT 10;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_o2_state ORDER BY total_allowed DESC LIMIT 20;
+SELECT * FROM o2_state ORDER BY total_allowed DESC LIMIT 20;
 
 -- Oxygen DME Specialty Summary
 SELECT 'text' AS component, 'Oxygen DME Specialty Summary' AS title, 'Breakdown of oxygen DME rental months and allowed amounts by referring provider specialty.' AS contents;
 SELECT 'chart' AS component, 'Top 10 Specialties by Oxygen DME Allowed' AS title, 'bar' AS type, TRUE AS labels;
-SELECT specialty_desc AS label, total_allowed AS value FROM vw_o2_specialty ORDER BY total_allowed DESC LIMIT 10;
+SELECT specialty_desc AS label, total_allowed AS value FROM o2_specialty ORDER BY total_allowed DESC LIMIT 10;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_o2_specialty ORDER BY total_allowed DESC LIMIT 20;
+SELECT * FROM o2_specialty ORDER BY total_allowed DESC LIMIT 20;
 
 -- Integrated Market Stack Summary
 SELECT 'text' AS component, 'Integrated Market Stack Summary' AS title, 'Aggregate economics for diagnostics, E&M visits, and DME layers in the COPD market.' AS contents;
 SELECT 'chart' AS component, 'Medicare Allowed by Market Layer' AS title, 'bar' AS type, TRUE AS labels;
-SELECT market_name AS label, medicare_allowed AS value FROM vw_integrated_market ORDER BY layer_no;
+SELECT market_name AS label, medicare_allowed AS value FROM integrated_market ORDER BY layer_no;
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
-SELECT * FROM vw_integrated_market ORDER BY layer_no;
+SELECT * FROM integrated_market ORDER BY layer_no;
 ```
 ---
 sqlpage-conf:
@@ -260,11 +357,19 @@ SELECT
     'moon-stars' AS icon,
     'cyan' AS color;
 
+
 SELECT
     'COPD Evidence' AS title,
     'Consolidated COPD evidence views and charts mapped to the Voxia COPD analytics report.' AS description,
     '/mmi/copd-evidence.sql' AS link,
     'lungs' AS icon,
+    'teal' AS color;
+
+SELECT
+    'COPD PFT Diagnostic Evidence' AS title,
+    'Pulmonary Function Test (PFT) diagnostic evidence and analytics for COPD.' AS description,
+    '/mmi/copd-pft-diagnostic-evidence.sql' AS link,
+    'activity-heartbeat' AS icon,
     'teal' AS color;
 
 SELECT

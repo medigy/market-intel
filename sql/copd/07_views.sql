@@ -8,7 +8,7 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 1: PFT National Summary
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_pft_national AS
+CREATE VIEW IF NOT EXISTS pft_national AS
 SELECT
     hcpcs_cd,
     MAX(hcpcs_desc)                                             AS hcpcs_desc,
@@ -31,7 +31,7 @@ GROUP BY hcpcs_cd;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 2: PFT State Summary
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_pft_state AS
+CREATE VIEW IF NOT EXISTS pft_state AS
 SELECT
     geo_desc                                                    AS state,
     SUM(tot_srvcs)                                              AS total_services,
@@ -53,7 +53,7 @@ GROUP BY geo_desc;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 3: E&M National Summary
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_em_national AS
+CREATE VIEW IF NOT EXISTS em_national AS
 SELECT
     hcpcs_cd,
     MAX(hcpcs_desc)                                             AS hcpcs_desc,
@@ -73,7 +73,7 @@ GROUP BY hcpcs_cd;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 4: E&M State Summary with 99214 complexity signal
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_em_state AS
+CREATE VIEW IF NOT EXISTS em_state AS
 SELECT
     geo_desc                                                    AS state,
     SUM(tot_srvcs)                                              AS total_services,
@@ -95,7 +95,7 @@ GROUP BY geo_desc;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 5: Oxygen DME National Summary
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_o2_national AS
+CREATE VIEW IF NOT EXISTS o2_national AS
 SELECT
     hcpcs_cd,
     MAX(hcpcs_desc)                                             AS hcpcs_desc,
@@ -122,7 +122,7 @@ GROUP BY hcpcs_cd;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 6: Oxygen DME State Summary
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_o2_state AS
+CREATE VIEW IF NOT EXISTS o2_state AS
 SELECT
     prvdr_state                                                 AS state,
     SUM(tot_suplr_srvcs)                                        AS total_rental_months,
@@ -147,7 +147,7 @@ GROUP BY prvdr_state;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 7: Oxygen DME Specialty Summary
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_o2_specialty AS
+CREATE VIEW IF NOT EXISTS o2_specialty AS
 SELECT
     specialty_desc,
     SUM(tot_suplr_srvcs)                                        AS total_rental_months,
@@ -173,7 +173,7 @@ GROUP BY specialty_desc;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- VIEW 8: Integrated Market Stack Summary (all three layers)
 -- ─────────────────────────────────────────────────────────────────────────────
-CREATE VIEW IF NOT EXISTS vw_integrated_market AS
+CREATE VIEW IF NOT EXISTS integrated_market AS
 SELECT
     layer_no,
     layer_type,

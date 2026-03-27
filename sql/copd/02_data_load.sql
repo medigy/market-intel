@@ -23,86 +23,8 @@
 -- clean schema tables defined in 01_schema.sql.
 -- =============================================================================
 
-
 -- -----------------------------------------------------------------------------
--- STEP 1: Create raw staging tables (mirrors exact CSV column names)
--- -----------------------------------------------------------------------------
-
--- CREATE TABLE IF NOT EXISTS uniform_resource_cms_bygeography_copd_core_diagnosis (
---     Rndrng_Prvdr_Geo_Lvl    TEXT,
---     Rndrng_Prvdr_Geo_Cd     TEXT,
---     Rndrng_Prvdr_Geo_Desc   TEXT,
---     HCPCS_Cd                TEXT,
---     HCPCS_Desc              TEXT,
---     HCPCS_Drug_Ind          TEXT,
---     Place_Of_Srvc           TEXT,
---     Tot_Rndrng_Prvdrs       TEXT,
---     Tot_Benes               TEXT,
---     Tot_Srvcs               TEXT,
---     Tot_Bene_Day_Srvcs      TEXT,
---     Avg_Sbmtd_Chrg          TEXT,
---     Avg_Mdcr_Alowd_Amt      TEXT,
---     Avg_Mdcr_Pymt_Amt       TEXT,
---     Avg_Mdcr_Stdzd_Amt      TEXT
--- );
-
--- CREATE TABLE IF NOT EXISTS uniform_resource_cms_bygeography_copd_visits (
---     Rndrng_Prvdr_Geo_Lvl    TEXT,
---     Rndrng_Prvdr_Geo_Cd     TEXT,
---     Rndrng_Prvdr_Geo_Desc   TEXT,
---     HCPCS_Cd                TEXT,
---     HCPCS_Desc              TEXT,
---     HCPCS_Drug_Ind          TEXT,
---     Place_Of_Srvc           TEXT,
---     Tot_Rndrng_Prvdrs       TEXT,
---     Tot_Benes               TEXT,
---     Tot_Srvcs               TEXT,
---     Tot_Bene_Day_Srvcs      TEXT,
---     Avg_Sbmtd_Chrg          TEXT,
---     Avg_Mdcr_Alowd_Amt      TEXT,
---     Avg_Mdcr_Pymt_Amt       TEXT,
---     Avg_Mdcr_Stdzd_Amt      TEXT
--- );
-
--- CREATE TABLE IF NOT EXISTS uniform_resource_copd_oxygen (
---     Rfrg_NPI                     TEXT,
---     Rfrg_Prvdr_Last_Name_Org     TEXT,
---     Rfrg_Prvdr_First_Name        TEXT,
---     Rfrg_Prvdr_MI                TEXT,
---     Rfrg_Prvdr_Crdntls           TEXT,
---     Rfrg_Prvdr_Ent_Cd            TEXT,
---     Rfrg_Prvdr_St1               TEXT,
---     Rfrg_Prvdr_St2               TEXT,
---     Rfrg_Prvdr_City              TEXT,
---     Rfrg_Prvdr_State_Abrvtn      TEXT,
---     Rfrg_Prvdr_State_FIPS        TEXT,
---     Rfrg_Prvdr_Zip5              TEXT,
---     Rfrg_Prvdr_RUCA_Cat          TEXT,
---     Rfrg_Prvdr_RUCA              TEXT,
---     Rfrg_Prvdr_RUCA_Desc         TEXT,
---     Rfrg_Prvdr_Cntry             TEXT,
---     Rfrg_Prvdr_Spclty_Cd         TEXT,
---     Rfrg_Prvdr_Spclty_Desc       TEXT,
---     Rfrg_Prvdr_Spclty_Srce       TEXT,
---     RBCS_Lvl                     TEXT,
---     RBCS_Id                      TEXT,
---     RBCS_Desc                    TEXT,
---     HCPCS_CD                     TEXT,
---     HCPCS_Desc                   TEXT,
---     Suplr_Rentl_Ind              TEXT,
---     Tot_Suplrs                   TEXT,
---     Tot_Suplr_Benes              TEXT,
---     Tot_Suplr_Clms               TEXT,
---     Tot_Suplr_Srvcs              TEXT,
---     Avg_Suplr_Sbmtd_Chrg         TEXT,
---     Avg_Suplr_Mdcr_Alowd_Amt     TEXT,
---     Avg_Suplr_Mdcr_Pymt_Amt      TEXT,
---     Avg_Suplr_Mdcr_Stdzd_Amt     TEXT
--- );
-
-
--- -----------------------------------------------------------------------------
--- STEP 2: Migrate raw -> clean tables with type casting
+-- STEP 1: Migrate raw -> clean tables with type casting
 -- -----------------------------------------------------------------------------
 
 -- PFT: filter only the 4 COPD CPT codes and cast types
@@ -200,16 +122,9 @@ FROM uniform_resource_copd_oxygen
 WHERE TRIM(HCPCS_CD) IN ('E0434','E1392');
 
 
--- -----------------------------------------------------------------------------
--- STEP 3: Drop raw staging tables (optional — keeps DB clean)
--- -----------------------------------------------------------------------------
--- DROP TABLE IF EXISTS uniform_resource_cms_bygeography_copd_core_diagnosis;
--- DROP TABLE IF EXISTS uniform_resource_cms_bygeography_copd_visits;
--- DROP TABLE IF EXISTS uniform_resource_copd_oxygen;
-
 
 -- -----------------------------------------------------------------------------
--- STEP 4: Verify row counts after load
+-- STEP 2: Verify row counts after load
 -- -----------------------------------------------------------------------------
 SELECT 'copd_pft'    AS tbl, COUNT(*) AS rows FROM copd_pft
 UNION ALL
