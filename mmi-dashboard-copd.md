@@ -2655,6 +2655,7 @@ SELECT 'shell' AS component,
 SELECT 'table' AS component, 'Mapped Clusters' AS title, true AS sort, true AS search;
 SELECT distinct disease_state AS Cluster FROM dim_diagnosis WHERE disease_state != 'Other Chronic / Clinical';
 ```
+
 ## COPD PFT Diagnostic Evidence
 
 ```sql mmi/copd-pft-diagnostic-evidence.sql { route: { caption: "COPD PFT Diagnostic Evidence" } }
