@@ -60,7 +60,7 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
  surveilr orchestrate     ← transforms raw CSV ingestion into typed tables
          │
          ▼
- medicare-analytics.sql   ← ELT pipeline: indexes → dims → facts → views → scoring
+ medigy-analytics.sql   ← ELT pipeline: indexes → dims → facts → views → scoring
          │
          ▼
  spry + SQLPage           ← packages Executable Markdown into browser UI
@@ -77,7 +77,8 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
 .
 ├── medicare-ds/                         # CMS source CSV files (Git-ignored)
 ├── sql/
-│   └── medicare-analytics.sql           # Full ELT pipeline — run after ingestion
+│   └── medigy-analytics.sql           # Full ELT pipeline — run after ingestion
+│   └── medigy-ddl.sql                  # Data Provenance and other schema objects
 ├── mmi-dashboard.md                     # Executable Markdown — UI definition + deploy script
 └── resource-surveillance.sqlite.db      # Output RSSD (SQLite, generated at runtime)
 ```
@@ -283,13 +284,14 @@ surveilr ingest files -r medicare-ds/
 surveilr orchestrate transform-csv
 
 # 4. Run the ELT pipeline — builds all dims, facts, views, and scoring
-surveilr shell sql/medicare-analytics.sql
+surveilr shell sql/medigy-ddl.sql
+surveilr shell sql/medigy-analytics.sql
 
 # 5. Package the SQLPage UI and load it into the database
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md \
   | sqlite3 resource-surveillance.sqlite.db
 
-echo "Medicare Market Intelligence database and SQLPage UI are ready."
+echo "Medigy Market Intelligence database and SQLPage UI are ready."
 ```
 
 The SQLPage application will be served at `http://localhost:9227`.
