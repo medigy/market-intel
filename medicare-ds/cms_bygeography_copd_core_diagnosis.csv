@@ -1,0 +1,430 @@
+"Rndrng_Prvdr_Geo_Lvl","Rndrng_Prvdr_Geo_Cd","Rndrng_Prvdr_Geo_Desc","HCPCS_Cd","HCPCS_Desc","HCPCS_Drug_Ind","Place_Of_Srvc","Tot_Rndrng_Prvdrs","Tot_Benes","Tot_Srvcs","Tot_Bene_Day_Srvcs","Avg_Sbmtd_Chrg","Avg_Mdcr_Alowd_Amt","Avg_Mdcr_Pymt_Amt","Avg_Mdcr_Stdzd_Amt"
+National,"",National,"94010",Test to measure expiratory airflow and volume,N,F,6283,161492,198144,198132,53.5822,8.036155,6.1114187,6.07407
+National,"",National,"94010",Test to measure expiratory airflow and volume,N,O,19712,471731,645906,641960,94.597046,25.595327,19.169346,18.85403
+National,"",National,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,7093,253312,262058,262051,75.13476,10.030053,7.6307845,7.603513
+National,"",National,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,15694,459765,539696,537496,145.54863,36.876644,27.972023,27.311584
+National,"",National,"94726",Test to determine lung volumes using sensors,N,F,6205,252456,264058,264049,64.28726,11.693624,8.916247,8.899821
+National,"",National,"94726",Test to determine lung volumes using sensors,N,O,6075,328108,360117,358946,146.82686,49.86438,38.254745,37.977783
+National,"",National,"94729",Test to examine how well the lungs exchange gases,N,F,7342,353807,378043,378034,51.154007,8.708854,6.652558,6.625846
+National,"",National,"94729",Test to examine how well the lungs exchange gases,N,O,8623,533608,593434,591592,146.55437,52.204865,40.0098,39.41492
+State,"01",Alabama,"94010",Test to measure expiratory airflow and volume,N,F,99,2928,3676,3676,30.43087,7.680256,5.704913,5.96852
+State,"01",Alabama,"94010",Test to measure expiratory airflow and volume,N,O,448,8540,10208,10122,70.26203,22.782064,16.983664,19.176912
+State,"01",Alabama,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,83,2154,2219,2219,66.667755,9.537066,7.2802253,7.661568
+State,"01",Alabama,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,258,6519,8368,8361,114.27508,33.22234,25.160885,28.445078
+State,"01",Alabama,"94726",Test to determine lung volumes using sensors,N,F,51,1558,1601,1601,51.189274,11.1217985,8.585416,9.041749
+State,"01",Alabama,"94726",Test to determine lung volumes using sensors,N,O,94,4510,5311,5311,103.838455,45.61818,34.333626,39.26785
+State,"01",Alabama,"94729",Test to examine how well the lungs exchange gases,N,F,110,4175,4621,4621,45.591644,8.305527,6.2585998,6.5560007
+State,"01",Alabama,"94729",Test to examine how well the lungs exchange gases,N,O,225,11333,13128,13079,100.96107,48.11278,36.3865,41.592243
+State,"02",Alaska,"94010",Test to measure expiratory airflow and volume,N,F,19,598,624,624,95.469955,10.957548,8.116875,5.915272
+State,"02",Alaska,"94010",Test to measure expiratory airflow and volume,N,O,71,650,820,820,154.17899,29.746683,22.075243,19.248623
+State,"02",Alaska,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,18,543,554,554,121.98376,13.791354,9.9380865,7.2017508
+State,"02",Alaska,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,36,304,345,345,315.69565,41.475304,31.427391,27.434116
+State,"02",Alaska,"94726",Test to determine lung volumes using sensors,N,F,17,978,1013,1013,80.50543,16.180582,11.716979,8.440593
+State,"02",Alaska,"94726",Test to determine lung volumes using sensors,N,O,12,250,255,255,242.22745,55.726078,42.00553,38.840668
+State,"02",Alaska,"94729",Test to examine how well the lungs exchange gases,N,F,18,1015,1061,1061,61.741753,11.944053,8.741103,6.33721
+State,"02",Alaska,"94729",Test to examine how well the lungs exchange gases,N,O,12,299,312,312,258.3814,58.564552,44.93859,41.40529
+State,"04",Arizona,"94010",Test to measure expiratory airflow and volume,N,F,69,1285,1519,1519,43.762917,7.938025,5.979506,6.009302
+State,"04",Arizona,"94010",Test to measure expiratory airflow and volume,N,O,586,12875,18360,18360,64.4484,25.108717,18.93116,19.697922
+State,"04",Arizona,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,86,2927,2996,2996,51.28103,9.904683,7.453264,7.523685
+State,"04",Arizona,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,572,21878,24872,24801,108.51754,34.82629,26.324272,27.222994
+State,"04",Arizona,"94726",Test to determine lung volumes using sensors,N,F,78,3110,3199,3199,53.79501,11.586433,8.690628,8.764242
+State,"04",Arizona,"94726",Test to determine lung volumes using sensors,N,O,162,14963,15880,15877,120.692276,49.672535,37.85662,39.182667
+State,"04",Arizona,"94729",Test to examine how well the lungs exchange gases,N,F,82,3568,3801,3801,55.574615,8.604394,6.4949303,6.552126
+State,"04",Arizona,"94729",Test to examine how well the lungs exchange gases,N,O,206,18366,19593,19590,110.28484,50.088524,38.352734,39.728485
+State,"05",Arkansas,"94010",Test to measure expiratory airflow and volume,N,F,54,2988,3250,3250,50.00883,7.536837,5.71088,6.07572
+State,"05",Arkansas,"94010",Test to measure expiratory airflow and volume,N,O,197,5157,7045,7045,81.195496,22.656342,16.783419,19.554424
+State,"05",Arkansas,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,50,3152,3240,3240,82.1787,9.515947,7.2422533,7.638639
+State,"05",Arkansas,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,128,3325,3712,3708,105.63777,30.759195,22.868107,26.365496
+State,"05",Arkansas,"94726",Test to determine lung volumes using sensors,N,F,47,4282,4447,4447,56.58796,11.115891,8.475727,8.935338
+State,"05",Arkansas,"94726",Test to determine lung volumes using sensors,N,O,32,1985,2088,2088,109.31801,41.269146,30.795397,35.362003
+State,"05",Arkansas,"94729",Test to examine how well the lungs exchange gases,N,F,52,4657,4843,4843,46.37145,8.217396,6.2949557,6.6698866
+State,"05",Arkansas,"94729",Test to examine how well the lungs exchange gases,N,O,46,3998,4159,4158,104.83845,45.02011,33.95199,39.46783
+State,"06",California,"94010",Test to measure expiratory airflow and volume,N,F,344,9564,13287,13285,46.62073,8.742979,6.7349324,6.1487026
+State,"06",California,"94010",Test to measure expiratory airflow and volume,N,O,1366,34421,48531,48512,94.284164,29.348825,22.049822,19.433636
+State,"06",California,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,422,16895,17545,17545,96.48838,10.652062,8.06696,7.563146
+State,"06",California,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,1144,43205,51806,51614,138.67984,41.912758,31.810308,27.96893
+State,"06",California,"94726",Test to determine lung volumes using sensors,N,F,380,17371,18149,18149,55.61183,12.469545,9.499744,8.877233
+State,"06",California,"94726",Test to determine lung volumes using sensors,N,O,457,28445,32276,32257,140.90663,57.65795,44.253574,38.715263
+State,"06",California,"94729",Test to examine how well the lungs exchange gases,N,F,427,23241,25089,25089,45.888702,9.266206,7.0752177,6.611219
+State,"06",California,"94729",Test to examine how well the lungs exchange gases,N,O,641,40948,47262,47242,146.4459,61.14197,46.99397,40.788574
+State,"08",Colorado,"94010",Test to measure expiratory airflow and volume,N,F,101,1779,1891,1891,43.258347,8.160185,6.2137756,6.080968
+State,"08",Colorado,"94010",Test to measure expiratory airflow and volume,N,O,401,4973,6621,6621,80.345795,26.75279,19.822119,19.262522
+State,"08",Colorado,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,138,4330,4479,4476,46.692497,10.070286,7.6978297,7.6435947
+State,"08",Colorado,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,326,4324,4581,4581,117.46736,36.91011,28.122328,27.116676
+State,"08",Colorado,"94726",Test to determine lung volumes using sensors,N,F,129,5073,5247,5244,90.727165,11.822762,9.030011,8.911155
+State,"08",Colorado,"94726",Test to determine lung volumes using sensors,N,O,102,2625,2735,2734,123.95664,53.718975,41.216507,39.74884
+State,"08",Colorado,"94729",Test to examine how well the lungs exchange gases,N,F,146,6622,7235,7232,89.7984,8.784093,6.724289,6.6279044
+State,"08",Colorado,"94729",Test to examine how well the lungs exchange gases,N,O,159,4908,5255,5255,117.72538,54.887028,42.000477,40.26766
+State,"09",Connecticut,"94010",Test to measure expiratory airflow and volume,N,F,97,1505,1631,1630,73.19236,8.3881855,6.407603,6.1029305
+State,"09",Connecticut,"94010",Test to measure expiratory airflow and volume,N,O,271,6218,8778,8760,101.84284,26.609816,20.031105,18.396196
+State,"09",Connecticut,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,101,2243,2329,2329,100.5784,10.520932,8.104028,7.6920137
+State,"09",Connecticut,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,201,5239,7933,7930,175.10841,38.1204,29.282782,26.971579
+State,"09",Connecticut,"94726",Test to determine lung volumes using sensors,N,F,67,1503,1571,1570,108.0281,12.250853,9.585602,9.110159
+State,"09",Connecticut,"94726",Test to determine lung volumes using sensors,N,O,88,2195,2270,2270,159.1749,42.66093,33.226475,30.596096
+State,"09",Connecticut,"94729",Test to examine how well the lungs exchange gases,N,F,111,3374,3583,3582,79.811,9.09748,7.037653,6.694633
+State,"09",Connecticut,"94729",Test to examine how well the lungs exchange gases,N,O,142,7118,7919,7917,147.41281,47.737125,36.802734,33.672142
+State,"10",Delaware,"94010",Test to measure expiratory airflow and volume,N,F,7,519,560,560,27.376339,8.131161,6.1736608,6.0604463
+State,"10",Delaware,"94010",Test to measure expiratory airflow and volume,N,O,49,1663,2151,2151,71.70806,25.678968,18.754059,18.601023
+State,"10",Delaware,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,7,1674,1698,1698,73.42355,10.172921,7.455742,7.309358
+State,"10",Delaware,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,44,2942,3108,3108,137.92914,37.638718,28.857462,28.671556
+State,"10",Delaware,"94726",Test to determine lung volumes using sensors,N,F,16,1821,2371,2371,141.64104,11.530764,8.686609,8.60294
+State,"10",Delaware,"94726",Test to determine lung volumes using sensors,N,O,10,2398,2493,2493,106.09968,53.467377,40.43585,40.189735
+State,"10",Delaware,"94729",Test to examine how well the lungs exchange gases,N,F,7,1982,2056,2056,33.898346,8.814017,6.506634,6.3854523
+State,"10",Delaware,"94729",Test to examine how well the lungs exchange gases,N,O,14,2491,2581,2581,125.88524,55.11518,41.549343,41.261185
+State,"11",District of Columbia,"94010",Test to measure expiratory airflow and volume,N,F,20,799,832,832,32.557297,8.878762,6.886298,6.1921396
+State,"11",District of Columbia,"94010",Test to measure expiratory airflow and volume,N,O,36,648,871,871,82.566475,28.540493,21.319517,18.545925
+State,"11",District of Columbia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,16,514,518,518,61.964867,10.253513,7.5495753,7.4117374
+State,"11",District of Columbia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,41,809,977,977,144.96414,43.44774,32.69692,27.87213
+State,"11",District of Columbia,"94726",Test to determine lung volumes using sensors,N,F,14,394,395,395,91.81456,11.478177,8.438253,8.680076
+State,"11",District of Columbia,"94726",Test to determine lung volumes using sensors,N,O,25,969,1079,1079,179.22336,59.2576,45.649044,39.2535
+State,"11",District of Columbia,"94729",Test to examine how well the lungs exchange gases,N,F,22,884,903,903,49.51143,9.074618,6.8447285,6.5715504
+State,"11",District of Columbia,"94729",Test to examine how well the lungs exchange gases,N,O,27,1260,1400,1400,172.02429,60.541893,45.9081,38.842472
+State,"12",Florida,"94010",Test to measure expiratory airflow and volume,N,F,275,5360,6659,6659,44.262657,8.159422,6.3646584,6.2376947
+State,"12",Florida,"94010",Test to measure expiratory airflow and volume,N,O,1420,35387,45000,44963,87.40716,25.530579,19.246288,19.648209
+State,"12",Florida,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,371,13136,13540,13539,68.99716,10.1421585,7.9042163,7.781208
+State,"12",Florida,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,1332,57277,62911,62626,119.30577,36.37762,27.825663,28.454218
+State,"12",Florida,"94726",Test to determine lung volumes using sensors,N,F,261,9938,10306,10306,47.82617,11.790727,9.220184,9.116305
+State,"12",Florida,"94726",Test to determine lung volumes using sensors,N,O,460,38590,40822,40617,132.66908,50.84052,39.206184,40.26573
+State,"12",Florida,"94729",Test to examine how well the lungs exchange gases,N,F,384,15471,16182,16182,42.678562,8.8171625,6.8946805,6.7751303
+State,"12",Florida,"94729",Test to examine how well the lungs exchange gases,N,O,835,67452,71278,71059,119.54084,53.03859,40.997097,42.16958
+State,"13",Georgia,"94010",Test to measure expiratory airflow and volume,N,F,136,2919,3502,3502,39.08673,7.808521,5.9527955,6.045911
+State,"13",Georgia,"94010",Test to measure expiratory airflow and volume,N,O,878,21550,27636,27619,106.030556,24.715433,18.247477,19.200548
+State,"13",Georgia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,160,3676,3743,3743,82.09992,9.798041,7.4014535,7.542883
+State,"13",Georgia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,599,16596,19489,19378,172.99513,34.895325,26.340195,28.242788
+State,"13",Georgia,"94726",Test to determine lung volumes using sensors,N,F,143,3314,3372,3372,80.44385,11.455935,8.707447,8.886583
+State,"13",Georgia,"94726",Test to determine lung volumes using sensors,N,O,276,13199,14324,14324,165.4216,49.97723,38.167202,39.918293
+State,"13",Georgia,"94729",Test to examine how well the lungs exchange gases,N,F,176,5343,5525,5525,56.37065,8.489588,6.4967766,6.627312
+State,"13",Georgia,"94729",Test to examine how well the lungs exchange gases,N,O,350,22910,25169,25166,165.42007,51.43363,38.92812,41.608562
+State,"15",Hawaii,"94726",Test to determine lung volumes using sensors,N,O,12,237,257,257,92.2907,48.783543,37.030663,36.080544
+State,"15",Hawaii,"94010",Test to measure expiratory airflow and volume,N,F,22,221,237,237,25.880423,7.990633,5.6931224,5.5787764
+State,"15",Hawaii,"94010",Test to measure expiratory airflow and volume,N,O,39,314,355,355,54.11766,28.135803,20.236,19.034422
+State,"15",Hawaii,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,27,574,581,581,37.425114,10.09253,7.670568,7.600878
+State,"15",Hawaii,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,21,80,81,81,77.07173,24.06926,16.158766,16.41963
+State,"15",Hawaii,"94726",Test to determine lung volumes using sensors,N,F,24,464,468,468,33.819958,11.79359,8.907585,8.789402
+State,"15",Hawaii,"94729",Test to examine how well the lungs exchange gases,N,F,25,652,665,665,29.46555,8.678301,6.587564,6.5598946
+State,"15",Hawaii,"94729",Test to examine how well the lungs exchange gases,N,O,15,255,276,276,90.32369,51.10761,39.406956,38.025036
+State,"16",Idaho,"94010",Test to measure expiratory airflow and volume,N,F,40,1143,1229,1229,28.007095,7.6632466,5.6053295,5.8795605
+State,"16",Idaho,"94010",Test to measure expiratory airflow and volume,N,O,84,1082,1417,1417,68.57102,20.410437,14.643648,16.1059
+State,"16",Idaho,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,47,2490,2566,2566,46.906055,9.62371,7.031473,7.3442945
+State,"16",Idaho,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,61,807,976,841,98.774376,16.37081,11.530563,12.828607
+State,"16",Idaho,"94726",Test to determine lung volumes using sensors,N,F,43,2907,3024,3024,46.719246,11.258664,8.20957,8.545879
+State,"16",Idaho,"94726",Test to determine lung volumes using sensors,N,O,32,745,967,777,107.80056,20.390766,14.078159,15.786319
+State,"16",Idaho,"94729",Test to examine how well the lungs exchange gases,N,F,45,3314,3463,3463,33.053883,8.3250475,6.0828705,6.3688045
+State,"16",Idaho,"94729",Test to examine how well the lungs exchange gases,N,O,33,905,1155,969,81.446625,17.755991,12.556935,14.1184845
+State,"17",Illinois,"94010",Test to measure expiratory airflow and volume,N,F,254,5438,5779,5779,53.737595,8.128847,6.2271066,6.1027513
+State,"17",Illinois,"94010",Test to measure expiratory airflow and volume,N,O,507,8879,11712,11712,111.63255,25.821547,19.402727,19.111893
+State,"17",Illinois,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,317,14526,14854,14854,94.82689,10.166456,7.835644,7.7030573
+State,"17",Illinois,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,417,10532,12492,12442,175.34483,34.10125,25.706043,25.402357
+State,"17",Illinois,"94726",Test to determine lung volumes using sensors,N,F,287,17537,18160,18160,77.40163,11.871045,9.167715,9.008023
+State,"17",Illinois,"94726",Test to determine lung volumes using sensors,N,O,223,12086,13748,13748,184.83046,49.100628,37.92441,37.491688
+State,"17",Illinois,"94729",Test to examine how well the lungs exchange gases,N,F,308,19043,19716,19716,65.22612,8.8554,6.850872,6.703584
+State,"17",Illinois,"94729",Test to examine how well the lungs exchange gases,N,O,242,13265,14976,14975,180.74553,51.531654,39.626175,39.293575
+State,"18",Indiana,"94010",Test to measure expiratory airflow and volume,N,F,149,3440,4105,4105,42.017944,7.670034,5.8642483,6.1312327
+State,"18",Indiana,"94010",Test to measure expiratory airflow and volume,N,O,286,6599,8386,8386,90.219,22.936625,16.979435,18.656603
+State,"18",Indiana,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,214,9840,10113,10113,59.027115,9.653586,7.371578,7.6489005
+State,"18",Indiana,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,326,7310,9791,9789,131.34798,30.939953,22.980413,24.979614
+State,"18",Indiana,"94726",Test to determine lung volumes using sensors,N,F,199,9954,10222,10222,45.615166,11.289381,8.648218,8.959858
+State,"18",Indiana,"94726",Test to determine lung volumes using sensors,N,O,99,3145,3401,3400,115.78739,43.100967,32.569225,35.586426
+State,"18",Indiana,"94729",Test to examine how well the lungs exchange gases,N,F,218,12002,12432,12432,42.43487,8.335078,6.393943,6.6710496
+State,"18",Indiana,"94729",Test to examine how well the lungs exchange gases,N,O,148,7219,8366,8364,98.669205,43.05684,32.530117,35.53018
+State,"19",Iowa,"94010",Test to measure expiratory airflow and volume,N,F,74,4394,5545,5545,44.945816,7.6173472,5.7119894,6.004799
+State,"19",Iowa,"94010",Test to measure expiratory airflow and volume,N,O,140,4500,5589,5581,97.34806,20.87572,15.066789,16.453651
+State,"19",Iowa,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,82,4301,4513,4513,67.60238,9.577636,7.2789054,7.61068
+State,"19",Iowa,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,111,2528,2715,2714,142.26775,27.869598,20.63495,22.38744
+State,"19",Iowa,"94726",Test to determine lung volumes using sensors,N,F,72,4589,4777,4777,53.43769,11.221961,8.54172,8.88714
+State,"19",Iowa,"94726",Test to determine lung volumes using sensors,N,O,49,1149,1200,1200,133.69417,39.172607,28.981783,31.594007
+State,"19",Iowa,"94729",Test to examine how well the lungs exchange gases,N,F,77,6414,6710,6710,50.444004,8.291003,6.3231044,6.622832
+State,"19",Iowa,"94729",Test to examine how well the lungs exchange gases,N,O,67,3301,3618,3618,127.17761,38.79552,28.466625,30.898405
+State,"20",Kansas,"94010",Test to measure expiratory airflow and volume,N,F,72,2327,2805,2805,106.47549,7.7262816,6.008927,6.219298
+State,"20",Kansas,"94010",Test to measure expiratory airflow and volume,N,O,168,4545,5800,5800,84.92437,22.475468,16.550432,18.002728
+State,"20",Kansas,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,89,2314,2370,2370,140.82222,9.682333,7.3648777,7.610772
+State,"20",Kansas,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,120,4324,4960,4960,136.45836,32.615597,24.536802,26.874746
+State,"20",Kansas,"94726",Test to determine lung volumes using sensors,N,F,72,3505,3787,3787,139.73477,11.333974,8.6782255,8.94582
+State,"20",Kansas,"94726",Test to determine lung volumes using sensors,N,O,68,4697,5026,5026,136.40524,46.843082,35.02307,38.426212
+State,"20",Kansas,"94729",Test to examine how well the lungs exchange gases,N,F,72,3860,4170,4170,68.29078,8.371352,6.4324007,6.6695204
+State,"20",Kansas,"94729",Test to examine how well the lungs exchange gases,N,O,72,5313,5694,5694,137.87497,47.443447,35.121807,38.55853
+State,"21",Kentucky,"94010",Test to measure expiratory airflow and volume,N,F,154,2746,3230,3230,26.760845,7.693997,5.898495,6.0885634
+State,"21",Kentucky,"94010",Test to measure expiratory airflow and volume,N,O,317,8317,10224,10223,85.02043,23.142061,17.101654,19.099228
+State,"21",Kentucky,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,162,5574,5741,5741,47.607483,9.680214,7.42421,7.667396
+State,"21",Kentucky,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,219,4449,4722,4722,118.14737,31.87892,24.388365,27.032553
+State,"21",Kentucky,"94726",Test to determine lung volumes using sensors,N,F,167,6177,6339,6339,43.961796,11.3204,8.702761,8.966794
+State,"21",Kentucky,"94726",Test to determine lung volumes using sensors,N,O,98,4770,5130,5130,113.00098,45.143734,34.868965,38.704567
+State,"21",Kentucky,"94729",Test to examine how well the lungs exchange gases,N,F,166,7001,7213,7213,32.99594,8.422354,6.477385,6.7014694
+State,"21",Kentucky,"94729",Test to examine how well the lungs exchange gases,N,O,120,6205,6703,6703,112.70407,46.381,35.68196,39.883198
+State,"22",Louisiana,"94010",Test to measure expiratory airflow and volume,N,F,95,2944,3281,3280,53.23712,7.817726,5.9249983,6.052469
+State,"22",Louisiana,"94010",Test to measure expiratory airflow and volume,N,O,225,5180,6715,6714,101.18828,21.174793,15.694574,17.35944
+State,"22",Louisiana,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,95,3304,3416,3416,77.10241,9.784895,7.4471135,7.6186094
+State,"22",Louisiana,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,135,2844,3176,3166,166.42807,30.349886,22.799074,25.272425
+State,"22",Louisiana,"94726",Test to determine lung volumes using sensors,N,F,77,3329,3480,3480,77.81104,11.380443,8.675839,8.884442
+State,"22",Louisiana,"94726",Test to determine lung volumes using sensors,N,O,46,2079,2371,2371,139.18343,39.296116,29.803555,33.202496
+State,"22",Louisiana,"94729",Test to examine how well the lungs exchange gases,N,F,103,5431,5740,5740,73.01019,8.492094,6.48573,6.622052
+State,"22",Louisiana,"94729",Test to examine how well the lungs exchange gases,N,O,77,3405,3685,3685,130.69026,36.637722,28.255264,31.438643
+State,"23",Maine,"94010",Test to measure expiratory airflow and volume,N,F,44,1046,1124,1124,116.582954,7.773505,5.8929806,6.064048
+State,"23",Maine,"94010",Test to measure expiratory airflow and volume,N,O,51,295,380,380,69.51313,23.930422,17.430473,17.505974
+State,"23",Maine,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,42,1238,1266,1266,125.48264,9.868618,7.571501,7.6655765
+State,"23",Maine,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,54,546,655,655,96.35678,34.02768,26.100794,27.929298
+State,"23",Maine,"94726",Test to determine lung volumes using sensors,N,F,39,1355,1393,1393,210.29881,11.514437,8.775987,8.895671
+State,"23",Maine,"94726",Test to determine lung volumes using sensors,N,O,22,696,731,731,103.541725,50.859917,37.224964,38.432392
+State,"23",Maine,"94729",Test to examine how well the lungs exchange gases,N,F,42,1687,1735,1735,111.55105,8.514945,6.5585938,6.679141
+State,"23",Maine,"94729",Test to examine how well the lungs exchange gases,N,O,23,741,781,781,111.270164,52.441883,39.797543,40.919155
+State,"24",Maryland,"94010",Test to measure expiratory airflow and volume,N,F,96,3653,4802,4802,57.667797,8.397397,6.3880444,6.0536695
+State,"24",Maryland,"94010",Test to measure expiratory airflow and volume,N,O,442,16436,21507,21504,91.7295,28.32707,21.475914,19.804415
+State,"24",Maryland,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,95,3005,3078,3078,65.53608,10.3977585,7.8898897,7.5766635
+State,"24",Maryland,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,323,13553,14906,14906,158.49445,40.352436,30.918058,28.496754
+State,"24",Maryland,"94726",Test to determine lung volumes using sensors,N,F,77,2559,2614,2614,85.78298,12.068978,9.18707,8.86658
+State,"24",Maryland,"94726",Test to determine lung volumes using sensors,N,O,130,6743,7569,7569,146.50545,56.67088,43.319412,40.10626
+State,"24",Maryland,"94729",Test to examine how well the lungs exchange gases,N,F,103,6167,6628,6628,51.185585,9.061942,6.875955,6.570374
+State,"24",Maryland,"94729",Test to examine how well the lungs exchange gases,N,O,187,17790,19453,19453,154.78735,59.00267,44.972897,41.482765
+State,"25",Massachusetts,"94010",Test to measure expiratory airflow and volume,N,F,259,7250,8674,8674,36.857872,8.499416,6.507156,6.1210895
+State,"25",Massachusetts,"94010",Test to measure expiratory airflow and volume,N,O,331,8118,11219,10806,107.59525,26.268667,19.72586,18.120125
+State,"25",Massachusetts,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,264,13512,13916,13916,58.71406,10.448027,7.995966,7.6482553
+State,"25",Massachusetts,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,222,7541,8812,8564,168.01994,35.578407,27.065077,25.047983
+State,"25",Massachusetts,"94726",Test to determine lung volumes using sensors,N,F,218,9233,9528,9528,47.774113,12.195317,9.364515,8.961938
+State,"25",Massachusetts,"94726",Test to determine lung volumes using sensors,N,O,77,3402,3621,3529,144.44049,43.732998,33.567772,31.086689
+State,"25",Massachusetts,"94729",Test to examine how well the lungs exchange gases,N,F,254,18178,19264,19264,47.229294,9.078634,6.9855328,6.667769
+State,"25",Massachusetts,"94729",Test to examine how well the lungs exchange gases,N,O,112,6378,6932,6647,168.72443,46.274853,35.301815,32.718807
+State,"26",Michigan,"94010",Test to measure expiratory airflow and volume,N,F,304,7940,9961,9961,42.79231,7.987887,6.036386,6.0511093
+State,"26",Michigan,"94010",Test to measure expiratory airflow and volume,N,O,950,13491,15734,15727,71.225266,22.833889,16.605085,16.99432
+State,"26",Michigan,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,292,9213,9397,9397,48.49683,9.890209,7.444143,7.5322113
+State,"26",Michigan,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,696,14100,16552,16545,120.47629,35.07452,26.068686,26.77852
+State,"26",Michigan,"94726",Test to determine lung volumes using sensors,N,F,288,9949,10162,10162,39.859837,11.5183325,8.688864,8.823858
+State,"26",Michigan,"94726",Test to determine lung volumes using sensors,N,O,244,8202,8462,8460,103.52156,45.564335,34.64258,35.95258
+State,"26",Michigan,"94729",Test to examine how well the lungs exchange gases,N,F,309,13905,15009,15009,34.29116,8.615799,6.5195336,6.5717144
+State,"26",Michigan,"94729",Test to examine how well the lungs exchange gases,N,O,310,13643,14604,14599,97.55876,44.939926,34.311527,35.469494
+State,"27",Minnesota,"94010",Test to measure expiratory airflow and volume,N,F,111,1943,2162,2160,58.992092,7.762812,5.884986,5.9462953
+State,"27",Minnesota,"94010",Test to measure expiratory airflow and volume,N,O,288,6529,8434,8428,127.29249,25.34244,19.361727,19.173502
+State,"27",Minnesota,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,147,3579,3672,3672,90.38813,9.7368355,7.381746,7.4365087
+State,"27",Minnesota,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,205,5045,5238,5237,207.26923,33.193295,25.756601,25.430174
+State,"27",Minnesota,"94726",Test to determine lung volumes using sensors,N,F,112,3721,3847,3847,85.13268,11.373561,8.6781,8.745516
+State,"27",Minnesota,"94726",Test to determine lung volumes using sensors,N,O,101,6498,7107,7106,238.71457,48.072296,37.758038,37.22663
+State,"27",Minnesota,"94729",Test to examine how well the lungs exchange gases,N,F,127,4687,4921,4921,57.66292,8.4215765,6.4295917,6.5176163
+State,"27",Minnesota,"94729",Test to examine how well the lungs exchange gases,N,O,124,9695,11049,11048,230.08502,51.81776,40.043472,39.253445
+State,"28",Mississippi,"94010",Test to measure expiratory airflow and volume,N,F,49,3644,3942,3942,41.910095,7.381497,5.462633,5.7181277
+State,"28",Mississippi,"94010",Test to measure expiratory airflow and volume,N,O,158,11414,16265,16259,127.70472,22.064869,16.477133,19.023487
+State,"28",Mississippi,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,64,2332,2397,2397,87.37338,9.599087,7.309003,7.625144
+State,"28",Mississippi,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,101,2590,2830,2830,138.56706,30.244774,22.350145,26.017128
+State,"28",Mississippi,"94726",Test to determine lung volumes using sensors,N,F,63,2577,2640,2640,56.359585,11.160951,8.542193,8.924106
+State,"28",Mississippi,"94726",Test to determine lung volumes using sensors,N,O,61,5079,5807,5807,141.47873,42.92891,33.55202,38.89209
+State,"28",Mississippi,"94729",Test to examine how well the lungs exchange gases,N,F,70,3322,3433,3433,74.92589,8.282044,6.34402,6.63815
+State,"28",Mississippi,"94729",Test to examine how well the lungs exchange gases,N,O,86,7483,8344,8344,140.62746,44.406498,34.11134,39.963394
+State,"29",Missouri,"94010",Test to measure expiratory airflow and volume,N,F,180,5034,5634,5634,38.195786,7.800064,5.9525967,6.1036863
+State,"29",Missouri,"94010",Test to measure expiratory airflow and volume,N,O,306,7486,10684,10645,90.08526,23.415754,17.292025,17.91141
+State,"29",Missouri,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,187,8201,8476,8476,62.247574,9.784278,7.41657,7.584299
+State,"29",Missouri,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,264,4753,5469,5279,144.25937,29.01735,21.666632,22.835144
+State,"29",Missouri,"94726",Test to determine lung volumes using sensors,N,F,189,10656,11075,11075,50.24708,11.414659,8.658263,8.860736
+State,"29",Missouri,"94726",Test to determine lung volumes using sensors,N,O,133,6104,6702,6683,128.72467,41.15274,31.104265,32.57278
+State,"29",Missouri,"94729",Test to examine how well the lungs exchange gases,N,F,206,11993,12475,12475,41.81446,8.47049,6.4487333,6.604586
+State,"29",Missouri,"94729",Test to examine how well the lungs exchange gases,N,O,160,7244,8117,7971,128.44223,41.17186,31.05833,32.633614
+State,"30",Montana,"94010",Test to measure expiratory airflow and volume,N,F,32,1414,1569,1569,31.826061,7.9384255,5.9472914,5.8290315
+State,"30",Montana,"94010",Test to measure expiratory airflow and volume,N,O,44,1206,1469,1469,79.697075,23.876535,17.636827,17.894167
+State,"30",Montana,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,37,1661,1824,1824,31.510372,9.720164,7.1752577,7.050855
+State,"30",Montana,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,34,801,950,950,121.81162,30.572369,23.399,23.509148
+State,"30",Montana,"94726",Test to determine lung volumes using sensors,N,F,30,1726,1777,1777,53.73721,11.848385,8.966821,8.797985
+State,"30",Montana,"94726",Test to determine lung volumes using sensors,N,O,10,438,474,474,123.97047,49.7458,36.45076,36.864662
+State,"30",Montana,"94729",Test to examine how well the lungs exchange gases,N,F,31,2063,2152,2152,47.376526,8.798164,6.6561384,6.5360456
+State,"30",Montana,"94729",Test to examine how well the lungs exchange gases,N,O,23,738,761,761,126.46551,51.46351,37.5202,37.74515
+State,"31",Nebraska,"94010",Test to measure expiratory airflow and volume,N,F,65,424,523,523,34.866882,7.5760994,5.6848183,6.0161757
+State,"31",Nebraska,"94010",Test to measure expiratory airflow and volume,N,O,124,1588,1813,1813,72.16226,23.958235,17.283321,19.050562
+State,"31",Nebraska,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,74,3092,3184,3184,39.73327,9.6595545,7.2914824,7.5713725
+State,"31",Nebraska,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,101,3489,3747,3747,100.72206,33.97608,25.163849,27.591646
+State,"31",Nebraska,"94726",Test to determine lung volumes using sensors,N,F,70,2886,2977,2977,36.141613,11.239781,8.4998455,8.8452
+State,"31",Nebraska,"94726",Test to determine lung volumes using sensors,N,O,56,3238,3412,3412,97.12844,47.65414,35.857536,39.424694
+State,"31",Nebraska,"94729",Test to examine how well the lungs exchange gases,N,F,70,3289,3389,3388,28.877531,8.336542,6.3363795,6.612874
+State,"31",Nebraska,"94729",Test to examine how well the lungs exchange gases,N,O,58,3518,3753,3753,98.71011,49.481255,37.582603,41.335674
+State,"32",Nevada,"94010",Test to measure expiratory airflow and volume,N,F,19,184,193,193,57.228447,8.099119,6.430829,6.349482
+State,"32",Nevada,"94010",Test to measure expiratory airflow and volume,N,O,228,3555,4533,4533,79.89703,25.745544,19.330639,19.357557
+State,"32",Nevada,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,49,1796,1881,1881,73.0467,10.087442,7.8940406,7.805524
+State,"32",Nevada,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,145,4643,5908,5907,144.46916,37.771946,28.888554,28.837257
+State,"32",Nevada,"94726",Test to determine lung volumes using sensors,N,F,43,1585,1720,1720,50.254128,11.747041,9.186582,9.088064
+State,"32",Nevada,"94726",Test to determine lung volumes using sensors,N,O,42,2968,3373,3373,159.14473,53.19524,41.48933,41.18042
+State,"32",Nevada,"94729",Test to examine how well the lungs exchange gases,N,F,47,1757,1888,1888,53.58374,8.7318535,6.849338,6.775392
+State,"32",Nevada,"94729",Test to examine how well the lungs exchange gases,N,O,66,5024,6151,6151,159.07605,55.297733,42.206512,42.34882
+State,"33",New Hampshire,"94010",Test to measure expiratory airflow and volume,N,F,56,1971,2279,2279,144.73453,8.093357,5.958938,5.886727
+State,"33",New Hampshire,"94010",Test to measure expiratory airflow and volume,N,O,74,932,1540,1540,91.41718,25.166494,17.964895,17.507343
+State,"33",New Hampshire,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,57,3561,3669,3669,132.66748,10.054486,7.757964,7.7191987
+State,"33",New Hampshire,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,57,465,570,565,157.92632,30.79479,22.972631,22.344473
+State,"33",New Hampshire,"94726",Test to determine lung volumes using sensors,N,F,56,3132,3229,3229,86.376274,11.74782,9.069709,9.008067
+State,"33",New Hampshire,"94726",Test to determine lung volumes using sensors,N,O,14,299,375,372,122.86667,41.370186,30.82176,29.87272
+State,"33",New Hampshire,"94729",Test to examine how well the lungs exchange gases,N,F,56,4910,5266,5266,91.65875,8.729466,6.641954,6.5993924
+State,"33",New Hampshire,"94729",Test to examine how well the lungs exchange gases,N,O,16,339,420,415,118.75476,40.50462,29.748524,28.618738
+State,"34",New Jersey,"94010",Test to measure expiratory airflow and volume,N,F,140,2410,2550,2549,66.897514,8.554412,6.5596747,6.1434627
+State,"34",New Jersey,"94010",Test to measure expiratory airflow and volume,N,O,640,23818,33015,32831,100.53172,28.409609,21.390543,19.042313
+State,"34",New Jersey,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,226,5554,5707,5705,103.63065,10.692487,8.20911,7.6751866
+State,"34",New Jersey,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,594,24337,29400,29399,146.60991,41.271423,31.558481,27.742598
+State,"34",New Jersey,"94726",Test to determine lung volumes using sensors,N,F,113,2397,2454,2453,80.65276,12.307197,9.541886,9.04493
+State,"34",New Jersey,"94726",Test to determine lung volumes using sensors,N,O,184,9137,10285,10284,158.58864,55.75919,43.23517,37.88154
+State,"34",New Jersey,"94729",Test to examine how well the lungs exchange gases,N,F,224,6968,7199,7198,92.075714,9.278451,7.1635714,6.691938
+State,"34",New Jersey,"94729",Test to examine how well the lungs exchange gases,N,O,369,24214,26693,26692,170.12648,58.149464,44.890717,39.363014
+State,"35",New Mexico,"94010",Test to measure expiratory airflow and volume,N,F,26,754,836,836,51.561005,7.916651,6.1584806,6.2160287
+State,"35",New Mexico,"94010",Test to measure expiratory airflow and volume,N,O,110,1887,2569,2569,71.88374,22.124811,16.207579,17.580326
+State,"35",New Mexico,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,34,917,932,932,80.45601,9.868766,7.524367,7.621416
+State,"35",New Mexico,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,73,2526,2684,2684,113.088005,31.156666,23.170172,25.204159
+State,"35",New Mexico,"94726",Test to determine lung volumes using sensors,N,F,28,961,970,970,88.38763,11.517774,8.861515,8.982258
+State,"35",New Mexico,"94726",Test to determine lung volumes using sensors,N,O,29,2187,2322,2322,115.436134,43.179134,32.605064,35.863686
+State,"35",New Mexico,"94729",Test to examine how well the lungs exchange gases,N,F,29,1360,1428,1428,42.120926,8.558158,6.6065197,6.6931515
+State,"35",New Mexico,"94729",Test to examine how well the lungs exchange gases,N,O,31,2290,2428,2428,116.6756,43.42011,33.115242,36.356377
+State,"36",New York,"94010",Test to measure expiratory airflow and volume,N,F,354,7946,9819,9819,60.145634,8.483513,6.5037723,6.1102242
+State,"36",New York,"94010",Test to measure expiratory airflow and volume,N,O,1741,56104,76799,76794,122.85384,30.04888,22.681536,19.339512
+State,"36",New York,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,382,10663,11015,11015,133.43315,10.523228,8.135233,7.719668
+State,"36",New York,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,1215,51934,66644,66581,186.09225,43.71074,33.57608,28.675179
+State,"36",New York,"94726",Test to determine lung volumes using sensors,N,F,314,9158,9586,9586,129.55122,12.227189,9.446519,9.006114
+State,"36",New York,"94726",Test to determine lung volumes using sensors,N,O,448,28326,32053,32050,212.29398,59.948105,46.887665,40.00449
+State,"36",New York,"94729",Test to examine how well the lungs exchange gases,N,F,435,16572,17884,17884,60.89206,9.193461,7.1240306,6.70463
+State,"36",New York,"94729",Test to examine how well the lungs exchange gases,N,O,681,54720,63358,63353,210.81,63.748024,49.799908,42.120537
+State,"37",North Carolina,"94010",Test to measure expiratory airflow and volume,N,F,187,3541,3731,3731,39.948795,7.8303404,5.9898095,6.1201367
+State,"37",North Carolina,"94010",Test to measure expiratory airflow and volume,N,O,772,16452,19036,19036,98.38867,24.275747,18.276077,19.530033
+State,"37",North Carolina,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,154,4602,4740,4740,59.40948,9.835738,7.5109787,7.626635
+State,"37",North Carolina,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,570,12030,13754,13388,160.41832,33.541714,25.013197,26.787237
+State,"37",North Carolina,"94726",Test to determine lung volumes using sensors,N,F,183,5106,5298,5298,55.911777,11.432726,8.725008,8.907161
+State,"37",North Carolina,"94726",Test to determine lung volumes using sensors,N,O,282,15328,17196,16727,140.97453,47.29024,35.690628,38.246338
+State,"37",North Carolina,"94729",Test to examine how well the lungs exchange gases,N,F,213,8219,8757,8756,46.590443,8.44712,6.426484,6.6047254
+State,"37",North Carolina,"94729",Test to examine how well the lungs exchange gases,N,O,354,22229,25284,24653,151.34277,48.56747,36.3105,38.96183
+State,"38",North Dakota,"94010",Test to measure expiratory airflow and volume,N,F,24,1409,1583,1583,56.51295,7.89844,5.75566,5.810385
+State,"38",North Dakota,"94010",Test to measure expiratory airflow and volume,N,O,33,741,875,855,85.956345,11.384651,8.231806,8.647109
+State,"38",North Dakota,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,31,1471,1508,1508,62.209385,9.950511,7.2912135,7.304025
+State,"38",North Dakota,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,28,339,359,357,135.58162,19.327827,14.220306,15.058858
+State,"38",North Dakota,"94726",Test to determine lung volumes using sensors,N,F,24,1511,1542,1542,60.827496,11.616414,8.508067,8.531116
+State,"38",North Dakota,"94726",Test to determine lung volumes using sensors,N,O,13,296,305,304,79.72131,26.02846,19.457508,21.125278
+State,"38",North Dakota,"94729",Test to examine how well the lungs exchange gases,N,F,29,2099,2193,2193,35.172867,8.587569,6.299886,6.345472
+State,"38",North Dakota,"94729",Test to examine how well the lungs exchange gases,N,O,27,851,1012,990,55.346836,17.326738,12.8275795,13.551305
+State,"39",Ohio,"94010",Test to measure expiratory airflow and volume,N,F,355,7860,9669,9669,44.667538,7.8613753,5.934895,6.050416
+State,"39",Ohio,"94010",Test to measure expiratory airflow and volume,N,O,549,10552,13414,13413,71.43889,18.989445,13.884758,14.886249
+State,"39",Ohio,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,414,15010,15450,15450,56.432144,9.836021,7.4629593,7.5809684
+State,"39",Ohio,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,608,11108,11966,11966,130.26886,26.517042,19.747166,21.142689
+State,"39",Ohio,"94726",Test to determine lung volumes using sensors,N,F,370,12881,13358,13358,42.08144,11.522683,8.78349,8.949608
+State,"39",Ohio,"94726",Test to determine lung volumes using sensors,N,O,250,7605,8246,8246,94.91778,32.634937,24.83891,26.420444
+State,"39",Ohio,"94729",Test to examine how well the lungs exchange gases,N,F,429,19024,20021,20021,40.82927,8.558508,6.5363994,6.6592016
+State,"39",Ohio,"94729",Test to examine how well the lungs exchange gases,N,O,303,11825,12853,12853,90.7018,32.63568,24.76987,26.628613
+State,"40",Oklahoma,"94010",Test to measure expiratory airflow and volume,N,F,101,2170,2454,2454,34.730408,7.6949635,5.919197,6.137816
+State,"40",Oklahoma,"94010",Test to measure expiratory airflow and volume,N,O,219,6314,7674,7673,65.489395,22.504152,16.724407,18.621698
+State,"40",Oklahoma,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,115,4295,4441,4441,51.233097,9.754551,7.5428505,7.723285
+State,"40",Oklahoma,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,136,2553,2727,2726,107.49239,31.65587,24.083183,26.964987
+State,"40",Oklahoma,"94726",Test to determine lung volumes using sensors,N,F,93,3840,3992,3992,39.928772,11.377823,8.7389555,8.957302
+State,"40",Oklahoma,"94726",Test to determine lung volumes using sensors,N,O,56,2059,2213,2212,92.98551,38.434906,29.537235,33.122173
+State,"40",Oklahoma,"94729",Test to examine how well the lungs exchange gases,N,F,112,5807,6109,6109,28.472355,8.437373,6.512274,6.6895943
+State,"40",Oklahoma,"94729",Test to examine how well the lungs exchange gases,N,O,60,2982,3235,3234,95.54298,42.005722,32.40424,36.379364
+State,"41",Oregon,"94010",Test to measure expiratory airflow and volume,N,F,87,1202,1323,1323,41.537476,8.071164,6.029161,5.9706273
+State,"41",Oregon,"94010",Test to measure expiratory airflow and volume,N,O,170,2228,2742,2741,97.77502,24.59685,18.211445,18.610981
+State,"41",Oregon,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,108,4356,4458,4458,72.96767,9.990179,7.3464627,7.34179
+State,"41",Oregon,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,157,2743,3091,3090,159.23819,35.10939,26.44811,26.79703
+State,"41",Oregon,"94726",Test to determine lung volumes using sensors,N,F,104,3830,3932,3932,56.1838,11.69469,8.644812,8.605527
+State,"41",Oregon,"94726",Test to determine lung volumes using sensors,N,O,53,1832,1910,1910,150.1722,46.074333,34.843117,35.597965
+State,"41",Oregon,"94729",Test to examine how well the lungs exchange gases,N,F,107,4723,4891,4891,55.822235,8.641077,6.413502,6.4257965
+State,"41",Oregon,"94729",Test to examine how well the lungs exchange gases,N,O,78,2806,3043,3043,153.84279,48.84289,37.0276,37.509464
+State,"42",Pennsylvania,"94010",Test to measure expiratory airflow and volume,N,F,396,9593,12987,12985,109.05245,8.164128,6.1881804,6.072444
+State,"42",Pennsylvania,"94010",Test to measure expiratory airflow and volume,N,O,622,16440,22907,22901,86.504974,26.508762,19.917534,19.262125
+State,"42",Pennsylvania,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,438,18126,18731,18731,66.79699,10.015007,7.562841,7.5515366
+State,"42",Pennsylvania,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,544,13467,14830,14829,129.4613,34.448788,25.990639,25.63243
+State,"42",Pennsylvania,"94726",Test to determine lung volumes using sensors,N,F,397,17731,18853,18852,56.37727,11.760654,8.900766,8.834299
+State,"42",Pennsylvania,"94726",Test to determine lung volumes using sensors,N,O,207,7571,7869,7866,122.5645,44.82676,34.039852,33.271553
+State,"42",Pennsylvania,"94729",Test to examine how well the lungs exchange gases,N,F,451,23202,24900,24899,49.427334,8.719841,6.61361,6.580312
+State,"42",Pennsylvania,"94729",Test to examine how well the lungs exchange gases,N,O,314,15151,15955,15951,118.62841,48.641884,37.364082,36.651974
+State,"44",Rhode Island,"94010",Test to measure expiratory airflow and volume,N,F,32,771,830,830,85.92589,8.271879,6.365024,6.1533613
+State,"44",Rhode Island,"94010",Test to measure expiratory airflow and volume,N,O,75,2252,2781,2781,73.433426,26.310759,19.948372,19.373995
+State,"44",Rhode Island,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,36,1102,1116,1116,114.099434,10.103352,7.8115053,7.7400537
+State,"44",Rhode Island,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,35,1027,1134,1134,127.67337,32.60319,25.525389,23.720184
+State,"44",Rhode Island,"94726",Test to determine lung volumes using sensors,N,F,18,921,962,962,77.632675,12.098264,9.411466,9.086133
+State,"44",Rhode Island,"94726",Test to determine lung volumes using sensors,N,O,25,1399,1549,1549,137.78006,46.41179,36.29579,33.29364
+State,"44",Rhode Island,"94729",Test to examine how well the lungs exchange gases,N,F,35,1893,1958,1958,84.131096,8.880802,6.882906,6.722748
+State,"44",Rhode Island,"94729",Test to examine how well the lungs exchange gases,N,O,27,1912,2137,2137,132.6321,50.036896,38.658176,36.017193
+State,"45",South Carolina,"94010",Test to measure expiratory airflow and volume,N,F,108,4320,4978,4978,73.78518,7.718666,5.8707814,6.0980496
+State,"45",South Carolina,"94010",Test to measure expiratory airflow and volume,N,O,355,14591,18742,18739,87.92734,22.70672,16.751822,18.352737
+State,"45",South Carolina,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,116,3045,3102,3102,69.079346,9.76757,7.386457,7.571257
+State,"45",South Carolina,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,276,8573,9376,9375,153.14844,33.943787,25.17184,27.650993
+State,"45",South Carolina,"94726",Test to determine lung volumes using sensors,N,F,116,4114,4192,4192,47.94737,11.382278,8.711594,8.93713
+State,"45",South Carolina,"94726",Test to determine lung volumes using sensors,N,O,128,8171,8512,8512,133.558,47.10473,36.03207,39.327164
+State,"45",South Carolina,"94729",Test to examine how well the lungs exchange gases,N,F,126,5588,5889,5889,47.46814,8.417684,6.398667,6.6064763
+State,"45",South Carolina,"94729",Test to examine how well the lungs exchange gases,N,O,148,11815,12872,12868,135.17792,45.797157,34.385563,37.73102
+State,"46",South Dakota,"94010",Test to measure expiratory airflow and volume,N,F,24,952,996,996,32.32022,7.8576407,5.8608937,5.9710946
+State,"46",South Dakota,"94010",Test to measure expiratory airflow and volume,N,O,47,568,983,844,64.95237,18.431791,13.416103,13.700061
+State,"46",South Dakota,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,28,2016,2103,2103,37.7435,9.86739,7.297375,7.4020114
+State,"46",South Dakota,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,44,738,1043,825,61.441803,16.572233,12.318341,12.493614
+State,"46",South Dakota,"94726",Test to determine lung volumes using sensors,N,F,20,1430,1458,1458,33.821213,11.523635,8.572722,8.695453
+State,"46",South Dakota,"94726",Test to determine lung volumes using sensors,N,O,26,568,756,608,58.23123,22.133703,16.622633,16.815159
+State,"46",South Dakota,"94729",Test to examine how well the lungs exchange gases,N,F,21,2049,2122,2122,29.3931,8.526084,6.3736477,6.489802
+State,"46",South Dakota,"94729",Test to examine how well the lungs exchange gases,N,O,28,742,1032,840,55.338867,22.066404,16.680542,16.801619
+State,"47",Tennessee,"94010",Test to measure expiratory airflow and volume,N,F,141,4943,5894,5894,33.920307,7.5687003,5.7835493,6.144291
+State,"47",Tennessee,"94010",Test to measure expiratory airflow and volume,N,O,761,19574,25740,25733,94.066795,22.267227,16.464287,18.421947
+State,"47",Tennessee,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,156,3309,3400,3400,47.23243,9.603903,7.3018765,7.6295147
+State,"47",Tennessee,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,607,8270,8903,8898,128.40804,32.25069,24.05415,26.790743
+State,"47",Tennessee,"94726",Test to determine lung volumes using sensors,N,F,114,3911,4039,4039,46.572655,11.244028,8.498894,8.854189
+State,"47",Tennessee,"94726",Test to determine lung volumes using sensors,N,O,163,7029,8005,8005,105.47953,41.597343,31.834742,35.855316
+State,"47",Tennessee,"94729",Test to examine how well the lungs exchange gases,N,F,167,6262,6579,6579,33.88451,8.285564,6.2823877,6.59786
+State,"47",Tennessee,"94729",Test to examine how well the lungs exchange gases,N,O,285,14875,17274,17266,121.46774,44.00577,33.43624,37.69437
+State,"48",Texas,"94010",Test to measure expiratory airflow and volume,N,F,389,11672,14754,14753,50.53365,7.9245324,6.0754848,6.1368713
+State,"48",Texas,"94010",Test to measure expiratory airflow and volume,N,O,1728,29225,53365,53359,77.3529,25.11537,19.0921,19.50668
+State,"48",Texas,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,398,9840,10292,10292,68.94911,9.892221,7.635211,7.7227373
+State,"48",Texas,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,1376,38353,46520,46480,142.02979,36.323734,27.57714,28.43329
+State,"48",Texas,"94726",Test to determine lung volumes using sensors,N,F,367,13514,14461,14461,69.64622,11.600104,8.955172,9.014168
+State,"48",Texas,"94726",Test to determine lung volumes using sensors,N,O,455,31426,34203,34199,138.876,50.520966,39.075703,40.243435
+State,"48",Texas,"94729",Test to examine how well the lungs exchange gases,N,F,432,19021,21084,21084,50.10226,8.578814,6.618923,6.693333
+State,"48",Texas,"94729",Test to examine how well the lungs exchange gases,N,O,614,39221,42734,42730,142.6029,52.255146,40.239887,41.536793
+State,"49",Utah,"94010",Test to measure expiratory airflow and volume,N,F,45,1611,1967,1967,23.089588,7.8856177,5.9607067,6.0456786
+State,"49",Utah,"94010",Test to measure expiratory airflow and volume,N,O,155,1403,1969,1969,70.236145,23.430492,17.002605,18.274103
+State,"49",Utah,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,47,1784,1828,1827,59.538727,9.797199,7.3461323,7.511805
+State,"49",Utah,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,115,1869,2075,2075,122.99402,32.554276,24.564182,26.297663
+State,"49",Utah,"94726",Test to determine lung volumes using sensors,N,F,33,1018,1052,1051,47.63865,11.5123005,8.707975,8.837614
+State,"49",Utah,"94726",Test to determine lung volumes using sensors,N,O,29,810,863,863,98.562,43.317394,32.321297,34.544136
+State,"49",Utah,"94729",Test to examine how well the lungs exchange gases,N,F,44,3129,3389,3388,39.137733,8.51738,6.3302746,6.4560256
+State,"49",Utah,"94729",Test to examine how well the lungs exchange gases,N,O,40,1482,1594,1594,113.79573,43.95417,32.97455,35.45371
+State,"50",Vermont,"94010",Test to measure expiratory airflow and volume,N,F,31,1120,1429,1427,63.93594,7.7516937,5.6982436,5.826221
+State,"50",Vermont,"94010",Test to measure expiratory airflow and volume,N,O,34,224,286,286,90.81224,25.60993,17.686714,18.051783
+State,"50",Vermont,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,27,1053,1079,1079,126.546425,9.824847,7.4182577,7.5497313
+State,"50",Vermont,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,7,76,79,79,154.98506,35.402786,27.442026,27.74519
+State,"50",Vermont,"94726",Test to determine lung volumes using sensors,N,F,28,847,870,868,61.721504,11.515035,8.802264,8.916023
+State,"50",Vermont,"94726",Test to determine lung volumes using sensors,N,O,3,172,242,242,84.1157,52.454174,38.634586,39.10405
+State,"50",Vermont,"94729",Test to examine how well the lungs exchange gases,N,F,30,1315,1466,1466,39.914173,8.477285,6.476719,6.610907
+State,"50",Vermont,"94729",Test to examine how well the lungs exchange gases,N,O,3,106,115,115,82.45217,53.441216,41.896782,42.245045
+State,"51",Virginia,"94010",Test to measure expiratory airflow and volume,N,F,195,5243,7046,7046,31.45447,8.151621,6.169709,6.0541387
+State,"51",Virginia,"94010",Test to measure expiratory airflow and volume,N,O,536,17844,29628,26836,73.52659,24.924936,18.686245,17.555895
+State,"51",Virginia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,186,6960,7292,7292,38.44922,9.916405,7.537205,7.610015
+State,"51",Virginia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,366,14845,16807,16669,145.42401,37.48475,28.246386,27.540901
+State,"51",Virginia,"94726",Test to determine lung volumes using sensors,N,F,179,8000,8345,8345,32.3005,11.616944,8.810538,8.857821
+State,"51",Virginia,"94726",Test to determine lung volumes using sensors,N,O,180,11082,12181,12181,147.3887,50.88007,38.213345,37.936134
+State,"51",Virginia,"94729",Test to examine how well the lungs exchange gases,N,F,197,9532,9955,9955,26.333708,8.614248,6.5424924,6.589412
+State,"51",Virginia,"94729",Test to examine how well the lungs exchange gases,N,O,245,18048,20332,20331,137.52086,54.28843,41.60817,40.628334
+State,"53",Washington,"94010",Test to measure expiratory airflow and volume,N,F,139,2579,3159,3159,26.404736,8.3531275,6.2278094,5.9617505
+State,"53",Washington,"94010",Test to measure expiratory airflow and volume,N,O,295,4505,5222,5183,94.001015,26.24734,19.744295,19.070238
+State,"53",Washington,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,167,5329,5491,5491,59.36954,10.290046,7.514083,7.308818
+State,"53",Washington,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,272,7026,7944,7909,148.68259,36.39474,27.26336,26.469866
+State,"53",Washington,"94726",Test to determine lung volumes using sensors,N,F,162,5517,5741,5741,53.32159,11.985989,8.756863,8.535201
+State,"53",Washington,"94726",Test to determine lung volumes using sensors,N,O,153,6373,6879,6879,154.97592,51.31401,38.690655,37.575745
+State,"53",Washington,"94729",Test to examine how well the lungs exchange gases,N,F,164,6903,7488,7488,34.568554,8.947955,6.596596,6.397302
+State,"53",Washington,"94729",Test to examine how well the lungs exchange gases,N,O,178,8602,9651,9616,158.9533,53.18918,39.39442,37.924034
+State,"54",West Virginia,"94010",Test to measure expiratory airflow and volume,N,F,67,916,988,988,30.339504,7.7458906,5.920607,6.1442914
+State,"54",West Virginia,"94010",Test to measure expiratory airflow and volume,N,O,78,1817,2196,2185,80.756836,20.327082,14.857896,16.734362
+State,"54",West Virginia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,80,2491,2542,2542,79.963066,9.729103,7.362144,7.5981116
+State,"54",West Virginia,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,78,2720,3147,3147,155.62459,31.562027,23.086823,26.096994
+State,"54",West Virginia,"94726",Test to determine lung volumes using sensors,N,F,69,2007,2067,2067,42.565582,11.354267,8.515675,8.79193
+State,"54",West Virginia,"94726",Test to determine lung volumes using sensors,N,O,27,1984,2049,2044,85.73373,38.02205,28.579508,31.706247
+State,"54",West Virginia,"94729",Test to examine how well the lungs exchange gases,N,F,76,2815,2890,2890,36.041462,8.4478855,6.4142733,6.6086297
+State,"54",West Virginia,"94729",Test to examine how well the lungs exchange gases,N,O,38,2598,2669,2663,117.893005,43.247948,32.30704,36.642414
+State,"55",Wisconsin,"94010",Test to measure expiratory airflow and volume,N,F,136,4734,6002,6002,97.41593,7.6883574,5.786073,6.0386686
+State,"55",Wisconsin,"94010",Test to measure expiratory airflow and volume,N,O,238,4496,5516,5446,244.82916,22.046736,16.151268,17.16366
+State,"55",Wisconsin,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,139,6521,6757,6757,164.78683,9.740348,7.3710995,7.576284
+State,"55",Wisconsin,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,202,2810,2938,2933,365.1186,31.843212,23.294691,24.58001
+State,"55",Wisconsin,"94726",Test to determine lung volumes using sensors,N,F,132,7265,7530,7530,135.76068,11.373644,8.654665,8.896964
+State,"55",Wisconsin,"94726",Test to determine lung volumes using sensors,N,O,101,2775,2872,2872,459.55923,46.212112,35.007565,37.092724
+State,"55",Wisconsin,"94729",Test to examine how well the lungs exchange gases,N,F,145,9177,9846,9846,97.96284,8.390656,6.3923717,6.6144466
+State,"55",Wisconsin,"94729",Test to examine how well the lungs exchange gases,N,O,116,3858,4182,4182,426.3604,47.236168,35.645866,37.721027
+State,"56",Wyoming,"94010",Test to measure expiratory airflow and volume,N,F,6,313,352,352,20.533579,7.7841477,6.1704264,6.348324
+State,"56",Wyoming,"94010",Test to measure expiratory airflow and volume,N,O,28,132,151,151,81.20841,23.961325,16.30053,16.565298
+State,"56",Wyoming,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,15,282,282,282,136.81738,9.988404,7.459291,7.4540424
+State,"56",Wyoming,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,24,175,175,175,259.62857,35.1044,25.791086,25.474
+State,"56",Wyoming,"94726",Test to determine lung volumes using sensors,N,F,8,265,267,267,65.78749,11.6924715,8.837004,8.8137455
+State,"56",Wyoming,"94726",Test to determine lung volumes using sensors,N,O,3,68,68,68,128.66911,55.76985,41.398823,39.473087
+State,"56",Wyoming,"94729",Test to examine how well the lungs exchange gases,N,F,5,508,526,526,46.22483,8.544753,6.358764,6.465266
+State,"56",Wyoming,"94729",Test to examine how well the lungs exchange gases,N,O,3,71,71,71,137.30281,58.598167,41.068874,38.94493
+State,"66",Guam,"94010",Test to measure expiratory airflow and volume,N,F,1,262,277,277,24.950903,8.075956,6.0371118,6.017076
+State,"66",Guam,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,1,27,27,27,43.24,42.575184,32.654076,29.304073
+State,"66",Guam,"94726",Test to determine lung volumes using sensors,N,F,1,176,177,177,36.445084,11.991582,8.87226,8.639096
+State,"66",Guam,"94729",Test to examine how well the lungs exchange gases,N,F,3,258,269,269,26.655613,8.734907,6.5401115,6.5342007
+State,"72",Puerto Rico,"94010",Test to measure expiratory airflow and volume,N,F,3,15,15,15,20.832,8.016666,6.386667,6.3733335
+State,"72",Puerto Rico,"94010",Test to measure expiratory airflow and volume,N,O,34,340,388,388,34.54912,26.406675,19.659485,19.837912
+State,"72",Puerto Rico,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,F,2,16,16,16,20.65,10.04,6.9825,6.965
+State,"72",Puerto Rico,"94060",Test to measure expiratory airflow and volume changes before and after medication administration,N,O,71,1107,1415,1415,49.60196,37.918762,28.26422,28.604303
+State,"72",Puerto Rico,"94726",Test to determine lung volumes using sensors,N,F,3,22,22,22,27.040909,11.699546,7.8431816,7.8431816
+State,"72",Puerto Rico,"94726",Test to determine lung volumes using sensors,N,O,25,258,273,273,64.175125,52.09106,38.76762,39.36344
+State,"72",Puerto Rico,"94729",Test to examine how well the lungs exchange gases,N,F,4,32,32,32,29.085938,8.70125,6.493125,6.478125
+State,"72",Puerto Rico,"94729",Test to examine how well the lungs exchange gases,N,O,84,1894,2012,2012,64.83583,54.741386,41.65154,42.840965
+State,"78",Virgin Islands,"94010",Test to measure expiratory airflow and volume,N,O,6,109,109,109,34.66165,26.173578,19.70844,20.065964

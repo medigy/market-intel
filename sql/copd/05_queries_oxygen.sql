@@ -94,11 +94,16 @@ UNION ALL SELECT 'Friction per patient over 36 months',
 FROM copd_oxygen WHERE hcpcs_cd = 'E1392';
 
 
--- Year-by-year rental table
 WITH monthly_rates AS (
     SELECT ROUND(AVG(avg_suplr_mdcr_alowd_amt), 2) AS monthly_allowed,
            ROUND(AVG(avg_suplr_sbmtd_chrg), 2)     AS monthly_submitted
     FROM copd_oxygen WHERE hcpcs_cd = 'E1392'
+),
+periods AS (
+    SELECT 'Month 1-12 (Year 1)' AS period, 12 AS months UNION ALL
+    SELECT 'Month 13-24 (Year 2)', 12 UNION ALL
+    SELECT 'Month 25-36 (Year 3)', 12 UNION ALL
+    SELECT 'Full 36-Month Cap', 36
 )
 SELECT
     period,
@@ -106,11 +111,7 @@ SELECT
     ROUND(monthly_allowed  * months, 2) AS medicare_pays,
     ROUND(monthly_submitted * months, 2) AS provider_bills,
     ROUND((monthly_submitted - monthly_allowed) * months, 2) AS friction
-FROM monthly_rates,
-(VALUES ('Month 1-12 (Year 1)', 12),
-        ('Month 13-24 (Year 2)', 12),
-        ('Month 25-36 (Year 3)', 12),
-        ('Full 36-Month Cap', 36)) AS periods(period, months);
+FROM monthly_rates, periods;
 
 
 -- ─────────────────────────────────────────────────────────────────────────────

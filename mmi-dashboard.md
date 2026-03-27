@@ -1,3 +1,93 @@
+
+## Medigy Market Intelligence — COPD Evidence
+
+```sql mmi/copd-evidence.sql { route: { caption: "COPD Evidence" } }
+-- @route.description "Consolidated COPD evidence views and charts mapped to the Voxia COPD analytics report."
+
+SELECT 'shell' AS component,
+       'COPD Evidence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       '/footer-links.js' AS javascript,
+    '**CMS COPD Dataset and Resources (2023)**  
+    [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
+    [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+
+SELECT 'hero' AS component,
+    'COPD Evidence' AS title,
+    'Consolidated evidence views and charts mapped to the Voxia COPD analytics report.' AS description,
+    'teal' AS color;
+
+-- PFT National Summary
+SELECT 'text' AS component, 'Pulmonary Function Test (PFT) National Summary' AS title, 'National-level summary of Pulmonary Function Test (PFT) procedure volumes, allowed amounts, and average payments per test.' AS contents;
+SELECT 'chart' AS component, 'PFT Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
+SELECT hcpcs_cd AS label, total_services AS value FROM vw_pft_national ORDER BY total_services DESC;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS search, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_pft_national;
+
+-- PFT State Summary
+SELECT 'text' AS component, 'PFT State Summary' AS title, 'State-level breakdown of PFT volumes, allowed amounts, provider counts, and office vs facility mix.' AS contents;
+SELECT 'chart' AS component, 'Top 10 States by PFT Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels;
+SELECT state AS label, total_allowed AS value FROM vw_pft_state ORDER BY total_allowed DESC LIMIT 10;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_pft_state ORDER BY total_allowed DESC LIMIT 20;
+
+-- E&M National Summary
+SELECT 'text' AS component, 'E&M National Summary' AS title, 'National summary of Evaluation & Management (E&M) visit volumes, allowed amounts, and average payments per visit.' AS contents;
+SELECT 'chart' AS component, 'E&M Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
+SELECT hcpcs_cd AS label, total_services AS value FROM vw_em_national ORDER BY total_services DESC;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_em_national;
+
+-- E&M State Summary
+SELECT 'text' AS component, 'E&M State Summary' AS title, 'State-level breakdown of E&M visit volumes, allowed amounts, and complexity mix.' AS contents;
+SELECT 'chart' AS component, 'Top 10 States by E&M Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels;
+SELECT state AS label, total_allowed AS value FROM vw_em_state ORDER BY total_allowed DESC LIMIT 10;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_em_state ORDER BY total_allowed DESC LIMIT 20;
+
+-- Oxygen DME National Summary
+SELECT 'text' AS component, 'Oxygen DME National Summary' AS title, 'National summary of oxygen DME (Durable Medical Equipment) rental months, claims, allowed amounts, and per-patient economics.' AS contents;
+SELECT 'chart' AS component, 'Oxygen DME Volume by Code' AS title, 'bar' AS type, TRUE AS labels;
+SELECT hcpcs_cd AS label, total_rental_months AS value FROM vw_o2_national ORDER BY total_rental_months DESC;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_o2_national;
+
+-- Oxygen DME State Summary
+SELECT 'text' AS component, 'Oxygen DME State Summary' AS title, 'State-level summary of oxygen DME rental months, allowed amounts, rural share, and provider counts.' AS contents;
+SELECT 'chart' AS component, 'Top 10 States by Oxygen DME Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels;
+SELECT state AS label, total_allowed AS value FROM vw_o2_state ORDER BY total_allowed DESC LIMIT 10;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_o2_state ORDER BY total_allowed DESC LIMIT 20;
+
+-- Oxygen DME Specialty Summary
+SELECT 'text' AS component, 'Oxygen DME Specialty Summary' AS title, 'Breakdown of oxygen DME rental months and allowed amounts by referring provider specialty.' AS contents;
+SELECT 'chart' AS component, 'Top 10 Specialties by Oxygen DME Allowed' AS title, 'bar' AS type, TRUE AS labels;
+SELECT specialty_desc AS label, total_allowed AS value FROM vw_o2_specialty ORDER BY total_allowed DESC LIMIT 10;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_o2_specialty ORDER BY total_allowed DESC LIMIT 20;
+
+-- Integrated Market Stack Summary
+SELECT 'text' AS component, 'Integrated Market Stack Summary' AS title, 'Aggregate economics for diagnostics, E&M visits, and DME layers in the COPD market.' AS contents;
+SELECT 'chart' AS component, 'Medicare Allowed by Market Layer' AS title, 'bar' AS type, TRUE AS labels;
+SELECT market_name AS label, medicare_allowed AS value FROM vw_integrated_market ORDER BY layer_no;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows;
+SELECT * FROM vw_integrated_market ORDER BY layer_no;
+```
 ---
 sqlpage-conf:
   database_url: "sqlite://resource-surveillance.sqlite.db?mode=rwc"
@@ -26,6 +116,13 @@ rm -f resource-surveillance.sqlite.*
 
 surveilr ingest files -r medicare-ds/ && surveilr orchestrate transform-csv 
 surveilr shell sql/medicare-analytics.sql 
+surveilr shell sql/copd/01_schema.sql 
+surveilr shell sql/copd/02_data_load.sql
+surveilr shell sql/copd/03_queries_pft.sql
+surveilr shell sql/copd/04_queries_em.sql 
+surveilr shell sql/copd/05_queries_oxygen.sql 
+surveilr shell sql/copd/06_queries_integrated.sql
+surveilr shell sql/copd/07_views.sql
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
 echo "Medicare patient analytics database and SQLPage UI are ready."
 ```
@@ -50,10 +147,14 @@ SELECT 'shell' AS component,
      [Medicare Physician & Other Practitioners - by Provider](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-provider)  
      [Medicare Physician & Other Practitioners - by Geography and Service](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service)' AS footer,
     '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
-    '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
-       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+    '{"link": "/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+    '{"link": "/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+    '{"link": "/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+    '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+    '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+    '{"link": "/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+    '{"link": "/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+    '{"link": "/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -81,6 +182,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
@@ -149,12 +252,20 @@ SELECT
     'trophy' AS icon,
     'azure' AS color;
 
+
 SELECT
     'Evidence' AS title,
     'Consolidated evidence views and charts mapped to the Voxia prioritization report references, including opportunity matrix, gatekeepers, Pareto drug spend, and geographic concentration.' AS description,
     '/mmi/sleep-apnea-evidence.sql' AS link,
     'moon-stars' AS icon,
     'cyan' AS color;
+
+SELECT
+    'COPD Evidence' AS title,
+    'Consolidated COPD evidence views and charts mapped to the Voxia COPD analytics report.' AS description,
+    '/mmi/copd-evidence.sql' AS link,
+    'lungs' AS icon,
+    'teal' AS color;
 
 SELECT
     'Sleep Apnea Market' AS title,
@@ -265,6 +376,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -377,6 +490,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -449,6 +564,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -521,6 +638,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -616,6 +735,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -685,6 +806,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -803,6 +926,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
@@ -1116,6 +1241,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -2371,6 +2498,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -2509,6 +2638,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -2536,6 +2667,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -2563,6 +2696,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -2592,6 +2727,8 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link": "/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+       '{"link": "/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;

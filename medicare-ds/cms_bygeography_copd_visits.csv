@@ -1,0 +1,243 @@
+"Rndrng_Prvdr_Geo_Lvl","Rndrng_Prvdr_Geo_Cd","Rndrng_Prvdr_Geo_Desc","HCPCS_Cd","HCPCS_Desc","HCPCS_Drug_Ind","Place_Of_Srvc","Tot_Rndrng_Prvdrs","Tot_Benes","Tot_Srvcs","Tot_Bene_Day_Srvcs","Avg_Sbmtd_Chrg","Avg_Mdcr_Alowd_Amt","Avg_Mdcr_Pymt_Amt","Avg_Mdcr_Stdzd_Amt"
+National,"",National,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,134474,2464992,4704865,4703937,167.23631,62.1239,44.796158,44.887253
+National,"",National,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,612530,19069444,66756833,66751756,179.9672,85.51108,59.64884,59.964535
+National,"",National,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,158258,3500703,8122291,8121674,246.69843,92.08906,66.70302,67.09089
+National,"",National,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,609466,21122940,92477055,92471321,263.55328,120.16261,84.208664,85.80398
+State,"01",Alabama,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1246,23596,47657,47657,139.54918,57.986145,41.75228,44.36352
+State,"01",Alabama,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,8702,298815,908459,908439,132.137,79.32021,54.557415,60.274616
+State,"01",Alabama,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1637,48852,103101,103099,202.25049,87.75734,63.732597,67.6131
+State,"01",Alabama,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,8879,352494,1507314,1507289,190.41653,112.28828,78.020935,86.38729
+State,"02",Alaska,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,437,8366,19123,19123,220.97322,81.9086,59.934372,44.5367
+State,"02",Alaska,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,1601,53887,139678,139669,248.5987,104.27355,71.87863,57.786705
+State,"02",Alaska,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,409,9340,19647,19646,307.9497,120.27645,86.43965,64.60351
+State,"02",Alaska,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,1560,57593,174915,174909,378.00345,149.1635,103.98062,83.04171
+State,"04",Arizona,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2347,31626,62740,62726,149.30225,59.985355,43.92016,45.434994
+State,"04",Arizona,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,12862,507034,1584344,1584248,173.24727,82.5557,57.39169,59.43732
+State,"04",Arizona,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,2972,41934,84769,84762,222.85976,89.81094,65.9334,67.29259
+State,"04",Arizona,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,13292,568940,2520911,2520795,247.51146,117.68853,83.55925,86.79092
+State,"05",Arkansas,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1102,33673,58440,58437,134.45503,57.817257,41.7638,45.09458
+State,"05",Arkansas,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,5263,241517,739374,739323,130.44147,75.71072,51.279507,58.84231
+State,"05",Arkansas,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1194,56538,120531,120526,196.32404,85.35754,61.833675,67.43848
+State,"05",Arkansas,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,5176,273954,1048326,1048247,191.44516,104.816444,70.70239,83.71208
+State,"06",California,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,8586,160362,302351,302329,239.31232,67.34163,49.293186,46.212
+State,"06",California,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,52822,1830928,6737568,6736428,194.6296,93.91438,66.744514,62.112442
+State,"06",California,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,10423,253306,599842,599819,358.72696,99.19203,72.595055,68.536766
+State,"06",California,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,53194,2004307,8911283,8910736,302.76172,132.48518,94.9743,88.94289
+State,"08",Colorado,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1971,25566,40953,40952,207.97617,62.482044,45.260693,45.19524
+State,"08",Colorado,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,11169,306677,811199,811137,189.92175,84.45233,57.60634,58.736507
+State,"08",Colorado,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,2667,44457,85010,85003,291.28357,91.4068,66.40408,66.8675
+State,"08",Colorado,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,11564,329485,1109158,1109080,272.2727,115.78293,79.7231,85.11887
+State,"09",Connecticut,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1564,21449,38774,38773,193.91905,65.53809,48.426006,45.78394
+State,"09",Connecticut,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,8793,245450,798772,798722,181.14558,90.34293,63.993095,60.461205
+State,"09",Connecticut,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1891,31640,63667,63665,286.61044,97.200294,72.203606,68.39159
+State,"09",Connecticut,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,8529,262324,972746,972693,266.6043,128.12117,91.32258,86.079254
+State,"10",Delaware,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,619,13759,21821,21804,177.6927,62.804745,44.84799,44.418762
+State,"10",Delaware,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,2056,131591,398638,398617,154.45238,84.9222,59.466133,59.964138
+State,"10",Delaware,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,656,19676,36781,36751,249.76651,92.55166,67.594894,67.06152
+State,"10",Delaware,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,2023,142937,522083,522056,229.87178,120.41367,84.73714,85.976555
+State,"11",District of Columbia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,478,8570,14452,14451,156.6613,68.95669,50.32316,46.05064
+State,"11",District of Columbia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,1870,69130,143614,143590,179.89082,97.03512,68.70002,62.179047
+State,"11",District of Columbia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,599,14285,26117,26116,255.22563,103.032684,75.573456,68.96832
+State,"11",District of Columbia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,1862,90325,203540,203528,261.29123,137.39017,97.99569,88.79099
+State,"12",Florida,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,5393,87424,166121,166107,176.3334,64.45963,47.3316,46.136353
+State,"12",Florida,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,41953,1627724,5856193,5856026,184.49268,86.18632,61.160633,61.38356
+State,"12",Florida,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,6825,140803,309639,309603,252.75497,94.52324,69.81467,68.48543
+State,"12",Florida,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,42388,1823500,9192221,9191921,266.4472,122.19327,87.41106,88.502655
+State,"13",Georgia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2508,42583,88494,88493,181.3559,60.32964,43.70458,44.893726
+State,"13",Georgia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,17733,621532,2104561,2104505,191.3451,82.14464,57.070457,59.920414
+State,"13",Georgia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,2922,49083,106672,106671,276.5933,90.38249,66.18445,67.74667
+State,"13",Georgia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,17634,693891,2900348,2900272,273.17413,117.60167,82.036896,86.0594
+State,"15",Hawaii,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,310,9398,17179,17171,135.21788,63.422474,44.883064,44.876522
+State,"15",Hawaii,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,2165,66531,197813,197808,155.73538,87.806145,59.66423,59.86838
+State,"15",Hawaii,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,335,10429,23173,23169,200.19196,91.644714,64.003716,67.28291
+State,"15",Hawaii,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,2109,73487,255234,255225,224.77512,120.127716,81.64905,85.80259
+State,"16",Idaho,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1151,33393,59979,59975,132.8653,57.973053,40.918644,43.330006
+State,"16",Idaho,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,3406,118422,278920,278901,160.68834,73.79112,49.177868,54.152954
+State,"16",Idaho,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1217,43856,92432,92425,187.0773,85.78548,60.788284,64.47597
+State,"16",Idaho,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,3428,116605,320829,320799,229.15297,104.47625,71.537094,78.663925
+State,"17",Illinois,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,5797,114219,205516,205496,176.6055,64.974396,47.142803,45.483467
+State,"17",Illinois,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,22583,832079,2399660,2399316,172.12149,86.79446,60.54904,59.75139
+State,"17",Illinois,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,7209,171016,378397,378369,260.97592,96.3648,70.30186,67.75856
+State,"17",Illinois,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,22560,953455,3407598,3407341,251.15207,123.1231,86.282005,85.32786
+State,"18",Indiana,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2799,51983,96408,96404,138.57608,58.72026,42.657635,45.110687
+State,"18",Indiana,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,13657,502639,1456362,1456323,143.93135,79.71987,54.192474,58.850586
+State,"18",Indiana,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,3282,71296,148691,148687,200.74516,87.37524,64.040405,67.67708
+State,"18",Indiana,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,13222,561404,2001839,2001792,205.61882,113.725685,77.73732,84.38144
+State,"19",Iowa,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2009,55645,99450,99450,149.14572,59.12446,42.140865,44.915455
+State,"19",Iowa,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,5522,250817,639164,639156,162.35751,78.29549,53.24689,57.767178
+State,"19",Iowa,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,2265,80757,186354,186352,212.39037,87.2576,62.521137,66.55372
+State,"19",Iowa,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,5476,263096,750913,750900,232.95125,110.82251,75.80226,82.27569
+State,"20",Kansas,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1533,36714,64461,64461,126.72081,58.525925,42.099464,45.09727
+State,"20",Kansas,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,5293,249572,657084,657071,145.62093,78.66329,53.730022,58.707363
+State,"20",Kansas,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1772,52262,113608,113604,186.25851,86.302475,62.181633,66.98911
+State,"20",Kansas,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,5211,274903,858018,857983,207.50955,110.2547,75.32552,83.95107
+State,"21",Kentucky,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2169,46878,93578,93166,118.34141,57.868725,41.567722,44.177628
+State,"21",Kentucky,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,9376,324927,990876,990804,148.3651,78.04614,53.082397,58.382652
+State,"21",Kentucky,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,2526,56490,127294,127290,184.7926,87.01131,63.79544,67.61272
+State,"21",Kentucky,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,8990,354686,1258369,1258341,219.89156,110.40994,75.39766,83.09398
+State,"22",Louisiana,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2922,47579,92431,92427,149.93146,61.52209,44.01039,45.042828
+State,"22",Louisiana,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,8066,266662,825882,825823,154.85556,80.68262,55.797234,60.112064
+State,"22",Louisiana,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,3268,73112,181615,181608,218.83583,90.360405,64.02089,66.04881
+State,"22",Louisiana,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,8105,310751,1242834,1242700,225.96027,114.19925,80.02147,86.063484
+State,"23",Maine,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1267,21837,37914,37911,130.54507,58.77779,42.051334,43.74081
+State,"23",Maine,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,2925,80051,175635,175620,149.27217,74.11169,50.403404,53.069595
+State,"23",Maine,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1416,32079,64663,64662,192.79651,86.1946,61.820324,65.5505
+State,"23",Maine,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,3019,84387,217868,217848,213.91782,97.61664,66.443275,74.874344
+State,"24",Maryland,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2598,39231,68468,68462,188.06987,65.87892,48.357006,46.011745
+State,"24",Maryland,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,12522,585010,1838288,1837906,184.69427,89.475845,62.16732,60.697792
+State,"24",Maryland,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,3464,64939,131089,131083,263.77487,96.75339,70.96216,68.43392
+State,"24",Maryland,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,12852,670050,2801024,2800315,271.53802,123.5587,85.84565,86.882866
+State,"25",Massachusetts,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,6434,135143,247870,247862,223.61792,66.00747,47.65437,45.224
+State,"25",Massachusetts,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,16491,614167,1790422,1790344,242.45984,88.85839,62.24588,59.6326
+State,"25",Massachusetts,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,7419,219993,529184,529169,327.5107,97.71301,71.019394,67.5272
+State,"25",Massachusetts,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,16867,675089,2355282,2355166,351.21643,124.32645,87.714935,85.21014
+State,"26",Michigan,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,6497,97035,163237,163213,124.07543,61.970844,44.47564,44.507362
+State,"26",Michigan,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,19861,536239,1636918,1636861,141.095,82.10348,56.795593,59.499336
+State,"26",Michigan,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,7662,137221,275207,275202,176.91994,91.19109,65.57586,67.098495
+State,"26",Michigan,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,19897,594457,2076230,2076168,198.01155,113.541534,78.29665,84.116
+State,"27",Minnesota,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,3453,60745,108665,108663,159.25792,59.382175,41.821438,42.910378
+State,"27",Minnesota,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,12961,262962,603324,603294,237.44243,81.445526,55.895493,57.376488
+State,"27",Minnesota,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,4081,74391,163036,163030,258.55466,89.05677,63.29709,64.93872
+State,"27",Minnesota,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,13153,310194,917041,916986,350.68344,115.06492,79.93638,82.46272
+State,"28",Mississippi,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,991,35985,68376,68323,127.86184,57.841022,41.029686,43.665684
+State,"28",Mississippi,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,4985,241070,741840,741792,128.19965,76.204216,52.382668,58.493633
+State,"28",Mississippi,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1110,52455,120281,120255,183.10486,87.23405,62.32256,66.23534
+State,"28",Mississippi,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,4972,283151,1108546,1108473,186.76382,108.41481,74.953094,83.28608
+State,"29",Missouri,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,3221,75598,130346,130343,139.4291,60.44915,43.717175,45.242146
+State,"29",Missouri,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,10930,404218,1037382,1037354,155.60779,80.29566,54.911278,58.574963
+State,"29",Missouri,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,3738,110959,243359,243349,203.4025,89.60582,64.834984,67.244675
+State,"29",Missouri,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,10920,460655,1419639,1419604,216.80652,112.94921,77.5116,83.660385
+State,"30",Montana,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,885,33013,57447,57443,113.86222,60.62948,42.12564,42.54064
+State,"30",Montana,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,2005,87459,188978,188974,170.65695,81.34269,54.556572,55.62509
+State,"30",Montana,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,932,44757,104919,104911,163.85759,88.72663,62.83086,65.337036
+State,"30",Montana,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,2050,89383,220520,220513,247.35846,109.32999,73.54141,79.90978
+State,"31",Nebraska,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1325,30821,53501,53501,169.88007,58.81594,42.577995,45.38833
+State,"31",Nebraska,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,4132,165890,447928,447910,189.55994,77.44167,52.312134,58.283386
+State,"31",Nebraska,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1507,42114,85357,85354,258.28027,87.38585,63.95725,68.7596
+State,"31",Nebraska,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,4005,180508,581480,581478,268.81308,108.45544,73.97397,84.54964
+State,"32",Nevada,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,375,5905,11213,11203,185.66296,61.7504,46.553802,46.631615
+State,"32",Nevada,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,5059,175605,591316,591297,197.42432,84.56006,58.930656,59.77816
+State,"32",Nevada,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,432,12144,22329,22325,266.82022,91.56105,68.8418,68.562546
+State,"32",Nevada,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,5035,190537,802524,802197,288.67752,119.47554,84.3961,86.264275
+State,"33",New Hampshire,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1284,35383,61620,61620,138.21742,61.75457,44.387238,43.90183
+State,"33",New Hampshire,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,3323,136863,315807,315790,193.47334,81.301476,55.98305,55.954536
+State,"33",New Hampshire,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1370,53125,115584,115581,200.02605,91.46516,66.18672,65.68679
+State,"33",New Hampshire,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,3396,147564,438263,438239,271.22528,113.567245,78.722206,79.952934
+State,"34",New Jersey,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2684,31765,67888,67874,235.9645,67.80659,50.5863,47.205963
+State,"34",New Jersey,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,18313,723726,2712240,2711858,208.36052,94.17582,67.35675,62.779324
+State,"34",New Jersey,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,3231,44092,86830,86820,362.48404,99.42761,73.813774,69.206245
+State,"34",New Jersey,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,17654,773621,3370323,3369973,306.26724,132.12137,94.364685,89.67961
+State,"35",New Mexico,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1052,23558,37497,37494,132.66745,61.077663,43.660027,44.154606
+State,"35",New Mexico,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,3028,117342,302903,302887,163.58076,79.74122,54.438774,57.447865
+State,"35",New Mexico,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1111,36650,73773,73771,182.18665,90.4052,64.397705,65.46996
+State,"35",New Mexico,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,3148,131094,396965,396936,227.21568,111.98258,76.92816,81.3807
+State,"36",New York,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,8959,129053,245101,245069,206.9253,66.69911,48.654068,45.71062
+State,"36",New York,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,42232,1316233,5343026,5342566,221.01686,96.32584,70.04276,62.596153
+State,"36",New York,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,9533,169806,361506,361486,297.9237,98.41237,71.9295,67.947586
+State,"36",New York,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,40765,1361041,5695740,5695361,350.21674,135.2132,98.2721,88.45029
+State,"37",North Carolina,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,3441,65793,113806,113798,166.64041,59.64235,43.219803,44.93307
+State,"37",North Carolina,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,21505,713595,2052811,2052766,171.19246,80.34019,55.048424,58.216034
+State,"37",North Carolina,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,4511,99050,201633,201630,239.3312,88.2876,64.34371,66.920616
+State,"37",North Carolina,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,22028,847930,3355034,3354946,249.95958,113.92313,78.36677,83.03521
+State,"38",North Dakota,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,958,32584,59998,59998,128.91774,59.252438,41.84819,42.818226
+State,"38",North Dakota,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,1594,59473,126396,126393,179.06818,74.71469,50.38923,52.670856
+State,"38",North Dakota,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,994,38948,88018,88018,172.14151,86.81309,61.551434,64.00919
+State,"38",North Dakota,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,1548,64964,152156,152152,258.67035,101.12151,66.790794,74.21168
+State,"39",Ohio,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,7745,138883,256003,256000,156.73755,60.32596,43.205887,44.370094
+State,"39",Ohio,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,25383,769746,2325867,2325682,157.5715,78.712,52.90592,56.90264
+State,"39",Ohio,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,8607,176594,386209,386198,240.44853,88.63478,63.780067,66.3996
+State,"39",Ohio,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,24704,833897,2905990,2905935,224.9297,109.36191,73.48951,81.68989
+State,"40",Oklahoma,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1216,39730,69968,69959,160.15845,60.121258,43.549152,45.652294
+State,"40",Oklahoma,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,6898,276979,844176,844127,156.12337,77.97506,53.35317,58.784496
+State,"40",Oklahoma,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1307,62672,140551,140516,189.5538,88.10795,63.922806,67.76053
+State,"40",Oklahoma,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,6826,320934,1265227,1265150,216.25043,109.15703,74.41594,84.040054
+State,"41",Oregon,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1403,23860,40247,40246,185.55356,61.83481,43.722996,44.031956
+State,"41",Oregon,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,8024,230539,555343,555324,218.16013,81.54319,55.109074,57.75005
+State,"41",Oregon,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1706,41539,86727,86725,265.47913,90.44295,64.30625,65.69777
+State,"41",Oregon,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,8215,256290,775258,775235,323.90692,111.91075,75.44397,82.67603
+State,"42",Pennsylvania,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,7416,125522,212116,212108,156.1265,62.568787,45.19479,45.079548
+State,"42",Pennsylvania,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,29048,969678,2835315,2835048,160.99411,84.39101,58.202976,59.56619
+State,"42",Pennsylvania,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,9236,188026,378464,378444,225.72113,93.178215,67.41276,67.26261
+State,"42",Pennsylvania,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,28763,1104340,3863241,3862950,233.37672,119.16967,82.000656,85.112656
+State,"44",Rhode Island,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,434,6621,11168,11168,204.86295,64.515335,47.563805,46.621483
+State,"44",Rhode Island,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,2608,85505,239650,239633,182.1462,85.16618,59.193188,59.519684
+State,"44",Rhode Island,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,529,10966,19903,19903,288.50214,94.92564,69.81162,68.70223
+State,"44",Rhode Island,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,2586,87926,274117,274109,261.2291,115.19924,79.85538,85.479385
+State,"45",South Carolina,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1557,35131,64061,64060,143.84155,60.266087,44.03881,45.969948
+State,"45",South Carolina,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,9559,462469,1443893,1443860,153.49553,80.90591,56.101593,60.113182
+State,"45",South Carolina,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1925,45682,95505,95504,211.19185,89.294914,65.43343,68.31493
+State,"45",South Carolina,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,9681,538950,2206412,2206366,221.97269,115.47842,80.39215,86.165245
+State,"46",South Dakota,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1042,34643,64598,64596,128.61586,59.01281,41.092712,42.539604
+State,"46",South Dakota,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,1856,74949,161221,161210,145.25177,76.3494,52.375324,54.622322
+State,"46",South Dakota,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1085,48756,106029,106028,174.09401,88.48529,61.826454,63.87124
+State,"46",South Dakota,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,1810,76130,170389,170213,202.89095,108.30698,74.513954,78.21725
+State,"47",Tennessee,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2268,39015,66846,66846,171.3962,58.02703,41.51503,44.131065
+State,"47",Tennessee,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,14757,518322,1611111,1611086,159.70511,77.93578,53.595615,59.034153
+State,"47",Tennessee,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,2777,64557,134891,134890,267.9033,86.68226,63.0047,67.18953
+State,"47",Tennessee,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,14720,591896,2378895,2378802,235.8232,110.63526,76.396095,84.47792
+State,"48",Texas,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,7330,128048,251363,251322,170.06569,61.28383,44.405415,45.06713
+State,"48",Texas,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,41706,1306763,4204695,4204357,177.662,83.73894,58.015717,60.11593
+State,"48",Texas,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,8789,185848,414268,414239,250.19614,90.925026,66.05866,67.15585
+State,"48",Texas,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,41939,1507118,6607572,6607091,259.76044,118.756035,83.32016,86.44079
+State,"49",Utah,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,799,11557,22094,22089,158.01549,61.117165,44.756363,45.649456
+State,"49",Utah,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,5501,151589,417798,417775,153.18036,80.971344,55.164745,58.410194
+State,"49",Utah,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1211,18185,31787,31780,227.85783,90.1372,65.34985,66.80871
+State,"49",Utah,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,5618,169340,587049,587004,225.52802,113.09003,78.44493,83.51429
+State,"50",Vermont,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,536,25319,41592,41592,85.25035,60.92396,41.886948,43.137554
+State,"50",Vermont,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,1158,42710,88874,88869,130.42216,75.97559,50.82321,53.250782
+State,"50",Vermont,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,554,23746,44161,44159,147.96579,89.314545,62.961075,65.77167
+State,"50",Vermont,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,1160,43664,104598,104585,193.36118,106.72785,72.573296,75.977
+State,"51",Virginia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,3278,76145,125403,125402,145.46788,61.332752,44.055103,44.62357
+State,"51",Virginia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,15532,688537,2031376,2031290,163.57016,85.53121,59.25728,59.2221
+State,"51",Virginia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,3806,113955,229680,229679,215.19882,91.19118,65.72182,66.482956
+State,"51",Virginia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,15629,798612,3066545,3066479,237.91196,120.71373,83.89395,84.19981
+State,"53",Washington,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2770,66148,114512,114501,145.384,64.164406,45.460545,44.053127
+State,"53",Washington,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,13869,418327,1026785,1026738,192.6182,85.36041,58.181515,57.441563
+State,"53",Washington,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,3412,103961,218232,218224,209.5653,96.01419,68.186295,65.92493
+State,"53",Washington,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,14151,492152,1611041,1610959,285.8639,121.429016,83.63177,82.6084
+State,"54",West Virginia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,1613,42985,76753,76751,148.27795,59.280518,41.97399,43.498875
+State,"54",West Virginia,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,3360,137759,359606,359596,156.3669,76.9112,51.975357,56.720444
+State,"54",West Virginia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,1630,49335,105212,105211,206.83751,88.49986,63.681503,66.1043
+State,"54",West Virginia,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,3219,131160,355194,355187,221.16144,109.2107,73.99148,80.54653
+State,"55",Wisconsin,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,4394,86294,154628,154482,178.89168,59.403625,42.168617,44.15657
+State,"55",Wisconsin,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,11424,314895,726496,726419,230.71027,78.997475,53.115852,56.50732
+State,"55",Wisconsin,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,4823,109612,241885,241687,267.86804,88.20875,63.22614,66.1749
+State,"55",Wisconsin,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,11342,361981,1011035,1010936,343.5518,112.858284,76.22765,81.10781
+State,"56",Wyoming,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,133,4726,7259,7257,152.84515,59.061836,42.283703,42.768665
+State,"56",Wyoming,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,1041,59570,146111,146105,166.79968,83.64077,55.835335,56.857822
+State,"56",Wyoming,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,143,5564,11315,11312,231.22586,88.225914,63.059772,63.243034
+State,"56",Wyoming,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,1009,52776,135057,135054,255.61082,117.44681,81.50644,83.05583
+State,"66",Guam,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,24,385,627,627,281.99603,66.07727,48.52075,47.4104
+State,"66",Guam,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,121,7087,17399,17398,119.98817,88.493935,58.756485,58.31546
+State,"66",Guam,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,29,422,660,660,390.2595,94.83815,71.65183,69.416245
+State,"66",Guam,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,114,8617,26871,26870,186.91412,129.31381,86.83062,84.233315
+State,"69",Northern Mariana Islands,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,9,113,136,136,180.58015,63.307205,44.93169,44.042133
+State,"69",Northern Mariana Islands,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,7,332,657,657,73.81732,70.69163,34.61359,50.710396
+State,"69",Northern Mariana Islands,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,9,56,74,74,275.53986,85.08419,56.995407,55.72419
+State,"69",Northern Mariana Islands,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,6,306,852,852,120.56737,115.56473,58.670483,68.32521
+State,"72",Puerto Rico,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,119,1070,1898,1898,146.20758,64.62481,46.027035,46.520573
+State,"72",Puerto Rico,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,3731,24703,127507,127497,93.14226,84.11473,57.302357,61.731216
+State,"72",Puerto Rico,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,71,689,1787,1787,128.62885,95.35611,70.421425,71.03783
+State,"72",Puerto Rico,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,1274,15224,40590,40587,154.7272,119.36033,83.07109,89.03068
+State,"78",Virgin Islands,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,5,46,51,51,156.96176,56.97431,44.1249,44.976864
+State,"78",Virgin Islands,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,96,5468,11412,11404,164.50763,85.391,52.894093,54.13654
+State,"78",Virgin Islands,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,5,54,86,86,162.69756,88.64291,66.77198,69.01826
+State,"78",Virgin Islands,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,97,6334,15348,15340,242.72418,122.115524,77.03605,78.58685
+State,"9A",Armed Forces Central/South America,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,2,223,310,310,127.49555,84.01574,57.65229,61.39697
+State,"9A",Armed Forces Central/South America,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,2,74,77,77,207.72507,116.10714,77.08831,81.73195
+State,"9B",Armed Forces Europe,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,4,122,124,124,124.99968,57.744034,33.140564,33.29968
+State,"9B",Armed Forces Europe,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,28,2293,2988,2988,139.45557,85.04723,60.7881,60.376396
+State,"9B",Armed Forces Europe,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,5,257,368,368,134.39651,94.51731,68.98766,69.31986
+State,"9B",Armed Forces Europe,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,30,2235,3121,3121,212.98491,124.59591,88.55951,87.707855
+State,"9C",Armed Forces Pacific,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,2,27,29,29,143.25,54.092068,43.291725,44.307587
+State,"9C",Armed Forces Pacific,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,21,709,991,991,164.76396,81.90773,55.16977,58.903793
+State,"9C",Armed Forces Pacific,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,4,45,58,58,215.23413,82.82535,61.60931,63.095863
+State,"9C",Armed Forces Pacific,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,18,1020,1756,1756,217.83919,115.60864,77.4614,83.75435
+State,"9D",Unknown,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,6,330,408,408,147.5538,54.324585,39.179043,40.037376
+State,"9D",Unknown,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,14,1749,2842,2842,134.52658,90.59096,67.95919,66.39639
+State,"9D",Unknown,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,6,191,223,223,229.32512,80.37296,60.04852,61.54843
+State,"9D",Unknown,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,15,1255,2139,2139,177.27515,123.5199,90.484535,90.7274
+State,"9E",Foreign Country,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,F,6,88,106,106,175.31038,58.161133,45.099434,47.714058
+State,"9E",Foreign Country,"99213","Established patient office or other outpatient visit, 20-29 minutes",N,O,28,840,1032,1032,198.67332,81.3167,55.92685,57.747715
+State,"9E",Foreign Country,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,F,8,102,107,107,248.91644,91.93299,71.81327,73.70972
+State,"9E",Foreign Country,"99214","Established patient office or other outpatient visit, 30-39 minutes",N,O,27,1027,1562,1562,300.69095,113.53992,77.86164,82.821075
