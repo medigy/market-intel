@@ -51,7 +51,7 @@ SELECT 'shell' AS component,
     '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
-    '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
@@ -224,7 +224,7 @@ WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
 SELECT 'divider' AS component;
 
 -- DATA SOURCE REFERENCE
-SELECT 'card' AS component, 'Pipeline Reference' AS title, 2 AS columns;
+SELECT 'card' AS component, 'Pipeline Reference' AS title, 1 AS columns;
 
 SELECT
     'Data Dictionary' AS title,
@@ -233,12 +233,6 @@ SELECT
     'database' AS icon,
     'gray' AS color;
 
-SELECT
-    'CMS Source Data' AS title,
-    'Direct link to CMS Physician & Other Practitioners public datasets used in this pipeline.' AS description,
-    'https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners' AS link,
-    'external-link' AS icon,
-    'gray' AS color;
 ```
 
 ---
@@ -260,6 +254,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -370,6 +365,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -440,6 +436,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -510,6 +507,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -603,6 +601,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -670,6 +669,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -1096,6 +1096,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -2349,6 +2350,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
@@ -2438,15 +2440,19 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
     CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
+    '/footer-links.js' AS javascript,
      '© 2026 Medigy Market Intelligence' AS footer,
     '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'table' AS component, 'Indexed Specialties' AS title, true AS search;
 SELECT distinct specialty_name AS Name, specialty_domain AS Description FROM dim_specialty;
@@ -2463,15 +2469,19 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
     CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-      '/footer-links.js' AS javascript,
+    '/footer-links.js' AS javascript,
      '© 2026 Medigy Market Intelligence' AS footer,
     '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'table' AS component, 'Available Codes' AS title, true AS search, 20 AS limit;
 SELECT hcpcs_code AS Code, procedure_description AS Label FROM dim_procedure;
@@ -2488,16 +2498,19 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
     CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
+    '/footer-links.js' AS javascript,
      '© 2026 Medigy Market Intelligence' AS footer,
     '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 -- A simple list of states using cards
 SELECT 'card' AS component, 6 AS columns;
@@ -2515,16 +2528,19 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
     CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
+    '/footer-links.js' AS javascript,
      '© 2026 Medigy Market Intelligence' AS footer,
     '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
        '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
        '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'table' AS component, 'Mapped Clusters' AS title, true AS sort, true AS search;
 SELECT distinct disease_state AS Cluster FROM dim_diagnosis WHERE disease_state != 'Other Chronic / Clinical';
