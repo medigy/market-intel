@@ -182,6 +182,14 @@ SELECT
     'lungs' AS icon,
     'teal' AS color;
 
+
+SELECT
+    'COPD Integrated Market Stack & LTV Model' AS title,
+    'Master market overview, LTV stack, markup, and key findings for COPD (PFT, E&M, DME combined).' AS description,
+    '/mmi/copd-integrated-market-stack.sql' AS link,
+    'layers' AS icon,
+    'indigo' AS color;
+
 SELECT
     'Oxygen DME Analytics' AS title,
     'Analytics for Medicare oxygen equipment (E0434/E1392): national, state, specialty, and provider KPIs.' AS description,
@@ -3178,5 +3186,88 @@ SELECT prvdr_state AS label, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) /
 SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
 SELECT prvdr_state, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS total_allowed, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs), 2) AS total_submitted, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) / SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS markup_x, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) / SUM(tot_suplr_srvcs), 2) AS avg_monthly_allowed FROM copd_oxygen GROUP BY prvdr_state ORDER BY markup_x DESC LIMIT 15;
 
+```
+
+## COPD Integrated Market Stack & LTV Model
+
+```sql mmi/copd-integrated-market-stack.sql { route: { caption: "COPD Integrated Market Stack & LTV Model" } }
+-- @route.description "COPD Integrated Market Stack & LTV Model: Master market overview, LTV stack, markup, and key findings."
+
+-- HEADER NAVIGATION (add link to all SQL pages)
+SELECT 'shell' AS component,
+    'Medigy Market Intelligence' AS title,
+    NULL AS icon,
+    'fluid' AS layout,
+    true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    [Medicare DMEPOS - Oxygen Equipment](https://data.cms.gov/medicare-durable-medical-equipment-pos/oxygen-equipment)  
+    [Medicare DMEPOS - All Equipment](https://data.cms.gov/medicare-durable-medical-equipment-pos)'
+    AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+    '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+    '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+    '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+    '{"link":"/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+    '{"link":"/mmi/copd-em-visits.sql","title":"E&M Visits"}' AS menu_item,
+    '{"link":"/mmi/copd-oxygen.sql","title":"Oxygen DME Analytics"}' AS menu_item,
+    '{"link":"/mmi/copd-integrated-market-stack.sql","title":"COPD Integrated Market Stack & LTV Model"}' AS menu_item,
+    '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+    '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+    '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+    '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+-- HERO
+SELECT 'hero' AS component,
+    'COPD Integrated Market Stack & LTV Model' AS title,
+    'Master market overview, full LTV stack, markup comparison, and key findings for COPD.' AS description,
+    'indigo' AS color;
+
+-- MASTER MARKET STACK (Table & Chart)
+SELECT 'text' AS component, 'Master Market Stack — All Three Layers' AS title, 'Overview of diagnostics, visits, and DME economics.' AS contents;
+SELECT 'chart' AS component, 'Market Stack by Layer' AS title, 'bar' AS type, TRUE AS labels, 'Shows allowed, submitted, and markup by layer.' AS description;
+SELECT layer_type AS label, medicare_allowed AS value FROM (
+    SELECT layer_type, SUM(medicare_allowed) AS medicare_allowed FROM (
+        SELECT 'DIAGNOSTIC' AS layer_type, SUM(avg_mdcr_alowd_amt * tot_srvcs) AS medicare_allowed FROM copd_pft WHERE geo_level = 'National'
+        UNION ALL
+        SELECT 'VISIT', SUM(avg_mdcr_alowd_amt * tot_srvcs) * 0.08 FROM copd_em WHERE geo_level = 'National'
+        UNION ALL
+        SELECT 'DME', SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) FROM copd_oxygen
+    ) GROUP BY layer_type
+);
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT layer_no, layer_type, market_name, medicare_allowed, submitted_charges, markup_x, billing_friction, all_payer_low, all_payer_high, data_basis FROM (
+    SELECT 1 AS layer_no, 'DIAGNOSTIC' AS layer_type,
+           'PFT Tests (94010/94060/94726/94729)' AS market_name,
+           ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs), 0) AS medicare_allowed,
+           ROUND(SUM(avg_sbmtd_chrg * tot_srvcs), 0) AS submitted_charges,
+           ROUND(SUM(avg_sbmtd_chrg * tot_srvcs) / NULLIF(SUM(avg_mdcr_alowd_amt * tot_srvcs),0), 2) AS markup_x,
+           ROUND(SUM(avg_sbmtd_chrg * tot_srvcs) - SUM(avg_mdcr_alowd_amt * tot_srvcs), 0) AS billing_friction,
+           ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs) * 3, 0) AS all_payer_low,
+           ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs) * 5, 0) AS all_payer_high,
+           'Exact CMS' AS data_basis
+    FROM copd_pft WHERE geo_level = 'National'
+    UNION ALL
+    SELECT 2, 'VISIT', 'E&M Office Visits 99213/99214 (COPD est. 8%)',
+           ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs) * 0.08, 0),
+           ROUND(SUM(avg_sbmtd_chrg * tot_srvcs) * 0.08, 0),
+           ROUND((SUM(avg_sbmtd_chrg * tot_srvcs) * 0.08) / NULLIF(SUM(avg_mdcr_alowd_amt * tot_srvcs) * 0.08,0), 2),
+           ROUND((SUM(avg_sbmtd_chrg * tot_srvcs) * 0.08) - (SUM(avg_mdcr_alowd_amt * tot_srvcs) * 0.08), 0),
+           ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs) * 0.08 * 3, 0),
+           ROUND(SUM(avg_mdcr_alowd_amt * tot_srvcs) * 0.08 * 5, 0),
+           'Estimated — 8% COPD share'
+    FROM copd_em WHERE geo_level = 'National'
+    UNION ALL
+    SELECT 3, 'DME', 'Oxygen DME (E0434 / E1392)',
+           ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 0),
+           ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs), 0),
+           ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) / NULLIF(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs),0), 2),
+           ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) - SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 0),
+           ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) * 3, 0),
+           ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) * 5, 0),
+           'Exact CMS DMEPOS PUF'
+    FROM copd_oxygen
+);
 ```
 
