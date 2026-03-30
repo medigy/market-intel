@@ -182,6 +182,13 @@ SELECT
     'lungs' AS icon,
     'teal' AS color;
 
+SELECT
+    'Oxygen DME Analytics' AS title,
+    'Analytics for Medicare oxygen equipment (E0434/E1392): national, state, specialty, and provider KPIs.' AS description,
+    '/mmi/copd-oxygen.sql' AS link,
+    'gas-pump' AS icon,
+    'blue' AS color;
+
 
 SELECT
     'E&M Visits' AS title,
@@ -3049,3 +3056,127 @@ ORDER BY em.em_total_allowed DESC
 LIMIT 15;
 
 ```
+
+## Oxygen DME Analytics — SQL Page
+
+```sql mmi/copd-oxygen.sql { route: { caption: "E&M Visits" } }
+-- @route.description "Oxygen DME: National, State, and Specialty Analytics for COPD Oxygen Equipment (E0434/E1392)"
+
+-- HEADER NAVIGATION (add link to all SQL pages)
+SELECT 'shell' AS component,
+    'Medigy Market Intelligence' AS title,
+    NULL AS icon,
+    'fluid' AS layout,
+    true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+    '/footer-links.js' AS javascript,
+    '**CMS Latest Dataset and Resources (2023)**  
+    [Medicare DMEPOS - Oxygen Equipment](https://data.cms.gov/medicare-durable-medical-equipment-pos/oxygen-equipment)  
+    [Medicare DMEPOS - All Equipment](https://data.cms.gov/medicare-durable-medical-equipment-pos)'
+    AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+    '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+    '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+    '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+    '{"link":"/mmi/copd-evidence.sql","title":"COPD Evidence"}' AS menu_item,
+    '{"link":"/mmi/copd-em-visits.sql","title":"E&M Visits"}' AS menu_item,
+    '{"link":"/mmi/copd-oxygen.sql","title":"Oxygen DME Analytics"}' AS menu_item,
+    '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+    '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+    '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+    '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+-- HERO
+SELECT 'hero' AS component,
+    'Oxygen DME — COPD Market' AS title,
+    'Analytics for Medicare oxygen equipment (E0434/E1392): national, state, specialty, and provider KPIs.' AS description,
+    'blue' AS color;
+
+-- NATIONAL TOP-LINE KPIs
+SELECT 'text' AS component, 'National Oxygen DME KPIs' AS title, 'Top-line metrics for oxygen equipment rental months, claims, and economics.' AS contents;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT
+    COALESCE(SUM(tot_suplr_srvcs), 0) AS total_rental_months,
+    COALESCE(SUM(tot_suplr_clms), 0) AS total_claims,
+    COALESCE(SUM(tot_suplr_benes), 0) AS total_benes_non_suppressed,
+    COALESCE(COUNT(DISTINCT rfrg_npi), 0) AS unique_referring_providers,
+    COALESCE(ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2), 0) AS total_allowed,
+    COALESCE(ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs), 2), 0) AS total_submitted,
+    COALESCE(ROUND(SUM(avg_suplr_mdcr_pymt_amt * tot_suplr_srvcs), 2), 0) AS total_payment,
+    COALESCE(ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) / NULLIF(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs),0), 2), 0) AS system_markup_x,
+    COALESCE(ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) - SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2), 0) AS billing_friction,
+    COALESCE(ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) / NULLIF(SUM(tot_suplr_srvcs),0), 2), 0) AS avg_allowed_per_rental_month
+FROM copd_oxygen;
+-- Add a bar chart for total_rental_months, total_allowed, total_payment
+SELECT 'chart' AS component, 'Oxygen DME National Totals' AS title, 'bar' AS type, TRUE AS labels, 'Shows total rental months, allowed, and payment.' AS description;
+SELECT 'Total Rental Months' AS label, COALESCE(SUM(tot_suplr_srvcs), 0) AS value FROM copd_oxygen
+UNION ALL SELECT 'Total Allowed', COALESCE(ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs),2), 0) FROM copd_oxygen
+UNION ALL SELECT 'Total Payment', COALESCE(ROUND(SUM(avg_suplr_mdcr_pymt_amt * tot_suplr_srvcs),2), 0) FROM copd_oxygen;
+
+-- CODE-LEVEL BREAKDOWN
+SELECT 'text' AS component, 'Oxygen DME Code Breakdown' AS title, 'Volume and economics for E0434 vs E1392.' AS contents;
+SELECT 'chart' AS component, 'Rental Months by Code' AS title, 'bar' AS type, TRUE AS labels, 'Shows the distribution of rental months by code.' AS description;
+SELECT hcpcs_cd AS label, SUM(tot_suplr_srvcs) AS value FROM copd_oxygen GROUP BY hcpcs_cd ORDER BY value DESC;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+-- Table: code-level breakdown
+SELECT hcpcs_cd, MAX(hcpcs_desc) AS description, SUM(tot_suplr_srvcs) AS total_rental_months, ROUND(SUM(tot_suplr_srvcs) * 100.0 / (SELECT SUM(tot_suplr_srvcs) FROM copd_oxygen), 1) AS pct_volume, SUM(tot_suplr_clms) AS total_claims, SUM(tot_suplr_benes) AS benes_non_suppressed, COUNT(DISTINCT rfrg_npi) AS unique_providers, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS total_allowed, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs), 2) AS total_submitted, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) / SUM(tot_suplr_srvcs), 2) AS avg_allowed_per_month, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) / SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS markup_x, ROUND((SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) / SUM(tot_suplr_srvcs)) * 12, 2) AS annual_per_patient, ROUND((SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) / SUM(tot_suplr_srvcs)) * 36, 2) AS medicare_36mo_cap FROM copd_oxygen GROUP BY hcpcs_cd ORDER BY total_rental_months DESC;
+
+-- PER-PATIENT RENTAL ECONOMICS
+SELECT 'text' AS component, 'Per-Patient Rental Economics' AS title, '36-month rule economics for E1392.' AS contents;
+SELECT 'chart' AS component, '36-Month Cap by Period' AS title, 'bar' AS type, TRUE AS labels, 'Shows Medicare and provider economics by period.' AS description;
+WITH monthly_rates AS (SELECT ROUND(AVG(avg_suplr_mdcr_alowd_amt), 2) AS monthly_allowed, ROUND(AVG(avg_suplr_sbmtd_chrg), 2) AS monthly_submitted FROM copd_oxygen WHERE hcpcs_cd = 'E1392'), periods AS (SELECT 'Month 1-12 (Year 1)' AS period, 12 AS months UNION ALL SELECT 'Month 13-24 (Year 2)', 12 UNION ALL SELECT 'Month 25-36 (Year 3)', 12 UNION ALL SELECT 'Full 36-Month Cap', 36) SELECT period AS label, ROUND(monthly_allowed * months, 2) AS value FROM monthly_rates, periods;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+-- Table: per-patient economics
+SELECT * FROM (
+    SELECT 'Monthly allowed (E1392)' AS metric, ROUND(AVG(avg_suplr_mdcr_alowd_amt), 2) AS value FROM copd_oxygen WHERE hcpcs_cd = 'E1392'
+    UNION ALL SELECT 'Annual allowed per patient (x12)', ROUND(AVG(avg_suplr_mdcr_alowd_amt) * 12, 2) FROM copd_oxygen WHERE hcpcs_cd = 'E1392'
+    UNION ALL SELECT '36-month Medicare cap per patient', ROUND(AVG(avg_suplr_mdcr_alowd_amt) * 36, 2) FROM copd_oxygen WHERE hcpcs_cd = 'E1392'
+    UNION ALL SELECT 'Monthly submitted (billed) E1392', ROUND(AVG(avg_suplr_sbmtd_chrg), 2) FROM copd_oxygen WHERE hcpcs_cd = 'E1392'
+    UNION ALL SELECT '36-month submitted cap per patient', ROUND(AVG(avg_suplr_sbmtd_chrg) * 36, 2) FROM copd_oxygen WHERE hcpcs_cd = 'E1392'
+    UNION ALL SELECT 'Friction per patient over 36 months', ROUND((AVG(avg_suplr_sbmtd_chrg) - AVG(avg_suplr_mdcr_alowd_amt)) * 36, 2) FROM copd_oxygen WHERE hcpcs_cd = 'E1392'
+);
+
+-- TOP STATES BY ALLOWED
+SELECT 'text' AS component, 'Top 15 States by Allowed' AS title, 'States with highest total allowed for oxygen DME.' AS contents;
+SELECT 'chart' AS component, 'Top 15 States by Allowed' AS title, 'bar' AS type, TRUE AS horizontal, TRUE AS labels, 'Shows the top 15 states by total allowed.' AS description;
+SELECT prvdr_state AS label, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS value FROM copd_oxygen GROUP BY prvdr_state ORDER BY value DESC LIMIT 15;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT prvdr_state, SUM(tot_suplr_srvcs) AS total_rental_months, SUM(tot_suplr_benes) AS benes_non_suppressed, COUNT(DISTINCT rfrg_npi) AS total_providers, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS total_allowed, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs), 2) AS total_submitted, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) / SUM(tot_suplr_srvcs), 2) AS avg_allowed_per_month, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) / SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS markup_x, CASE WHEN RANK() OVER (ORDER BY SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) DESC) <= 4  THEN 'TIER 1' WHEN RANK() OVER (ORDER BY SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) DESC) <= 10 THEN 'TIER 2' ELSE 'TIER 3' END AS market_tier FROM copd_oxygen GROUP BY prvdr_state ORDER BY total_allowed DESC LIMIT 15;
+
+-- URBAN vs RURAL
+SELECT 'text' AS component, 'Urban vs Rural' AS title, 'Rental months, allowed, and provider share by urban/rural category.' AS contents;
+SELECT 'chart' AS component, 'Rental Months by Urban/Rural' AS title, 'pie' AS type, TRUE AS labels, 'Shows the share of rental months by urban/rural.' AS description;
+SELECT ruca_cat AS label, SUM(tot_suplr_srvcs) AS value FROM copd_oxygen WHERE ruca_cat IS NOT NULL GROUP BY ruca_cat;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT ruca_cat, SUM(tot_suplr_srvcs) AS total_rental_months, ROUND(SUM(tot_suplr_srvcs) * 100.0 / (SELECT SUM(tot_suplr_srvcs) FROM copd_oxygen), 1) AS pct_rental_months, SUM(tot_suplr_benes) AS benes_non_suppressed, COUNT(DISTINCT rfrg_npi) AS unique_providers, ROUND(COUNT(DISTINCT rfrg_npi) * 100.0 / (SELECT COUNT(DISTINCT rfrg_npi) FROM copd_oxygen), 1) AS pct_providers, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS total_allowed, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) * 100.0 / (SELECT SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) FROM copd_oxygen), 1) AS pct_allowed FROM copd_oxygen WHERE ruca_cat IS NOT NULL GROUP BY ruca_cat ORDER BY total_allowed DESC;
+
+-- SPECIALTY ANALYSIS
+SELECT 'text' AS component, 'Referring Specialty Analysis' AS title, 'Top specialties by oxygen DME allowed and B2B tier.' AS contents;
+SELECT 'chart' AS component, 'Allowed by Specialty' AS title, 'bar' AS type, TRUE AS labels, 'Shows total allowed by specialty.' AS description;
+SELECT specialty_desc AS label, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS value FROM copd_oxygen WHERE specialty_desc IS NOT NULL GROUP BY specialty_desc ORDER BY value DESC LIMIT 12;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT specialty_desc, SUM(tot_suplr_srvcs) AS total_rental_months, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS total_allowed, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) * 100.0 / (SELECT SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) FROM copd_oxygen), 1) AS pct_of_market, COUNT(DISTINCT rfrg_npi) AS unique_providers, CASE specialty_desc WHEN 'Pulmonary Disease' THEN 'PRIMARY B2B' WHEN 'Internal Medicine' THEN 'PRIMARY B2B' WHEN 'Family Practice' THEN 'PRIMARY B2B' WHEN 'Nurse Practitioner' THEN 'KEY CHANNEL' WHEN 'Sleep Medicine' THEN 'STRATEGIC BRIDGE' ELSE 'SECONDARY' END AS b2b_tier FROM copd_oxygen WHERE specialty_desc IS NOT NULL GROUP BY specialty_desc ORDER BY total_allowed DESC LIMIT 12;
+
+-- LIQUID OXYGEN STATE ADOPTION
+SELECT 'text' AS component, 'E0434 Liquid Oxygen — State Adoption' AS title, 'State-level adoption of liquid oxygen (E0434) vs concentrators (E1392).' AS contents;
+SELECT 'chart' AS component, 'E0434 Share by State' AS title, 'bar' AS type, TRUE AS labels, 'Shows the share of E0434 by state.' AS description;
+SELECT prvdr_state AS label, ROUND(SUM(CASE WHEN hcpcs_cd = 'E0434' THEN tot_suplr_srvcs ELSE 0 END) * 100.0 / NULLIF(SUM(tot_suplr_srvcs), 0), 1) AS value FROM copd_oxygen GROUP BY prvdr_state HAVING SUM(tot_suplr_srvcs) > 100 ORDER BY value DESC LIMIT 15;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT prvdr_state, SUM(CASE WHEN hcpcs_cd = 'E0434' THEN tot_suplr_srvcs ELSE 0 END) AS e0434_months, SUM(CASE WHEN hcpcs_cd = 'E1392' THEN tot_suplr_srvcs ELSE 0 END) AS e1392_months, SUM(tot_suplr_srvcs) AS total_months, ROUND(SUM(CASE WHEN hcpcs_cd = 'E0434' THEN tot_suplr_srvcs ELSE 0 END) * 100.0 / NULLIF(SUM(tot_suplr_srvcs), 0), 1) AS e0434_pct, CASE WHEN ROUND(SUM(CASE WHEN hcpcs_cd = 'E0434' THEN tot_suplr_srvcs ELSE 0 END) * 100.0 / NULLIF(SUM(tot_suplr_srvcs), 0), 1) >= 5 THEN 'Legacy liquid O2 dominant' WHEN ROUND(SUM(CASE WHEN hcpcs_cd = 'E0434' THEN tot_suplr_srvcs ELSE 0 END) * 100.0 / NULLIF(SUM(tot_suplr_srvcs), 0), 1) >= 2 THEN 'Transitioning to concentrators' ELSE 'Concentrator dominant' END AS transition_status FROM copd_oxygen GROUP BY prvdr_state HAVING total_months > 100 ORDER BY e0434_pct DESC LIMIT 15;
+
+-- PROVIDER VOLUME DISTRIBUTION
+SELECT 'text' AS component, 'Provider Volume Distribution (E1392)' AS title, 'Distribution of providers by rental month volume.' AS contents;
+SELECT 'chart' AS component, 'Provider Volume Buckets' AS title, 'bar' AS type, TRUE AS labels, 'Shows provider count by rental month volume bucket.' AS description;
+SELECT volume_bucket AS label, provider_count AS value FROM (SELECT CASE WHEN total_months <= 10 THEN '1–10 months' WHEN total_months <= 30 THEN '11–30 months' WHEN total_months <= 100 THEN '31–100 months' WHEN total_months <= 300 THEN '101–300 months' ELSE '300+ months' END AS volume_bucket, COUNT(*) AS provider_count FROM (SELECT rfrg_npi, SUM(tot_suplr_srvcs) AS total_months FROM copd_oxygen WHERE hcpcs_cd = 'E1392' GROUP BY rfrg_npi) GROUP BY volume_bucket);
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT * FROM (SELECT CASE WHEN total_months <= 10 THEN '1–10 months' WHEN total_months <= 30 THEN '11–30 months' WHEN total_months <= 100 THEN '31–100 months' WHEN total_months <= 300 THEN '101–300 months' ELSE '300+ months' END AS volume_bucket, COUNT(*) AS provider_count, ROUND(COUNT(*) * 100.0 / (SELECT COUNT(DISTINCT rfrg_npi) FROM copd_oxygen WHERE hcpcs_cd = 'E1392'), 1) AS pct_providers, SUM(total_months) AS total_rental_months, ROUND(SUM(total_allowed), 2) AS total_allowed FROM (SELECT rfrg_npi, SUM(tot_suplr_srvcs) AS total_months, SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) AS total_allowed FROM copd_oxygen WHERE hcpcs_cd = 'E1392' GROUP BY rfrg_npi) provider_totals GROUP BY volume_bucket ORDER BY MIN(total_months));
+
+-- STATE MARKUP COMPARISON
+SELECT 'text' AS component, 'State Markup Comparison' AS title, 'Markup and allowed by state.' AS contents;
+SELECT 'chart' AS component, 'Markup by State' AS title, 'bar' AS type, TRUE AS labels, 'Shows markup by state.' AS description;
+SELECT prvdr_state AS label, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) / SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS value FROM copd_oxygen GROUP BY prvdr_state ORDER BY value DESC LIMIT 15;
+SELECT 'table' AS component, TRUE AS sort, TRUE AS hover, TRUE AS striped_rows, 20 AS page_size;
+SELECT prvdr_state, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS total_allowed, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs), 2) AS total_submitted, ROUND(SUM(avg_suplr_sbmtd_chrg * tot_suplr_srvcs) / SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 2) AS markup_x, ROUND(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs) / SUM(tot_suplr_srvcs), 2) AS avg_monthly_allowed FROM copd_oxygen GROUP BY prvdr_state ORDER BY markup_x DESC LIMIT 15;
+
+```
+
