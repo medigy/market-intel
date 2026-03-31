@@ -50,6 +50,17 @@ VALUES (
     'external_source',
     'DME and device referral data by provider and service.'
 );
+INSERT OR IGNORE INTO data_provenance (title, link, version_year, ingested_at, object_type, description)
+VALUES (
+    'Medicare Durable Medical Equipment, Devices & Supplies - by Geography and Service',
+    'https://data.cms.gov/provider-summary-by-type-of-service/medicare-durable-medical-equipment-devices-supplies/medicare-durable-medical-equipment-devices-supplies-by-geography-and-service',
+    2023,
+    '2026-03-31 16:00:00',
+    'external_source',
+    'DMEPOS non-institutional claims aggregated by State and HCPCS, including rental indicators.'
+);
+
+
 
 CREATE VIEW IF NOT EXISTS data_tables_derived AS
 SELECT 
@@ -83,8 +94,7 @@ WHERE s.type IN ('table', 'view')
     'party_relation_type', 'party_relation', 'person_type', 
     'sex_type', 'person', 'sqlpage_aide_navigation', 'sqlpage_files', 
     'uniform_resource', 'uniform_resource_graph', 'session_state_ephemeral',
-    'email_messages_with_timezone', 'filesystem_graph', 'imap_graph'
-  );
+    'email_messages_with_timezone', 'filesystem_graph', 'imap_graph','uniform_resource_file','uniform_resource_imap','uniform_resource_imap_content'  );
 
 
 DROP VIEW IF EXISTS data_dictionary_indexes;

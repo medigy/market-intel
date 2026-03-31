@@ -26,6 +26,7 @@ rm -f resource-surveillance.sqlite.*
 
 surveilr ingest files -r medicare-ds/ && surveilr orchestrate transform-csv 
 surveilr shell sql/medigy-ddl.sql
+surveilr shell sql/medigy-copd.sql
 surveilr shell sql/medigy-analytics.sql 
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
 echo "Medigy Market Intellignece database and SQLPage UI are ready."
@@ -1670,18 +1671,7 @@ SELECT
 FROM data_provenance 
 WHERE object_type = 'external_source';
 
--- 3. MASTER TABLES (Dimensions & Reference)
-SELECT 'text' AS component, '### 2. Master & Reference Tables' AS contents_md;
-SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
-SELECT 
-    name AS "Table Name"   
-FROM sqlite_schema s
-WHERE (name LIKE 'dim_%' OR name LIKE 'uniform_resource_ref_%')  
-ORDER BY name;
 
-
--- 5. DERIVED TABLES & ANALYTICAL VIEWS
--- 2. Header and Summary Statistics
 SELECT 'title' AS component, 'Schema Data Dictionary' AS contents;
 
 SELECT 'big_number' AS component, 1 AS columns;
@@ -1693,36 +1683,84 @@ SELECT
     'blue' AS color 
 FROM data_tables_derived;
 
+-- 3. MASTER TABLES (Dimensions & Reference)
+SELECT 'text' AS component, '### Master & Reference Tables' AS contents_md;
+SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
+SELECT 
+    name AS "Table Name"   
+FROM sqlite_schema s
+WHERE (name LIKE 'dim_%' OR name LIKE 'uniform_resource_ref_%')  
+ORDER BY name;
 
--- 3. The Data Table
+
+-- --- CONFIGURATION FOR TABLE 1 ---
+SET max_per_page_obj = 10;
+SET count_obj = (SELECT COUNT(*) FROM data_tables_derived);
+SET pages_obj = (CAST($count_obj AS INT) / $max_per_page_obj) + (CASE WHEN ($count_obj % $max_per_page_obj) = 0 THEN 0 ELSE 1 END);
+SET current_page_obj = COALESCE(CAST($page_obj AS INT), 1);
+
+-- --- RENDER TABLE 1 ---
 SELECT 'table' AS component, 
-       TRUE AS sort, 
-       TRUE AS search,
-       TRUE AS markdown,
-       'Object Name' AS object_name,
-       'Type' AS object_type,
-       'Category' AS category;
+       TRUE AS sort, TRUE AS search, TRUE AS markdown,
+       'Derived Objects Inventory' AS title;
 
 SELECT 
     object_name,   
     object_type,
-    -- You can color-code categories if you want to get fancy
     category
 FROM data_tables_derived
-ORDER BY category, object_name;
+ORDER BY category, object_name
+LIMIT $max_per_page_obj
+OFFSET ($current_page_obj - 1) * $max_per_page_obj;
+
+-- --- RENDER PAGINATION 1 ---
+SELECT 'pagination' AS component,
+    ($current_page_obj = 1) AS previous_disabled,
+    ($current_page_obj = $pages_obj) AS next_disabled,
+    sqlpage.link(sqlpage.path(), json_object('page_obj', $current_page_obj - 1, 'page_idx', $page_idx)) AS previous_link,
+    sqlpage.link(sqlpage.path(), json_object('page_obj', $current_page_obj + 1, 'page_idx', $page_idx)) AS next_link;
+
+WITH RECURSIVE page_numbers AS (
+    SELECT 1 AS n UNION ALL SELECT n + 1 FROM page_numbers WHERE n < $pages_obj
+)
+SELECT n AS contents, 
+       sqlpage.link(sqlpage.path(), json_object('page_obj', n, 'page_idx', $page_idx)) AS link,
+       (n = $current_page_obj) AS active FROM page_numbers;
 
 -- 6. PERFORMANCE INDEXES
-SELECT 'text' AS component, '### 5. Query Performance Indexes' AS contents_md;
+SELECT 'text' AS component, '### Query Performance Indexes' AS contents_md;
 
-SELECT 'table' AS component, 
-    TRUE AS hover, 
-    TRUE AS striped_rows;
+-- --- CONFIGURATION FOR TABLE 2 ---
+SET max_per_page_idx = 10;
+SET count_idx = (SELECT COUNT(*) FROM data_dictionary_indexes);
+SET pages_idx = (CAST($count_idx AS INT) / $max_per_page_idx) + (CASE WHEN ($count_idx % $max_per_page_idx) = 0 THEN 0 ELSE 1 END);
+SET current_page_idx = COALESCE(CAST($page_idx AS INT), 1);
+
+
+-- --- RENDER TABLE 2 ---
+SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
 
 SELECT 
     index_name AS "Index Name",
     table_name AS "Target Table",
     description AS "Description"
-FROM data_dictionary_indexes;
+FROM data_dictionary_indexes
+LIMIT $max_per_page_idx
+OFFSET ($current_page_idx - 1) * $max_per_page_idx;
+
+-- --- RENDER PAGINATION 2 ---
+SELECT 'pagination' AS component,
+    ($current_page_idx = 1) AS previous_disabled,
+    ($current_page_idx = $pages_idx) AS next_disabled,
+    sqlpage.link(sqlpage.path(), json_object('page_idx', $current_page_idx - 1, 'page_obj', $page_obj)) AS previous_link,
+    sqlpage.link(sqlpage.path(), json_object('page_idx', $current_page_idx + 1, 'page_obj', $page_obj)) AS next_link;
+
+WITH RECURSIVE idx_page_numbers AS (
+    SELECT 1 AS n UNION ALL SELECT n + 1 FROM idx_page_numbers WHERE n < $pages_idx
+)
+SELECT n AS contents, 
+       sqlpage.link(sqlpage.path(), json_object('page_idx', n, 'page_obj', $page_obj)) AS link,
+       (n = $current_page_idx) AS active FROM idx_page_numbers;
 ```
 
 ## Specialty Listing
