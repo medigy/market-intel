@@ -56,6 +56,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 -- END: PARTIAL global-layout.sql
 ```
@@ -82,12 +83,13 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 -- HERO
 SELECT 'hero' AS component,
     'Medigy Market Intelligence' AS title,
-    'CMS Part B analytics for identifying high-opportunity disease-specialty clusters.' AS description,
+    'CMS Part B & DMEPOS analytics for identifying high-opportunity disease-specialty clusters.' AS description,
     'azure' AS color;
 
 -- PIPELINE HEALTH CHECK
@@ -128,14 +130,13 @@ SELECT
     'teal' AS color
 FROM dim_geography;
 
-SELECT 'divider' AS component;
-
--- CORE NAVIGATION CARDS
-SELECT 'card' AS component, 'Analytics Modules' AS title, 3 AS columns;
+-- 3. PRIMARY NAVIGATION MODULES
+SELECT 'divider' AS component, 'Analytics Core' AS label;
+SELECT 'card' AS component, 3 AS columns;
 
 SELECT
     'Executive Dashboard' AS title,
-    'Top-line KPIs: total spend, patient reach, spend per patient, and service intensity across all specialties.' AS description,
+    'Top-line KPIs: total spend, patient reach, and service intensity across all specialties.' AS description,
     '/mmi/executive-dashboard.sql' AS link,
     'layout-dashboard' AS icon,
     'teal' AS color;
@@ -148,39 +149,17 @@ SELECT
     'azure' AS color;
 
 SELECT
-    'Evidence' AS title,
-    'Consolidated evidence views and charts mapped to the  prioritization report references, including opportunity matrix, gatekeepers, Pareto drug spend, and geographic concentration.' AS description,
-    '/mmi/sleep-apnea-evidence.sql' AS link,
-    'moon-stars' AS icon,
-    'cyan' AS color;
-
-SELECT
-    'Sleep Apnea Market' AS title,
-    'Dedicated CMS sleep apnea diagnostic and DME market analysis with national totals, test mix, geography, device billing, and system friction.' AS description,
-    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
-    'bed-flat' AS icon,
-    'blue' AS color;
-
-SELECT
     'Disease Mapping' AS title,
-    'ICD-10 cluster coverage, interaction density by disease, and repeat-visit tier classification.' AS description,
+    'ICD-10 cluster coverage and interaction density by disease.' AS description,
     '/mmi/disease-mapping.sql' AS link,
     'virus' AS icon,
-    'teal' AS color;
+    'indigo' AS color;
 
-SELECT
-    'Procedure Drilldown' AS title,
-    'Part B drug spend, facility vs office split, DME/supply refill velocity, and surgical anesthesia metrics.' AS description,
-    '/mmi/procedure-drilldown.sql' AS link,
-    'pill' AS icon,
-    'azure' AS color;
+-- 4. DISEASE STATE SNAPSHOTS
+SELECT 'divider' AS component, 'Market Snapshots' AS label;
 
-SELECT 'divider' AS component;
-
-SELECT 'text' AS component,
-    'Sleep Apnea Snapshot' AS title,
-    'Home-page summary derived from the national diagnostic and DME queries in `sql/cms_sleep_apnea_market_analysis.sql`.' AS contents;
-
+-- 4a. Sleep Apnea Summary
+SELECT 'text' AS component, 'Sleep Apnea Market Snapshot' AS contents_md;
 SELECT 'card' AS component, 4 AS columns;
 
 SELECT
@@ -193,43 +172,80 @@ FROM uniform_resource_diagnostics_data
 WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
 
 SELECT
-    'Diagnostic Beneficiaries' AS title,
-    printf('%,.0f', SUM(Tot_Benes)) AS description,
-    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
-    'users' AS icon,
-    'azure' AS color
-FROM uniform_resource_diagnostics_data
-WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
-
-SELECT
-    'DME Allowed' AS title,
+    'DME Allowed (CPAP)' AS title,
     '$' || printf('%,.1f', SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) / 1000000.0) || 'M' AS description,
     '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
     'device-desktop' AS icon,
-    'cyan' AS color
+    'blue' AS color
 FROM uniform_resource_dme_data
 WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
 
 SELECT
-    'Allowed vs Submitted' AS title,
-    printf('%.1f%%',
-        (SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt) * 100.0)
-        / NULLIF(SUM(Tot_Suplr_Srvcs * Avg_Suplr_Sbmtd_Chrg), 0)
+    'Avg. DME Markup' AS title,
+    printf('%.1fx', 
+        SUM(Tot_Suplr_Srvcs * Avg_Suplr_Sbmtd_Chrg) / 
+        NULLIF(SUM(Tot_Suplr_Srvcs * Avg_Suplr_Mdcr_Alowd_Amt), 0)
     ) AS description,
     '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
-    'percentage' AS icon,
+    'trending-up' AS icon,
     'indigo' AS color
 FROM uniform_resource_dme_data
 WHERE HCPCS_CD IN ('E0601', 'E0470', 'E0471');
 
-SELECT 'divider' AS component;
+SELECT
+    'Patient Funnel' AS title,
+    printf('%,.0f', SUM(Tot_Benes)) || ' tested' AS description,
+    '/mmi/cms-sleep-apnea-market-analysis.sql' AS link,
+    'users' AS icon,
+    'cyan' AS color
+FROM uniform_resource_diagnostics_data
+WHERE Rndrng_Prvdr_Geo_Lvl = 'National';
 
--- DATA SOURCE REFERENCE
-SELECT 'card' AS component, 'Pipeline Reference' AS title, 1 AS columns;
+
+-- 4b. COPD Summary
+SELECT 'text' AS component, 'COPD Respiratory Snapshot' AS contents_md;
+SELECT 'card' AS component, 4 AS columns;
+
+SELECT 
+    'PFT Allowed' AS title, 
+    '$' || printf('%,.1f', total_allowed / 1000000.0) || 'M' AS description,
+    '/mmi/copd-hub.sql' AS link,
+    'activity-heartbeat' AS icon,
+    'teal' AS color
+FROM copd_pft_national_kpis;
+
+SELECT 
+    'Oxygen DME Allowed' AS title, 
+    '$' || printf('%,.1f', total_allowed / 1000000.0) || 'M' AS description,
+    '/mmi/copd-hub.sql' AS link,
+    'droplet' AS icon,
+    'blue' AS color
+FROM oxygen_national_market_financial_summary;
+
+SELECT 
+    'Untested Gap' AS title, 
+    value || unit AS description,
+    '/mmi/copd-hub.sql' AS link,
+    'alert-triangle' AS icon,
+    'orange' AS color
+FROM copd_executive_summary_kpis WHERE finding_no = '3';
+
+SELECT 
+    'Patient LTV (36mo)' AS title, 
+    '$' || printf('%,.0f', ltv_36_months_with_o2) AS description,
+    '/mmi/copd-hub.sql' AS link,
+    'chart-line' AS icon,
+    'indigo' AS color
+FROM copd_patient_36mo_ltv_model;
+
+
+-- 5. REFERENCE & DICTIONARY
+SELECT 'divider' AS component, 'Infrastructure' AS label;
+SELECT 'card' AS component, 1 AS columns;
 
 SELECT
-    'Data Dictionary' AS title,
-    'Schema reference for all dimension and fact tables, views, and scoring methodology.' AS description,
+    'Data Dictionary & Provenance' AS title,
+    'Technical schema reference for dimension/fact tables and Singer-protocol data sources.' AS description,
     '/mmi/data-dictionary.sql' AS link,
     'database' AS icon,
     'gray' AS color;
@@ -258,6 +274,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -369,6 +386,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -440,6 +458,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 -- KPIs and Deep Dive for Selected Specialty
@@ -511,6 +530,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -605,6 +625,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -673,6 +694,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+      '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -789,6 +811,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -1100,6 +1123,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -1649,6 +1673,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -1660,7 +1685,7 @@ SELECT 'hero' AS component,
     'gray' AS color;
 
 -- 2. DATA SOURCES (External)
-SELECT 'text' AS component, '### 1. External Data Sources' AS contents_md;
+SELECT 'text' AS component, '1. External Data Sources' AS contents_md;
 SELECT 'list' AS component;
 SELECT 
     title,
@@ -1684,7 +1709,7 @@ SELECT
 FROM data_tables_derived;
 
 -- 3. MASTER TABLES (Dimensions & Reference)
-SELECT 'text' AS component, '### Master & Reference Tables' AS contents_md;
+SELECT 'text' AS component, 'Master & Reference Tables' AS contents_md;
 SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
 SELECT 
     name AS "Table Name"   
@@ -1728,7 +1753,7 @@ SELECT n AS contents,
        (n = $current_page_obj) AS active FROM page_numbers;
 
 -- 6. PERFORMANCE INDEXES
-SELECT 'text' AS component, '### Query Performance Indexes' AS contents_md;
+SELECT 'text' AS component, 'Query Performance Indexes' AS contents_md;
 
 -- --- CONFIGURATION FOR TABLE 2 ---
 SET max_per_page_idx = 10;
@@ -1782,6 +1807,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -1811,6 +1837,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -1840,6 +1867,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -1870,6 +1898,7 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
        '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
@@ -1877,4 +1906,121 @@ SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondar
 
 SELECT 'table' AS component, 'Mapped Clusters' AS title, true AS sort, true AS search;
 SELECT distinct disease_state AS Cluster FROM dim_diagnosis WHERE disease_state != 'Other Chronic / Clinical';
+```
+
+
+## COPD Executive Intelligence Hub
+
+```sql mmi/copd-hub.sql { route: { caption: "COPD Intelligence Hub" } }
+-- @route.description "Consolidated COPD evidence views and charts "
+
+-- 1. Shell and Navigation
+SELECT 'shell' AS component,
+       'Medigy Market Intelligence' AS title,
+       NULL AS icon,
+       'fluid' AS layout,
+       true AS fixed_top_menu,
+    CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+    '/footer-links.js' AS javascript,
+     '© 2026 Medigy Market Intelligence' AS footer,
+    '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
+       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
+       '{"link":"/mmi/opportunity-scoring.sql","title":"Opportunity Scores"}' AS menu_item,
+       '{"link":"/mmi/sleep-apnea-evidence.sql","title":"Evidence"}' AS menu_item,
+       '{"link":"/mmi/cms-sleep-apnea-market-analysis.sql","title":"Sleep Apnea Market"}' AS menu_item,
+       '{"link":"/mmi/disease-mapping.sql","title":"Disease Mapping"}' AS menu_item,
+       '{"link":"/mmi/procedure-drilldown.sql","title":"Procedure Drilldown"}' AS menu_item,       
+       '{"link":"/mmi/copd-hub.sql","title":"COPD Intelligence Hub"}' AS menu_item,
+       '{"link":"/mmi/data-dictionary.sql","title":"Data Dictionary"}' AS menu_item;
+
+SELECT 'button' AS component, 'start' AS justify;
+SELECT 'Back' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+-- 2. STRATEGIC ANCHOR
+SELECT 'hero' AS component,
+    'COPD Executive Intelligence Hub' AS title,
+    'A unified multi-layer model of Medicare spend across Diagnostics, Clinical Visits, and DME.' AS description,
+    'teal' AS color;
+
+-- 3. NATIONAL STRATEGIC STACK (The "Operational Truth™")
+SELECT 'big_number' AS component, 'National Market Totals' AS title;
+SELECT 'Total Medicare Allowed' AS title, total_medicare_allowed AS value, '$' AS prefix, 'success' AS color, 'PFT + E&M + Oxygen' AS description FROM copd_national_market_grand_total;
+SELECT 'All-Payer TAM (High)' AS title, all_payer_high AS value, '$' AS prefix, 'blue' AS color, 'Estimated 5x Medicare' AS description FROM copd_national_market_grand_total;
+SELECT 'System-Wide Markup' AS title, blended_markup_x AS value, 'x' AS suffix, 'warning' AS color, 'Billing friction ratio' AS description FROM copd_national_market_grand_total;
+SELECT 'Unique Patients' AS title, approx_unique_beneficiaries AS value, 'indigo' AS color, 'Est. unique beneficiaries' AS description FROM pft_national_beneficiary_summary;
+
+-- 4. THE PATIENT JOURNEY & REVENUE FUNNEL
+SELECT 'divider' AS component, 'Patient Journey & Economics' AS label;
+
+SELECT 'steps' AS component, 'The COPD Clinical Pathway' AS title, 6 AS width;
+SELECT 'Screening' AS title, 'Voice-based screen' AS description, 'phone' AS icon, 'completed' AS status;
+SELECT 'Diagnostics' AS title, 'PFT Confirmation' AS description, 'activity' AS icon, 'active' AS status;
+SELECT 'Management' AS title, 'E&M Follow-up' AS description, 'building-hospital' AS icon;
+SELECT 'DME Support' AS title, 'Oxygen Rental' AS description, 'droplet' AS icon;
+
+SELECT 'card' AS component, 3 AS columns, 6 AS width;
+SELECT 'Visit-to-Test Ratio' AS title, visit_to_test_ratio || 'x' AS description, 'Est. COPD visits per PFT' AS footer, 'activity' AS icon, 'orange' AS color FROM copd_diagnosis_funnel_gap;
+SELECT 'Untested Gap' AS title, pct_never_tested || '%' AS description, printf('%,.0f', never_tested_count) || ' patients' AS footer, 'users-minus' AS icon, 'red' AS color FROM copd_diagnosis_funnel_gap;
+SELECT '36-Mo Patient LTV' AS title, '$' || printf('%,.0f', ltv_36_months_with_o2) AS description, 'Including O2 DME' AS footer, 'trending-up' AS icon, 'teal' AS color FROM copd_patient_36mo_ltv_model;
+
+-- 5. DIAGNOSTIC & COMPETITIVE ANALYSIS
+SELECT 'divider' AS component, 'Diagnostic Domain (PFT)' AS label;
+
+SELECT 'chart' AS component, 'PFT Volume by Setting' AS title, 'donut' AS type, 4 AS width;
+SELECT setting AS label, total_services AS value FROM pft_national_setting_distribution;
+
+SELECT 'chart' AS component, 'Pricing: Lab vs. Office vs. Voice' AS title, 'bar' AS type, 8 AS width;
+SELECT diagnostic_method AS label, avg_medicare_allowed AS value, 
+       CASE WHEN diagnostic_method LIKE '%Voice%' THEN 'teal' ELSE 'blue' END AS color 
+FROM pft_competitive_pricing_benchmark;
+
+SELECT 'table' AS component, 'Procedure-Level Analytics' AS title, TRUE AS sort, 12 AS width;
+SELECT hcpcs_cd, description, total_services AS "Volume", total_allowed AS "Total Allowed ($)", 
+       avg_allowed_per_test AS "Avg Allowed ($)", markup_x || 'x' AS "Markup" 
+FROM pft_national_procedure_analytics;
+
+-- 6. CLINICAL MANAGEMENT (E&M) & DME (OXYGEN)
+SELECT 'divider' AS component, 'Management & DME Infrastructure' AS label;
+
+SELECT 'chart' AS component, 'Spend Distribution by Layer' AS title, 'donut' AS type, 5 AS width;
+SELECT market_name AS label, medicare_allowed AS value FROM copd_total_market_economic_stack;
+
+SELECT 'chart' AS component, 'Medicare Revenue Projection (36-Mo)' AS title, 'bar' AS type, 8 AS width;
+SELECT period AS label, medicare_pays AS value FROM oxygen_e1392_amortization_model;
+
+-- 7. GEOGRAPHIC INTELLIGENCE & TIERING
+SELECT 'divider' AS component, 'Geographic Burden & Priority Markets' AS label;
+
+SELECT 'chart' AS component, 'Top 10 High-Burden States (Total Allowed $)' AS title, 'bar' AS type, 8 AS width;
+SELECT state AS label, (pft_allowed + em_allowed_all_cond + o2_allowed) AS value 
+FROM copd_state_composite_market_tiering ORDER BY composite_rank_sum ASC LIMIT 10;
+
+SELECT 'list' AS component, 'Tier 1 Priority States' AS title, 4 AS width;
+-- SELECT state AS title, composite_tier AS description, 'map-pin' AS icon, 'teal' AS color 
+-- FROM copd_state_composite_market_tiering WHERE composite_tier = 'TIER 1' LIMIT 5;
+SELECT 
+    state AS title,
+    '$' || printf('%,.0f', total_allowed) AS description,
+    'map-pin' AS icon,
+    'teal' AS color
+FROM pft_state_top_market_summary
+ORDER BY total_allowed DESC
+LIMIT 5;
+
+-- 8. INTEGRATED ECONOMIC STACK (The Final Ledger)
+SELECT 'divider' AS component, 'Economic Layer Breakdown' AS label;
+
+SELECT 'chart' AS component, 'Cohort Revenue Streams (10k Patients)' AS title, 'donut' AS type, 4 AS width;
+SELECT 'PFT' AS label, total_pft_revenue AS value FROM copd_cohort_36mo_economic_projection
+UNION ALL SELECT 'E&M', total_annual_em_revenue FROM copd_cohort_36mo_economic_projection
+UNION ALL SELECT 'Oxygen', total_o2_36mo_revenue FROM copd_cohort_36mo_economic_projection;
+
+SELECT 'table' AS component, 'The Economic Stack Detail' AS title, 8 AS width;
+SELECT market_name AS "Layer", medicare_allowed AS "Allowed ($)", markup_x || 'x' AS "Markup", 
+       billing_friction AS "Friction ($)", all_payer_high AS "TAM High ($)" 
+FROM copd_total_market_economic_stack;
+
+-- 9. EXECUTIVE FINDINGS REGISTRY
+SELECT 'divider' AS component, 'Executive Key Findings Registry' AS label;
+SELECT 'timeline' AS component, 'Operational Truth™ Findings' AS title;
+SELECT metric AS title, formatted AS description, 'circle-check' AS icon FROM pft_national_key_findings_summary;
 ```
