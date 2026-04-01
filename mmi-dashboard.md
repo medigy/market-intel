@@ -19,6 +19,18 @@ This application surfaces the Medigy CMS analytics pipeline built from
 
 ```bash prepare-db-deploy-server --descr "Ingest Medigy raw files, build normalized analytics tables, and package SQLPage UI."
 #!/bin/bash
+set -u
+
+# --- SOURCING THE ENVIRONMENT ---
+# Since this task runs from the platform root where the .md and .env live:
+if [ -f ".env" ]; then
+    set -a            # Export all variables in .env to the environment
+    source ".env"
+    set +a
+    echo "DEBUG: Environment sourced from $(pwd)/.env"
+else
+    echo "WARN: .env file not found in $(pwd). Ensure it exists at the platform root."
+fi
 set -euo pipefail
 
 # Start from a clean database to avoid previously ingested malformed resources.
@@ -66,6 +78,13 @@ SELECT 'shell' AS component,
 
 ```sql index.sql { route: { caption: "Registration" } }
 -- @route.description "User registration gate before entering the dashboard"
+
+SELECT 'cookie' AS component,
+       'isVerified' AS name,
+       'false' AS value,
+       '/' AS path,
+       'lax' AS same_site
+WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
 
 SELECT 'shell' AS component,
        'Medigy Market Intelligence — Registration' AS title,
@@ -119,10 +138,116 @@ SELECT 'text' AS component,
 
 ---
 
+## Registration Submit Handler
+
+```sql registration-submit.sql { route: { caption: "Registration Submit Handler" } }
+-- @route.description "Sends a welcome email after registration submit using SQLPage exec + SMTP, then redirects"
+
+SET registration_profile_cookie = sqlpage.cookie('medigy_mmi_registration_profile_v2');
+SET smtp_host = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_HOST')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_HOST=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_port = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_PORT')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_PORT=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_username = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_USERNAME')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_USERNAME=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_password = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_APP_PASSWORD')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_APP_PASSWORD=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_from = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_FROM')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_FROM=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET recipient_email = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('RECEIVER_EMAIL')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^RECEIVER_EMAIL=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET submitted_first_name = COALESCE(NULLIF($first_name, ''), '');
+SET submitted_second_name = COALESCE(NULLIF($second_name, ''), '');
+SET submitted_email_address = COALESCE(NULLIF($email_address, ''), '');
+SET submitted_organization = COALESCE(NULLIF($organization, ''), '');
+SET submitted_message = COALESCE(NULLIF($message, ''), '');
+
+SET smtp_exec_command =
+    'RECIP="' || $recipient_email || '"; ' ||
+    'if [ -z "$RECIP" ]; then echo SKIPPED_NO_EMAIL_RECIPIENT; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
+    'if [ -z "' || $smtp_host || '" ] || [ -z "' || $smtp_port || '" ] || [ -z "' || $smtp_username || '" ] || [ -z "' || $smtp_password || '" ] || [ -z "' || $smtp_from || '" ]; then echo SKIPPED_MISSING_SMTP_CONFIG; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
+    'MESSAGE="From: ' || $smtp_from ||
+    '\r\nTo: ' || $recipient_email ||
+    '\r\nSubject: New User Registation to Medigy Market Intelligence.' ||
+    '\r\nContent-Type: text/plain; charset=UTF-8' ||
+    '\r\n\r\nA new user has been registered to Medigy Market Intelligence.' ||
+    '\r\n\r\nRegistered user details:' ||
+    '\r\nFirst Name: ' || REPLACE($submitted_first_name, '"', '''') ||
+    '\r\nSecond Name: ' || REPLACE($submitted_second_name, '"', '''') ||
+    '\r\nEmail Address: ' || REPLACE($submitted_email_address, '"', '''') ||
+    '\r\nOrganization: ' || REPLACE($submitted_organization, '"', '''') ||
+    '\r\nMessage: ' || REPLACE($submitted_message, '"', '''') ||
+    '\r\n"; ' ||
+    'printf "%b" "$MESSAGE" | ' ||
+    'curl --silent --show-error --url "smtp://' || $smtp_host || ':' || $smtp_port || '" --ssl-reqd --user "' || $smtp_username || ':' || $smtp_password || '" --mail-from "' || $smtp_from || '" --mail-rcpt "' || $recipient_email || '" --upload-file - 2>&1; ' ||
+    'CURL_EXIT_CODE=$?; echo CURL_EXIT_CODE:$CURL_EXIT_CODE; exit 0';
+
+SET smtp_exec_response = sqlpage.exec(
+    'sh',
+    '-lc',
+    $smtp_exec_command
+);
+
+SET email_send_status = CASE
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'SKIPPED_NO_EMAIL_RECIPIENT') > 0 THEN 'SKIPPED_NO_EMAIL'
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'SKIPPED_MISSING_SMTP_CONFIG') > 0 THEN 'SKIPPED_MISSING_SMTP_CONFIG'
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'CURL_EXIT_CODE:0') > 0 THEN 'SUCCESS'
+    ELSE 'FAILED'
+END;
+
+SET email_log_line =
+    'timestamp=' || STRFTIME('%Y-%m-%dT%H:%M:%SZ', 'now') ||
+    '&status=' || sqlpage.url_encode($email_send_status) ||
+    '&email=' || sqlpage.url_encode($recipient_email) ||
+    '&response=' || sqlpage.url_encode(COALESCE($smtp_exec_response, ''));
+
+SET email_log_append_status = sqlpage.exec(
+    'sh',
+    '-lc',
+    'echo "' || $email_log_line || '" >> ' || sqlpage.current_working_directory() || '/sqlpage/email_send_status.txt; echo LOG_APPEND_OK'
+);
+
+SELECT 'cookie' AS component,
+       'isVerified' AS name,
+       CASE WHEN $email_send_status = 'SUCCESS' THEN 'true' ELSE 'false' END AS value,
+       '/' AS path,
+       'lax' AS same_site;
+
+SELECT 'redirect' AS component,
+       '/mmi/home-overview.sql' AS link;
+```
+
+---
+
 ## Home Page
 
 ```sql registration.sql { route: { caption: "Registration Alias" } }
 -- @route.description "Alias route for user registration gate"
+
+SELECT 'cookie' AS component,
+       'isVerified' AS name,
+       'false' AS value,
+       '/' AS path,
+       'lax' AS same_site
+WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
 
 SELECT 'shell' AS component,
        'Medigy Market Intelligence — Registration' AS title,

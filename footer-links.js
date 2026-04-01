@@ -3,6 +3,7 @@
   const REGISTRATION_PATH = '/';
   const REGISTRATION_INDEX_PATH = '/index.sql';
   const REGISTRATION_ALIAS_PATH = '/registration.sql';
+  const REGISTRATION_SUBMIT_PATH = '/registration-submit.sql';
   const HOME_PAGE_PATH = '/mmi/home-overview.sql';
 
   const getCookie = (name) => {
@@ -94,7 +95,9 @@
   };
 
   if (isRegistrationPage && hasSubmittedRegistrationParams() && persistSubmittedRegistration()) {
-    window.location.replace(HOME_PAGE_PATH);
+    window.location.replace(
+      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&message=${encodeURIComponent(String(searchParams.get('message') || '').trim())}`
+    );
     return;
   }
 

@@ -287,7 +287,14 @@ surveilr orchestrate transform-csv
 surveilr shell sql/medigy-ddl.sql
 surveilr shell sql/medigy-analytics.sql
 
-# 5. Package the SQLPage UI and load it into the database
+# 5. Configure SMTP environment variables for registration welcome emails
+export EMAIL_HOST="<your-host>"
+export EMAIL_USERNAME="<your-user-name>"
+export EMAIL_APP_PASSWORD="<your-mailgun-app-password>"
+export EMAIL_FROM="<your-from-email>"
+export EMAIL_PORT="<your-port>"
+
+# 6. Package the SQLPage UI and load it into the database
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md \
   | sqlite3 resource-surveillance.sqlite.db
 
