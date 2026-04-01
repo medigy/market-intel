@@ -105,13 +105,13 @@ SELECT
     'organization' AS name,
     'Organization' AS label,
     'text' AS type,
-    true AS required;
+    false AS required;
 
 SELECT
     'message' AS name,
     'Message' AS label,
     'textarea' AS type,
-    true AS required;
+    false AS required;
 
 SELECT 'text' AS component,
        'Click Submit to continue.' AS contents;
@@ -162,13 +162,13 @@ SELECT
     'organization' AS name,
     'Organization' AS label,
     'text' AS type,
-    true AS required;
+    false AS required;
 
 SELECT
     'message' AS name,
     'Message' AS label,
     'textarea' AS type,
-    true AS required;
+    false AS required;
 
 SELECT 'text' AS component,
        'Click Submit to continue.' AS contents;
