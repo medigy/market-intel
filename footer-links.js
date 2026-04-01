@@ -52,9 +52,7 @@
         parsed &&
         String(parsed.firstName || '').trim() &&
         String(parsed.secondName || '').trim() &&
-        String(parsed.emailAddress || '').trim() &&
-        String(parsed.organization || '').trim() &&
-        String(parsed.message || '').trim()
+        String(parsed.emailAddress || '').trim()
       );
     } catch {
       return false;
@@ -72,9 +70,7 @@
     return Boolean(
       String(searchParams.get('first_name') || '').trim() &&
       String(searchParams.get('second_name') || '').trim() &&
-      String(searchParams.get('email_address') || '').trim() &&
-      String(searchParams.get('organization') || '').trim() &&
-      String(searchParams.get('message') || '').trim()
+      String(searchParams.get('email_address') || '').trim()
     );
   };
 
@@ -88,7 +84,7 @@
       registeredAt: new Date().toISOString()
     };
 
-    if (!payload.firstName || !payload.secondName || !payload.emailAddress || !payload.organization || !payload.message) {
+    if (!payload.firstName || !payload.secondName || !payload.emailAddress) {
       return false;
     }
 
