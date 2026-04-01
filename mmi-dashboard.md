@@ -62,9 +62,123 @@ SELECT 'shell' AS component,
 
 ---
 
+## Registration Page
+
+```sql index.sql { route: { caption: "Registration" } }
+-- @route.description "User registration gate before entering the dashboard"
+
+SELECT 'shell' AS component,
+       'Medigy Market Intelligence — Registration' AS title,
+       NULL AS icon,
+       'narrow' AS layout,
+       true AS fixed_top_menu,
+       './' AS link,
+       '/footer-links.js' AS javascript,
+       '© 2026 Medigy Market Intelligence' AS footer;
+
+SELECT 'hero' AS component,
+       'Registration' AS title,
+       'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
+       'azure' AS color;
+
+SELECT 'form' AS component, 'Get' AS method;
+
+SELECT
+    'first_name' AS name,
+    'First Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'second_name' AS name,
+    'Second Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'email_address' AS name,
+    'Email Address' AS label,
+    'email' AS type,
+    true AS required;
+
+SELECT
+    'organization' AS name,
+    'Organization' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'message' AS name,
+    'Message' AS label,
+    'textarea' AS type,
+    true AS required;
+
+SELECT 'text' AS component,
+       'Click Submit to continue.' AS contents;
+```
+
+---
+
 ## Home Page
 
-```sql index.sql { route: { caption: "Home" } }
+```sql registration.sql { route: { caption: "Registration Alias" } }
+-- @route.description "Alias route for user registration gate"
+
+SELECT 'shell' AS component,
+       'Medigy Market Intelligence — Registration' AS title,
+       NULL AS icon,
+       'narrow' AS layout,
+       true AS fixed_top_menu,
+       './' AS link,
+       '/footer-links.js' AS javascript,
+       '© 2026 Medigy Market Intelligence' AS footer;
+
+SELECT 'hero' AS component,
+       'Registration' AS title,
+       'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
+       'azure' AS color;
+
+SELECT 'form' AS component, 'Get' AS method;
+
+SELECT
+    'first_name' AS name,
+    'First Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'second_name' AS name,
+    'Second Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'email_address' AS name,
+    'Email Address' AS label,
+    'email' AS type,
+    true AS required;
+
+SELECT
+    'organization' AS name,
+    'Organization' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'message' AS name,
+    'Message' AS label,
+    'textarea' AS type,
+    true AS required;
+
+SELECT 'text' AS component,
+       'Click Submit to continue.' AS contents;
+```
+
+---
+
+## Overview Page
+
+```sql mmi/home-overview.sql { route: { caption: "Overview" } }
 -- @route.description "Medigy Market Intelligence — Landing Page"
 
 SELECT 'shell' AS component,
