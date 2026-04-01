@@ -3,7 +3,7 @@
   const REGISTRATION_PATH = '/';
   const REGISTRATION_INDEX_PATH = '/index.sql';
   const REGISTRATION_ALIAS_PATH = '/registration.sql';
-  const DASHBOARD_PATH = '/mmi/executive-dashboard.sql';
+  const HOME_PAGE_PATH = '/mmi/home-overview.sql';
 
   const getCookie = (name) => {
     const key = `${name}=`;
@@ -98,7 +98,7 @@
   };
 
   if (isRegistrationPage && hasSubmittedRegistrationParams() && persistSubmittedRegistration()) {
-    window.location.replace(DASHBOARD_PATH);
+    window.location.replace(HOME_PAGE_PATH);
     return;
   }
 
@@ -110,7 +110,7 @@
   }
 
   if (isRegistrationPage && hasCookie) {
-    window.location.replace(DASHBOARD_PATH);
+    window.location.replace(HOME_PAGE_PATH);
     return;
   }
 
