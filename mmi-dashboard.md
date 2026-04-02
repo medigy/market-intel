@@ -19,6 +19,18 @@ This application surfaces the Medigy CMS analytics pipeline built from
 
 ```bash prepare-db-deploy-server --descr "Ingest Medigy raw files, build normalized analytics tables, and package SQLPage UI."
 #!/bin/bash
+set -u
+
+# --- SOURCING THE ENVIRONMENT ---
+# Since this task runs from the platform root where the .md and .env live:
+if [ -f ".env" ]; then
+    set -a            # Export all variables in .env to the environment
+    source ".env"
+    set +a
+    echo "DEBUG: Environment sourced from $(pwd)/.env"
+else
+    echo "WARN: .env file not found in $(pwd). Ensure it exists at the platform root."
+fi
 set -euo pipefail
 
 # Start from a clean database to avoid previously ingested malformed resources.
@@ -63,9 +75,364 @@ SELECT 'shell' AS component,
 
 ---
 
+## Registration Page
+
+```sql index.sql { route: { caption: "Registration" } }
+-- @route.description "User registration gate before entering the dashboard"
+
+SELECT 'cookie' AS component,
+       'isVerified' AS name,
+       'false' AS value,
+       '/' AS path,
+       'lax' AS same_site
+WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
+
+SELECT 'shell' AS component,
+       'Medigy Market Intelligence — Registration' AS title,
+       NULL AS icon,
+       'narrow' AS layout,
+       true AS fixed_top_menu,
+       './' AS link,
+       '/footer-links.js' AS javascript,
+       '© 2026 Medigy Market Intelligence' AS footer;
+
+SELECT 'hero' AS component,
+       'Registration' AS title,
+       'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
+       'azure' AS color;
+
+SELECT 'alert' AS component,
+       'Invalid Email Address' AS title,
+       'The email address you entered is not valid. Please enter a valid email address (e.g. user@example.com).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_email';
+
+SELECT 'alert' AS component,
+       'Invalid Phone Number' AS title,
+    'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_phone';
+
+SELECT 'alert' AS component,
+       'Consent Required' AS title,
+       'Please review the consent text and confirm your agreement before continuing.' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_consent';
+
+SELECT 'form' AS component, 'Get' AS method, 'Continue to Application' AS validate;
+
+SELECT
+    'first_name' AS name,
+    'First Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'second_name' AS name,
+    'Second Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'email_address' AS name,
+    'Email Address' AS label,
+    'email' AS type,
+    true AS required;
+
+SELECT
+    'phone_number' AS name,
+    'Phone Number (with country code)' AS label,
+    'tel' AS type,
+    COALESCE(NULLIF($phone_number, ''), '+1') AS value,
+    true AS required;
+
+SELECT
+    'organization' AS name,
+    'Organization' AS label,
+    'text' AS type,
+    false AS required;
+
+SELECT
+    'purpose_of_visit' AS name,
+    'Purpose of Visit' AS label,
+    'select' AS type,
+    COALESCE(NULLIF($purpose_of_visit, ''), '') AS value,
+    '[{"value":"","label":"Select purpose (optional)"},{"value":"Exploring features","label":"Exploring features"},{"value":"Research / Study","label":"Research / Study"},{"value":"Business / Professional use","label":"Business / Professional use"},{"value":"Other","label":"Other"}]' AS options;
+
+SELECT
+    'consent_acknowledged' AS name,
+    'I agree to the consent and compliance statement' AS label,
+    'checkbox' AS type,
+    COALESCE(NULLIF($consent_acknowledged, ''), 'yes') AS value,
+    'By continuing, you agree that we may use your contact information to communicate updates, product information, and relevant notifications. We respect your privacy and will not share your data with third parties.' AS description,
+    true AS required;
+
+```
+
+---
+
+## Registration Submit Handler
+
+```sql registration-submit.sql { route: { caption: "Registration Submit Handler" } }
+-- @route.description "Sends a welcome email after registration submit using SQLPage exec + SMTP, then redirects"
+
+SET registration_profile_cookie = sqlpage.cookie('medigy_mmi_registration_profile_v2');
+SET smtp_host = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_HOST')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_HOST=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_port = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_PORT')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_PORT=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_username = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_USERNAME')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_USERNAME=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_password = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_APP_PASSWORD')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_APP_PASSWORD=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET smtp_from = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_FROM')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_FROM=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET recipient_email = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('RECEIVER_EMAIL')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^RECEIVER_EMAIL=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    ''
+);
+SET submitted_first_name = COALESCE(NULLIF($first_name, ''), '');
+SET submitted_second_name = COALESCE(NULLIF($second_name, ''), '');
+SET submitted_email_address = COALESCE(NULLIF($email_address, ''), '');
+SET submitted_phone_number = TRIM(COALESCE(NULLIF($phone_number, ''), ''));
+SET submitted_phone_number_sanitized = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number, '+', ''), ' ', ''), '-', ''), '(', ''), ')', ''), '.', '');
+SET submitted_phone_digits_stripped = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number_sanitized,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9','');
+SET submitted_organization = COALESCE(NULLIF($organization, ''), '');
+SET submitted_purpose_of_visit = COALESCE(NULLIF($purpose_of_visit, ''), '');
+SET submitted_consent_acknowledged = LOWER(TRIM(COALESCE(NULLIF($consent_acknowledged, ''), '')));
+SET submitted_full_name = TRIM($submitted_first_name || ' ' || $submitted_second_name);
+SET submitted_access_timestamp = STRFTIME('%Y-%m-%d %H:%M:%S UTC', 'now');
+SET submitted_ip_address = COALESCE(
+    NULLIF(TRIM($ip_address), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', 'hostname -I 2>/dev/null | awk ''{print $1}'' | tr -d ''[:space:]''')), ''),
+    'N/A'
+);
+SET submitted_user_agent = COALESCE(NULLIF(TRIM($user_agent), ''), 'N/A');
+
+-- Email validation: each condition multiplied — SQLite booleans return 1/0 so product = 1 only when all pass
+SET email_is_valid =
+    (TRIM(COALESCE($submitted_email_address, '')) != '') *
+    (LENGTH($submitted_email_address) - LENGTH(REPLACE($submitted_email_address, '@', '')) = 1) *
+    (INSTR($submitted_email_address, '@') > 1) *
+    (INSTR(SUBSTR($submitted_email_address, INSTR($submitted_email_address, '@') + 1), '.') > 0) *
+    (SUBSTR($submitted_email_address, LENGTH($submitted_email_address), 1) != '.');
+
+-- Phone validation: must start with +, digits-only body, length 6-15
+SET phone_is_valid =
+    (TRIM(COALESCE($submitted_phone_number, '')) != '') *
+    (SUBSTR($submitted_phone_number, 1, 1) = '+') *
+    (LENGTH($submitted_phone_number_sanitized) >= 6) *
+    (LENGTH($submitted_phone_number_sanitized) <= 15) *
+    ($submitted_phone_digits_stripped = '');
+
+SET consent_is_valid = ($submitted_consent_acknowledged IN ('yes', 'on', 'true', '1'));
+
+-- Redirect back to registration form with error if email is invalid
+SELECT 'redirect' AS component,
+       '/?error=invalid_email' AS link
+WHERE $email_is_valid = 0;
+
+SELECT 'redirect' AS component,
+       '/?error=invalid_phone' AS link
+WHERE $email_is_valid = 1 AND $phone_is_valid = 0;
+
+SELECT 'redirect' AS component,
+       '/?error=invalid_consent' AS link
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 0;
+
+SET smtp_exec_command =
+    'RECIP="' || $recipient_email || '"; ' ||
+    'if [ -z "$RECIP" ]; then echo SKIPPED_NO_EMAIL_RECIPIENT; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
+    'if [ -z "' || $smtp_host || '" ] || [ -z "' || $smtp_port || '" ] || [ -z "' || $smtp_username || '" ] || [ -z "' || $smtp_password || '" ] || [ -z "' || $smtp_from || '" ]; then echo SKIPPED_MISSING_SMTP_CONFIG; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
+    'MESSAGE="From: ' || $smtp_from ||
+    '\r\nTo: ' || $recipient_email ||
+    '\r\nSubject: New User Access Notification – Medigy Market Intelligence (MMI) Application Entry' ||
+    '\r\nMIME-Version: 1.0' ||
+    '\r\nContent-Type: text/html; charset=UTF-8' ||
+    '\r\n\r\n<html><body>' ||
+    '<p>Hi Team,</p>' ||
+    '<p>A new user has accessed Medigy Market Intelligence (MMI) Application and submitted their details.</p>' ||
+    '<p><strong>User Information:</strong></p>' ||
+    '<ul>' ||
+    '<li><strong>Full Name:</strong> ' || REPLACE($submitted_full_name, '"', '''') || '</li>' ||
+    '<li><strong>Email Address:</strong> ' || REPLACE($submitted_email_address, '"', '''') || '</li>' ||
+    '<li><strong>Phone Number:</strong> ' || REPLACE($submitted_phone_number, '"', '''') || '</li>' ||
+    '<li><strong>Organization / Company:</strong> ' || REPLACE($submitted_organization, '"', '''') || '</li>' ||
+    '<li><strong>Purpose of Visit:</strong> ' || REPLACE($submitted_purpose_of_visit, '"', '''') || '</li>' ||
+    '</ul>' ||
+    '<p><strong>Access Details:</strong></p>' ||
+    '<ul>' ||
+    '<li><strong>Date &amp; Time:</strong> ' || REPLACE($submitted_access_timestamp, '"', '''') || '</li>' ||
+    '<li><strong>IP Address:</strong> ' || REPLACE($submitted_ip_address, '"', '''') || '</li>' ||
+    '<li><strong>Device / Browser:</strong> ' || REPLACE($submitted_user_agent, '"', '''') || '</li>' ||
+    '</ul>' ||
+    '<p><strong>Notes:</strong><br>This notification is generated automatically when a user enters their details on the MMI Application entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' ||
+    '<p>Please reach out to the user if required.</p>' ||
+    '<p>Regards,<br>System Notification</p>' ||
+    '</body></html>' ||
+    '\r\n"; ' ||
+    'printf "%b" "$MESSAGE" | ' ||
+    'curl --silent --show-error --url "smtp://' || $smtp_host || ':' || $smtp_port || '" --ssl-reqd --user "' || $smtp_username || ':' || $smtp_password || '" --mail-from "' || $smtp_from || '" --mail-rcpt "' || $recipient_email || '" --upload-file - 2>&1; ' ||
+    'CURL_EXIT_CODE=$?; echo CURL_EXIT_CODE:$CURL_EXIT_CODE; exit 0';
+
+SET smtp_exec_response = sqlpage.exec(
+    'sh',
+    '-lc',
+    $smtp_exec_command
+);
+
+SET email_send_status = CASE
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'SKIPPED_NO_EMAIL_RECIPIENT') > 0 THEN 'SKIPPED_NO_EMAIL'
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'SKIPPED_MISSING_SMTP_CONFIG') > 0 THEN 'SKIPPED_MISSING_SMTP_CONFIG'
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'CURL_EXIT_CODE:0') > 0 THEN 'SUCCESS'
+    ELSE 'FAILED'
+END;
+
+SET email_log_line =
+    'timestamp=' || STRFTIME('%Y-%m-%dT%H:%M:%SZ', 'now') ||
+    '&status=' || sqlpage.url_encode($email_send_status) ||
+    '&email=' || sqlpage.url_encode($recipient_email) ||
+    '&response=' || sqlpage.url_encode(COALESCE($smtp_exec_response, ''));
+
+SET email_log_append_status = sqlpage.exec(
+    'sh',
+    '-lc',
+    'echo "' || $email_log_line || '" >> ' || sqlpage.current_working_directory() || '/sqlpage/email_send_status.txt; echo LOG_APPEND_OK'
+);
+
+SELECT 'cookie' AS component,
+       'isVerified' AS name,
+       CASE WHEN $email_send_status = 'SUCCESS' THEN 'true' ELSE 'false' END AS value,
+       '/' AS path,
+       'lax' AS same_site
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
+
+SELECT 'redirect' AS component,
+       '/mmi/home-overview.sql' AS link
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
+```
+
+```contribute sqlpage_files --base .
+./footer-links.js .
+```
+
+---
+
 ## Home Page
 
-```sql index.sql { route: { caption: "Home" } }
+```sql registration.sql { route: { caption: "Registration Alias" } }
+-- @route.description "Alias route for user registration gate"
+
+SELECT 'cookie' AS component,
+       'isVerified' AS name,
+       'false' AS value,
+       '/' AS path,
+       'lax' AS same_site
+WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
+
+SELECT 'shell' AS component,
+       'Medigy Market Intelligence — Registration' AS title,
+       NULL AS icon,
+       'narrow' AS layout,
+       true AS fixed_top_menu,
+       './' AS link,
+       '/footer-links.js' AS javascript,
+       '© 2026 Medigy Market Intelligence' AS footer;
+
+SELECT 'hero' AS component,
+       'Registration' AS title,
+       'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
+       'azure' AS color;
+
+SELECT 'alert' AS component,
+       'Invalid Email Address' AS title,
+       'The email address you entered is not valid. Please enter a valid email address (e.g. user@example.com).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_email';
+
+SELECT 'alert' AS component,
+       'Invalid Phone Number' AS title,
+    'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_phone';
+
+SELECT 'alert' AS component,
+       'Consent Required' AS title,
+       'Please review the consent text and confirm your agreement before continuing.' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_consent';
+
+SELECT 'form' AS component, 'Get' AS method, 'Continue to Application' AS validate;
+
+SELECT
+    'first_name' AS name,
+    'First Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'second_name' AS name,
+    'Second Name' AS label,
+    'text' AS type,
+    true AS required;
+
+SELECT
+    'email_address' AS name,
+    'Email Address' AS label,
+    'email' AS type,
+    true AS required;
+
+SELECT
+    'phone_number' AS name,
+    'Phone Number (with country code)' AS label,
+    'tel' AS type,
+    COALESCE(NULLIF($phone_number, ''), '+1') AS value,
+    true AS required;
+
+SELECT
+    'organization' AS name,
+    'Organization' AS label,
+    'text' AS type,
+    false AS required;
+
+SELECT
+    'purpose_of_visit' AS name,
+    'Purpose of Visit' AS label,
+    'select' AS type,
+    COALESCE(NULLIF($purpose_of_visit, ''), '') AS value,
+    '[{"value":"","label":"Select purpose (optional)"},{"value":"Exploring features","label":"Exploring features"},{"value":"Research / Study","label":"Research / Study"},{"value":"Business / Professional use","label":"Business / Professional use"},{"value":"Other","label":"Other"}]' AS options;
+
+SELECT
+    'consent_acknowledged' AS name,
+    'I agree to the consent and compliance statement' AS label,
+    'checkbox' AS type,
+    COALESCE(NULLIF($consent_acknowledged, ''), 'yes') AS value,
+    'By continuing, you agree that we may use your contact information to communicate updates, product information, and relevant notifications. We respect your privacy and will not share your data with third parties.' AS description,
+    true AS required;
+
+```
+
+---
+
+## Overview Page
+
+```sql mmi/home-overview.sql { route: { caption: "Overview" } }
 -- @route.description "Medigy Market Intelligence — Landing Page"
 
 SELECT 'shell' AS component,
