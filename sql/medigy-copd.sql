@@ -1868,30 +1868,17 @@ SELECT
 FROM copd_oxygen
 
 UNION ALL
--- Finding 8: Primary 3 specialties share of O2 market
+-- Finding 8: Primary 3 specialties share of O2 market (This works as copd_oxygen has the column)
 SELECT
     '8' AS finding_no,
     'Pulm + IM + Family Practice % of O2 market' AS metric,
     ROUND(
         SUM(CASE WHEN specialty_desc IN ('Pulmonary Disease','Internal Medicine','Family Practice')
             THEN avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs ELSE 0 END) * 100.0 /
-        SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 1
+        NULLIF(SUM(avg_suplr_mdcr_alowd_amt * tot_suplr_srvcs), 0), 1
     ) AS value,
     '%' AS unit
-FROM copd_oxygen
-
-UNION ALL
--- Finding 9: Primary 3 specialties share of PFT market
-SELECT
-    '9' AS finding_no,
-    'Pulm + IM + Family Practice % of PFT market' AS metric,
-    ROUND(
-        SUM(CASE WHEN specialty_desc IN ('Pulmonary Disease','Internal Medicine','Family Practice')
-            THEN avg_mdcr_alowd_amt * tot_srvcs ELSE 0 END) * 100.0 /
-        SUM(avg_mdcr_alowd_amt * tot_srvcs), 1
-    ) AS value,
-    '%' AS unit
-FROM copd_pft;
+FROM copd_oxygen;
 
 -- Script 07: Views — Pre-computed aggregations for dashboard use
 -- Create these once; reference them in application queries.
