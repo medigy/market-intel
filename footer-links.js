@@ -41,6 +41,9 @@
     }
   };
 
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const hasRegistrationCookie = () => {
     const rawValue = getStoredRegistration();
     if (!rawValue) {
@@ -86,6 +89,11 @@
     };
 
     if (!payload.firstName || !payload.secondName || !payload.emailAddress) {
+      return false;
+    }
+
+    if (!isValidEmail(payload.emailAddress)) {
+      window.location.replace(`${REGISTRATION_PATH}?error=invalid_email`);
       return false;
     }
 

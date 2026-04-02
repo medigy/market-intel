@@ -100,6 +100,12 @@ SELECT 'hero' AS component,
        'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
        'azure' AS color;
 
+SELECT 'alert' AS component,
+       'Invalid Email Address' AS title,
+       'The email address you entered is not valid. Please enter a valid email address (e.g. user@example.com).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_email';
+
 SELECT 'form' AS component, 'Get' AS method;
 
 SELECT
@@ -180,6 +186,26 @@ SET submitted_email_address = COALESCE(NULLIF($email_address, ''), '');
 SET submitted_organization = COALESCE(NULLIF($organization, ''), '');
 SET submitted_message = COALESCE(NULLIF($message, ''), '');
 
+-- Validate email format: must have exactly one @, chars before @, and a dot in the domain
+SET email_is_valid = CASE
+    -- Must not be empty
+    WHEN TRIM(COALESCE($submitted_email_address, '')) = '' THEN 0
+    -- Must contain exactly one '@'
+    WHEN LENGTH($submitted_email_address) - LENGTH(REPLACE($submitted_email_address, '@', '')) != 1 THEN 0
+    -- '@' must not be the first character (local part must exist)
+    WHEN INSTR($submitted_email_address, '@') <= 1 THEN 0
+    -- Domain part (after '@') must contain at least one '.'
+    WHEN INSTR(SUBSTR($submitted_email_address, INSTR($submitted_email_address, '@') + 1), '.') = 0 THEN 0
+    -- Must not end with a '.'
+    WHEN SUBSTR($submitted_email_address, LENGTH($submitted_email_address), 1) = '.' THEN 0
+    ELSE 1
+END;
+
+-- Redirect back to registration form with error if email is invalid
+SELECT 'redirect' AS component,
+       '/?error=invalid_email' AS link
+WHERE $email_is_valid = 0;
+
 SET smtp_exec_command =
     'RECIP="' || $recipient_email || '"; ' ||
     'if [ -z "$RECIP" ]; then echo SKIPPED_NO_EMAIL_RECIPIENT; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
@@ -229,10 +255,12 @@ SELECT 'cookie' AS component,
        'isVerified' AS name,
        CASE WHEN $email_send_status = 'SUCCESS' THEN 'true' ELSE 'false' END AS value,
        '/' AS path,
-       'lax' AS same_site;
+       'lax' AS same_site
+WHERE $email_is_valid = 1;
 
 SELECT 'redirect' AS component,
-       '/mmi/home-overview.sql' AS link;
+       '/mmi/home-overview.sql' AS link
+WHERE $email_is_valid = 1;
 ```
 
 ---
@@ -262,6 +290,12 @@ SELECT 'hero' AS component,
        'Registration' AS title,
        'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
        'azure' AS color;
+
+SELECT 'alert' AS component,
+       'Invalid Email Address' AS title,
+       'The email address you entered is not valid. Please enter a valid email address (e.g. user@example.com).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_email';
 
 SELECT 'form' AS component, 'Get' AS method;
 
