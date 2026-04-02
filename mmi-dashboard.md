@@ -261,12 +261,12 @@ SET smtp_exec_command =
     'if [ -z "' || $smtp_host || '" ] || [ -z "' || $smtp_port || '" ] || [ -z "' || $smtp_username || '" ] || [ -z "' || $smtp_password || '" ] || [ -z "' || $smtp_from || '" ]; then echo SKIPPED_MISSING_SMTP_CONFIG; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
     'MESSAGE="From: ' || $smtp_from ||
     '\r\nTo: ' || $recipient_email ||
-    '\r\nSubject: New User Access Notification – Medigy Market Intelligence (MMI) Site Entry' ||
+    '\r\nSubject: New User Access Notification – Medigy Market Intelligence (MMI) Application Entry' ||
     '\r\nMIME-Version: 1.0' ||
     '\r\nContent-Type: text/html; charset=UTF-8' ||
     '\r\n\r\n<html><body>' ||
     '<p>Hi Team,</p>' ||
-    '<p>A new user has accessed Medigy Market Intelligence (MMI) site and submitted their details.</p>' ||
+    '<p>A new user has accessed Medigy Market Intelligence (MMI) Application and submitted their details.</p>' ||
     '<p><strong>User Information:</strong></p>' ||
     '<ul>' ||
     '<li><strong>Full Name:</strong> ' || REPLACE($submitted_full_name, '"', '''') || '</li>' ||
@@ -281,7 +281,7 @@ SET smtp_exec_command =
     '<li><strong>IP Address:</strong> ' || REPLACE($submitted_ip_address, '"', '''') || '</li>' ||
     '<li><strong>Device / Browser:</strong> ' || REPLACE($submitted_user_agent, '"', '''') || '</li>' ||
     '</ul>' ||
-    '<p><strong>Notes:</strong><br>This notification is generated automatically when a user enters their details on the MMI site entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' ||
+    '<p><strong>Notes:</strong><br>This notification is generated automatically when a user enters their details on the MMI Application entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' ||
     '<p>Please reach out to the user if required.</p>' ||
     '<p>Regards,<br>System Notification</p>' ||
     '</body></html>' ||
