@@ -97,8 +97,9 @@ SELECT 'shell' AS component,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
-       'Registration' AS title,
-       'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
+       'Welcome! Let’s Get You Started' AS title,
+       'To provide you with a better experience and keep you updated, we’d like to collect a few basic details.
+This will only take a few seconds.' AS description,
        'azure' AS color;
 
 SELECT 'alert' AS component,
@@ -166,6 +167,9 @@ SELECT
     COALESCE(NULLIF($consent_acknowledged, ''), 'yes') AS value,
     'By continuing, you agree that we may use your contact information to communicate updates, product information, and relevant notifications. We respect your privacy and will not share your data with third parties.' AS description,
     true AS required;
+
+SELECT 'html' AS component,
+    '<p style="text-align:center; margin-top:8px;">Your information is safe and will be handled securely.</p>' AS html;
 
 ```
 
@@ -356,8 +360,8 @@ SELECT 'shell' AS component,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
-       'Registration' AS title,
-       'Enter your details to continue to the Medigy Market Intelligence dashboard.' AS description,
+       'Welcome! Let’s Get You Started' AS title,
+       'To provide you with a better experience and keep you updated, we’d like to collect a few basic details. This will only take a few seconds.' AS description,
        'azure' AS color;
 
 SELECT 'alert' AS component,
@@ -425,6 +429,9 @@ SELECT
     COALESCE(NULLIF($consent_acknowledged, ''), 'yes') AS value,
     'By continuing, you agree that we may use your contact information to communicate updates, product information, and relevant notifications. We respect your privacy and will not share your data with third parties.' AS description,
     true AS required;
+
+SELECT 'html' AS component,
+    '<p style="text-align:center; margin-top:8px;">Your information is safe and will be handled securely.</p>' AS html;
 
 ```
 
