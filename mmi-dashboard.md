@@ -112,7 +112,13 @@ SELECT 'alert' AS component,
        'danger' AS color
 WHERE $error = 'invalid_phone';
 
-SELECT 'form' AS component, 'Get' AS method;
+SELECT 'alert' AS component,
+       'Consent Required' AS title,
+       'Please review the consent text and confirm your agreement before continuing.' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_consent';
+
+SELECT 'form' AS component, 'Get' AS method, 'Continue to Application' AS validate;
 
 SELECT
     'first_name' AS name,
@@ -146,13 +152,20 @@ SELECT
     false AS required;
 
 SELECT
-    'message' AS name,
-    'Message' AS label,
-    'textarea' AS type,
-    false AS required;
+    'purpose_of_visit' AS name,
+    'Purpose of Visit' AS label,
+    'select' AS type,
+    COALESCE(NULLIF($purpose_of_visit, ''), '') AS value,
+    '[{"value":"","label":"Select purpose (optional)"},{"value":"Exploring features","label":"Exploring features"},{"value":"Research / Study","label":"Research / Study"},{"value":"Business / Professional use","label":"Business / Professional use"},{"value":"Other","label":"Other"}]' AS options;
 
-SELECT 'text' AS component,
-       'Click Submit to continue.' AS contents;
+SELECT
+    'consent_acknowledged' AS name,
+    'I agree to the consent and compliance statement' AS label,
+    'checkbox' AS type,
+    COALESCE(NULLIF($consent_acknowledged, ''), 'yes') AS value,
+    'By continuing, you agree that we may use your contact information to communicate updates, product information, and relevant notifications. We respect your privacy and will not share your data with third parties.' AS description,
+    true AS required;
+
 ```
 
 ---
@@ -200,7 +213,16 @@ SET submitted_phone_number = TRIM(COALESCE(NULLIF($phone_number, ''), ''));
 SET submitted_phone_number_sanitized = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number, '+', ''), ' ', ''), '-', ''), '(', ''), ')', ''), '.', '');
 SET submitted_phone_digits_stripped = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number_sanitized,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9','');
 SET submitted_organization = COALESCE(NULLIF($organization, ''), '');
-SET submitted_message = COALESCE(NULLIF($message, ''), '');
+SET submitted_purpose_of_visit = COALESCE(NULLIF($purpose_of_visit, ''), '');
+SET submitted_consent_acknowledged = LOWER(TRIM(COALESCE(NULLIF($consent_acknowledged, ''), '')));
+SET submitted_full_name = TRIM($submitted_first_name || ' ' || $submitted_second_name);
+SET submitted_access_timestamp = STRFTIME('%Y-%m-%d %H:%M:%S UTC', 'now');
+SET submitted_ip_address = COALESCE(
+    NULLIF(TRIM($ip_address), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-lc', 'hostname -I 2>/dev/null | awk ''{print $1}'' | tr -d ''[:space:]''')), ''),
+    'N/A'
+);
+SET submitted_user_agent = COALESCE(NULLIF(TRIM($user_agent), ''), 'N/A');
 
 -- Email validation: each condition multiplied — SQLite booleans return 1/0 so product = 1 only when all pass
 SET email_is_valid =
@@ -218,6 +240,8 @@ SET phone_is_valid =
     (LENGTH($submitted_phone_number_sanitized) <= 15) *
     ($submitted_phone_digits_stripped = '');
 
+SET consent_is_valid = ($submitted_consent_acknowledged IN ('yes', 'on', 'true', '1'));
+
 -- Redirect back to registration form with error if email is invalid
 SELECT 'redirect' AS component,
        '/?error=invalid_email' AS link
@@ -227,22 +251,40 @@ SELECT 'redirect' AS component,
        '/?error=invalid_phone' AS link
 WHERE $email_is_valid = 1 AND $phone_is_valid = 0;
 
+SELECT 'redirect' AS component,
+       '/?error=invalid_consent' AS link
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 0;
+
 SET smtp_exec_command =
     'RECIP="' || $recipient_email || '"; ' ||
     'if [ -z "$RECIP" ]; then echo SKIPPED_NO_EMAIL_RECIPIENT; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
     'if [ -z "' || $smtp_host || '" ] || [ -z "' || $smtp_port || '" ] || [ -z "' || $smtp_username || '" ] || [ -z "' || $smtp_password || '" ] || [ -z "' || $smtp_from || '" ]; then echo SKIPPED_MISSING_SMTP_CONFIG; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
     'MESSAGE="From: ' || $smtp_from ||
     '\r\nTo: ' || $recipient_email ||
-    '\r\nSubject: New User Registation to Medigy Market Intelligence.' ||
-    '\r\nContent-Type: text/plain; charset=UTF-8' ||
-    '\r\n\r\nA new user has been registered to Medigy Market Intelligence.' ||
-    '\r\n\r\nRegistered user details:' ||
-    '\r\nFirst Name: ' || REPLACE($submitted_first_name, '"', '''') ||
-    '\r\nSecond Name: ' || REPLACE($submitted_second_name, '"', '''') ||
-    '\r\nEmail Address: ' || REPLACE($submitted_email_address, '"', '''') ||
-    '\r\nPhone Number: ' || REPLACE($submitted_phone_number, '"', '''') ||
-    '\r\nOrganization: ' || REPLACE($submitted_organization, '"', '''') ||
-    '\r\nMessage: ' || REPLACE($submitted_message, '"', '''') ||
+    '\r\nSubject: New User Access Notification – Medigy Market Intelligence (MMI) Site Entry' ||
+    '\r\nMIME-Version: 1.0' ||
+    '\r\nContent-Type: text/html; charset=UTF-8' ||
+    '\r\n\r\n<html><body>' ||
+    '<p>Hi Team,</p>' ||
+    '<p>A new user has accessed Medigy Market Intelligence (MMI) site and submitted their details.</p>' ||
+    '<p><strong>User Information:</strong></p>' ||
+    '<ul>' ||
+    '<li><strong>Full Name:</strong> ' || REPLACE($submitted_full_name, '"', '''') || '</li>' ||
+    '<li><strong>Email Address:</strong> ' || REPLACE($submitted_email_address, '"', '''') || '</li>' ||
+    '<li><strong>Phone Number:</strong> ' || REPLACE($submitted_phone_number, '"', '''') || '</li>' ||
+    '<li><strong>Organization / Company:</strong> ' || REPLACE($submitted_organization, '"', '''') || '</li>' ||
+    '<li><strong>Purpose of Visit:</strong> ' || REPLACE($submitted_purpose_of_visit, '"', '''') || '</li>' ||
+    '</ul>' ||
+    '<p><strong>Access Details:</strong></p>' ||
+    '<ul>' ||
+    '<li><strong>Date &amp; Time:</strong> ' || REPLACE($submitted_access_timestamp, '"', '''') || '</li>' ||
+    '<li><strong>IP Address:</strong> ' || REPLACE($submitted_ip_address, '"', '''') || '</li>' ||
+    '<li><strong>Device / Browser:</strong> ' || REPLACE($submitted_user_agent, '"', '''') || '</li>' ||
+    '</ul>' ||
+    '<p><strong>Notes:</strong><br>This notification is generated automatically when a user enters their details on the MMI site entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' ||
+    '<p>Please reach out to the user if required.</p>' ||
+    '<p>Regards,<br>System Notification</p>' ||
+    '</body></html>' ||
     '\r\n"; ' ||
     'printf "%b" "$MESSAGE" | ' ||
     'curl --silent --show-error --url "smtp://' || $smtp_host || ':' || $smtp_port || '" --ssl-reqd --user "' || $smtp_username || ':' || $smtp_password || '" --mail-from "' || $smtp_from || '" --mail-rcpt "' || $recipient_email || '" --upload-file - 2>&1; ' ||
@@ -278,11 +320,11 @@ SELECT 'cookie' AS component,
        CASE WHEN $email_send_status = 'SUCCESS' THEN 'true' ELSE 'false' END AS value,
        '/' AS path,
        'lax' AS same_site
-WHERE $email_is_valid = 1 AND $phone_is_valid = 1;
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
 SELECT 'redirect' AS component,
        '/mmi/home-overview.sql' AS link
-WHERE $email_is_valid = 1 AND $phone_is_valid = 1;
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 ```
 
 ---
@@ -325,7 +367,13 @@ SELECT 'alert' AS component,
        'danger' AS color
 WHERE $error = 'invalid_phone';
 
-SELECT 'form' AS component, 'Get' AS method;
+SELECT 'alert' AS component,
+       'Consent Required' AS title,
+       'Please review the consent text and confirm your agreement before continuing.' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_consent';
+
+SELECT 'form' AS component, 'Get' AS method, 'Continue to Application' AS validate;
 
 SELECT
     'first_name' AS name,
@@ -359,13 +407,20 @@ SELECT
     false AS required;
 
 SELECT
-    'message' AS name,
-    'Message' AS label,
-    'textarea' AS type,
-    false AS required;
+    'purpose_of_visit' AS name,
+    'Purpose of Visit' AS label,
+    'select' AS type,
+    COALESCE(NULLIF($purpose_of_visit, ''), '') AS value,
+    '[{"value":"","label":"Select purpose (optional)"},{"value":"Exploring features","label":"Exploring features"},{"value":"Research / Study","label":"Research / Study"},{"value":"Business / Professional use","label":"Business / Professional use"},{"value":"Other","label":"Other"}]' AS options;
 
-SELECT 'text' AS component,
-       'Click Submit to continue.' AS contents;
+SELECT
+    'consent_acknowledged' AS name,
+    'I agree to the consent and compliance statement' AS label,
+    'checkbox' AS type,
+    COALESCE(NULLIF($consent_acknowledged, ''), 'yes') AS value,
+    'By continuing, you agree that we may use your contact information to communicate updates, product information, and relevant notifications. We respect your privacy and will not share your data with third parties.' AS description,
+    true AS required;
+
 ```
 
 ---

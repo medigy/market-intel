@@ -86,7 +86,8 @@
       String(searchParams.get('first_name') || '').trim() &&
       String(searchParams.get('second_name') || '').trim() &&
       String(searchParams.get('email_address') || '').trim() &&
-      String(searchParams.get('phone_number') || '').trim()
+      String(searchParams.get('phone_number') || '').trim() &&
+      String(searchParams.get('consent_acknowledged') || '').trim()
     );
   };
 
@@ -94,14 +95,16 @@
     const payload = {
       firstName: String(searchParams.get('first_name') || '').trim(),
       secondName: String(searchParams.get('second_name') || '').trim(),
+      fullName: `${String(searchParams.get('first_name') || '').trim()} ${String(searchParams.get('second_name') || '').trim()}`.trim(),
       emailAddress: String(searchParams.get('email_address') || '').trim(),
       phoneNumber: normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '+1').trim()),
       organization: String(searchParams.get('organization') || '').trim(),
-      message: String(searchParams.get('message') || '').trim(),
+      purposeOfVisit: String(searchParams.get('purpose_of_visit') || '').trim(),
+      consentAcknowledged: String(searchParams.get('consent_acknowledged') || '').trim().toLowerCase(),
       registeredAt: new Date().toISOString()
     };
 
-    if (!payload.firstName || !payload.secondName || !payload.emailAddress || !payload.phoneNumber) {
+    if (!payload.firstName || !payload.secondName || !payload.emailAddress || !payload.phoneNumber || !payload.consentAcknowledged) {
       return false;
     }
 
@@ -115,14 +118,20 @@
       return false;
     }
 
+    if (!['yes', 'on', 'true', '1'].includes(payload.consentAcknowledged)) {
+      window.location.replace(`${REGISTRATION_PATH}?error=invalid_consent`);
+      return false;
+    }
+
     const cookieValue = encodeURIComponent(JSON.stringify(payload));
     storeRegistration(cookieValue);
     return true;
   };
 
   if (isRegistrationPage && hasSubmittedRegistrationParams() && persistSubmittedRegistration()) {
+    const browserUserAgent = encodeURIComponent(navigator.userAgent || 'N/A');
     window.location.replace(
-      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&phone_number=${encodeURIComponent(normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '+1').trim()))}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&message=${encodeURIComponent(String(searchParams.get('message') || '').trim())}`
+      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&phone_number=${encodeURIComponent(normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '+1').trim()))}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&purpose_of_visit=${encodeURIComponent(String(searchParams.get('purpose_of_visit') || '').trim())}&consent_acknowledged=${encodeURIComponent(String(searchParams.get('consent_acknowledged') || '').trim().toLowerCase())}&user_agent=${browserUserAgent}&ip_address=${encodeURIComponent(String(searchParams.get('ip_address') || '').trim())}`
     );
     return;
   }
