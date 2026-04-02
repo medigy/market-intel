@@ -44,6 +44,17 @@
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  const normalizePhoneNumberWithCountryCode = (phoneNumber) => {
+    const trimmedPhoneNumber = String(phoneNumber || '').trim();
+    if (!trimmedPhoneNumber.startsWith('+')) {
+      return trimmedPhoneNumber.replace(/\D/g, '');
+    }
+    return `+${trimmedPhoneNumber.slice(1).replace(/\D/g, '')}`;
+  };
+
+  const isValidPhoneNumberWithCountryCode = (phoneNumber) =>
+    /^\+\d{6,15}$/.test(phoneNumber);
+
   const hasRegistrationCookie = () => {
     const rawValue = getStoredRegistration();
     if (!rawValue) {
@@ -74,7 +85,8 @@
     return Boolean(
       String(searchParams.get('first_name') || '').trim() &&
       String(searchParams.get('second_name') || '').trim() &&
-      String(searchParams.get('email_address') || '').trim()
+      String(searchParams.get('email_address') || '').trim() &&
+      String(searchParams.get('phone_number') || '').trim()
     );
   };
 
@@ -83,17 +95,23 @@
       firstName: String(searchParams.get('first_name') || '').trim(),
       secondName: String(searchParams.get('second_name') || '').trim(),
       emailAddress: String(searchParams.get('email_address') || '').trim(),
+      phoneNumber: normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '+1').trim()),
       organization: String(searchParams.get('organization') || '').trim(),
       message: String(searchParams.get('message') || '').trim(),
       registeredAt: new Date().toISOString()
     };
 
-    if (!payload.firstName || !payload.secondName || !payload.emailAddress) {
+    if (!payload.firstName || !payload.secondName || !payload.emailAddress || !payload.phoneNumber) {
       return false;
     }
 
     if (!isValidEmail(payload.emailAddress)) {
       window.location.replace(`${REGISTRATION_PATH}?error=invalid_email`);
+      return false;
+    }
+
+    if (!isValidPhoneNumberWithCountryCode(payload.phoneNumber)) {
+      window.location.replace(`${REGISTRATION_PATH}?error=invalid_phone`);
       return false;
     }
 
@@ -104,7 +122,7 @@
 
   if (isRegistrationPage && hasSubmittedRegistrationParams() && persistSubmittedRegistration()) {
     window.location.replace(
-      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&message=${encodeURIComponent(String(searchParams.get('message') || '').trim())}`
+      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&phone_number=${encodeURIComponent(normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '+1').trim()))}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&message=${encodeURIComponent(String(searchParams.get('message') || '').trim())}`
     );
     return;
   }

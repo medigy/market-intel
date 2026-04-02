@@ -106,6 +106,12 @@ SELECT 'alert' AS component,
        'danger' AS color
 WHERE $error = 'invalid_email';
 
+SELECT 'alert' AS component,
+       'Invalid Phone Number' AS title,
+    'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_phone';
+
 SELECT 'form' AS component, 'Get' AS method;
 
 SELECT
@@ -124,6 +130,13 @@ SELECT
     'email_address' AS name,
     'Email Address' AS label,
     'email' AS type,
+    true AS required;
+
+SELECT
+    'phone_number' AS name,
+    'Phone Number (with country code)' AS label,
+    'tel' AS type,
+    COALESCE(NULLIF($phone_number, ''), '+1') AS value,
     true AS required;
 
 SELECT
@@ -183,28 +196,36 @@ SET recipient_email = COALESCE(
 SET submitted_first_name = COALESCE(NULLIF($first_name, ''), '');
 SET submitted_second_name = COALESCE(NULLIF($second_name, ''), '');
 SET submitted_email_address = COALESCE(NULLIF($email_address, ''), '');
+SET submitted_phone_number = TRIM(COALESCE(NULLIF($phone_number, ''), ''));
+SET submitted_phone_number_sanitized = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number, '+', ''), ' ', ''), '-', ''), '(', ''), ')', ''), '.', '');
+SET submitted_phone_digits_stripped = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number_sanitized,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9','');
 SET submitted_organization = COALESCE(NULLIF($organization, ''), '');
 SET submitted_message = COALESCE(NULLIF($message, ''), '');
 
--- Validate email format: must have exactly one @, chars before @, and a dot in the domain
-SET email_is_valid = CASE
-    -- Must not be empty
-    WHEN TRIM(COALESCE($submitted_email_address, '')) = '' THEN 0
-    -- Must contain exactly one '@'
-    WHEN LENGTH($submitted_email_address) - LENGTH(REPLACE($submitted_email_address, '@', '')) != 1 THEN 0
-    -- '@' must not be the first character (local part must exist)
-    WHEN INSTR($submitted_email_address, '@') <= 1 THEN 0
-    -- Domain part (after '@') must contain at least one '.'
-    WHEN INSTR(SUBSTR($submitted_email_address, INSTR($submitted_email_address, '@') + 1), '.') = 0 THEN 0
-    -- Must not end with a '.'
-    WHEN SUBSTR($submitted_email_address, LENGTH($submitted_email_address), 1) = '.' THEN 0
-    ELSE 1
-END;
+-- Email validation: each condition multiplied — SQLite booleans return 1/0 so product = 1 only when all pass
+SET email_is_valid =
+    (TRIM(COALESCE($submitted_email_address, '')) != '') *
+    (LENGTH($submitted_email_address) - LENGTH(REPLACE($submitted_email_address, '@', '')) = 1) *
+    (INSTR($submitted_email_address, '@') > 1) *
+    (INSTR(SUBSTR($submitted_email_address, INSTR($submitted_email_address, '@') + 1), '.') > 0) *
+    (SUBSTR($submitted_email_address, LENGTH($submitted_email_address), 1) != '.');
+
+-- Phone validation: must start with +, digits-only body, length 6-15
+SET phone_is_valid =
+    (TRIM(COALESCE($submitted_phone_number, '')) != '') *
+    (SUBSTR($submitted_phone_number, 1, 1) = '+') *
+    (LENGTH($submitted_phone_number_sanitized) >= 6) *
+    (LENGTH($submitted_phone_number_sanitized) <= 15) *
+    ($submitted_phone_digits_stripped = '');
 
 -- Redirect back to registration form with error if email is invalid
 SELECT 'redirect' AS component,
        '/?error=invalid_email' AS link
 WHERE $email_is_valid = 0;
+
+SELECT 'redirect' AS component,
+       '/?error=invalid_phone' AS link
+WHERE $email_is_valid = 1 AND $phone_is_valid = 0;
 
 SET smtp_exec_command =
     'RECIP="' || $recipient_email || '"; ' ||
@@ -219,6 +240,7 @@ SET smtp_exec_command =
     '\r\nFirst Name: ' || REPLACE($submitted_first_name, '"', '''') ||
     '\r\nSecond Name: ' || REPLACE($submitted_second_name, '"', '''') ||
     '\r\nEmail Address: ' || REPLACE($submitted_email_address, '"', '''') ||
+    '\r\nPhone Number: ' || REPLACE($submitted_phone_number, '"', '''') ||
     '\r\nOrganization: ' || REPLACE($submitted_organization, '"', '''') ||
     '\r\nMessage: ' || REPLACE($submitted_message, '"', '''') ||
     '\r\n"; ' ||
@@ -256,11 +278,11 @@ SELECT 'cookie' AS component,
        CASE WHEN $email_send_status = 'SUCCESS' THEN 'true' ELSE 'false' END AS value,
        '/' AS path,
        'lax' AS same_site
-WHERE $email_is_valid = 1;
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1;
 
 SELECT 'redirect' AS component,
        '/mmi/home-overview.sql' AS link
-WHERE $email_is_valid = 1;
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1;
 ```
 
 ---
@@ -297,6 +319,12 @@ SELECT 'alert' AS component,
        'danger' AS color
 WHERE $error = 'invalid_email';
 
+SELECT 'alert' AS component,
+       'Invalid Phone Number' AS title,
+    'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
+       'danger' AS color
+WHERE $error = 'invalid_phone';
+
 SELECT 'form' AS component, 'Get' AS method;
 
 SELECT
@@ -315,6 +343,13 @@ SELECT
     'email_address' AS name,
     'Email Address' AS label,
     'email' AS type,
+    true AS required;
+
+SELECT
+    'phone_number' AS name,
+    'Phone Number (with country code)' AS label,
+    'tel' AS type,
+    COALESCE(NULLIF($phone_number, ''), '+1') AS value,
     true AS required;
 
 SELECT
