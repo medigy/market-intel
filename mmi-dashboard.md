@@ -328,6 +328,10 @@ SELECT 'redirect' AS component,
 WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 ```
 
+```contribute sqlpage_files --base .
+./footer-links.js .
+```
+
 ---
 
 ## Home Page
