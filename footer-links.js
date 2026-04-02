@@ -1,5 +1,7 @@
 (() => {
   const COOKIE_NAME = 'medigy_mmi_registration_profile_v2';
+  const SKIP_FOR_NOW_PARAM = 'skip_for_now';
+  const SKIP_SESSION_KEY = 'mmi_registration_skip_once';
   const REGISTRATION_PATH = '/';
   const REGISTRATION_INDEX_PATH = '/index.sql';
   const REGISTRATION_ALIAS_PATH = '/registration.sql';
@@ -55,6 +57,22 @@
   const isValidPhoneNumberWithCountryCode = (phoneNumber) =>
     /^\+\d{6,15}$/.test(phoneNumber);
 
+  const hasSkippedRegistrationForSession = () => {
+    try {
+      return window.sessionStorage.getItem(SKIP_SESSION_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  };
+
+  const markSkippedRegistrationForSession = () => {
+    try {
+      window.sessionStorage.setItem(SKIP_SESSION_KEY, 'true');
+    } catch {
+      // Ignore sessionStorage errors and fallback to standard registration flow.
+    }
+  };
+
   const hasRegistrationCookie = () => {
     const rawValue = getStoredRegistration();
     if (!rawValue) {
@@ -90,6 +108,9 @@
       String(searchParams.get('consent_acknowledged') || '').trim()
     );
   };
+
+  const hasSkipForNowParam =
+    String(searchParams.get(SKIP_FOR_NOW_PARAM) || '').trim() === '1';
 
   const persistSubmittedRegistration = () => {
     const payload = {
@@ -128,6 +149,42 @@
     return true;
   };
 
+  const addInlineSkipButtonNextToContinue = () => {
+    const formElement = document.querySelector('form');
+    if (!formElement) {
+      return;
+    }
+
+    const submitButton = formElement.querySelector('button[type="submit"], input[type="submit"]');
+    if (!submitButton) {
+      return;
+    }
+
+    const submitContainer = submitButton.parentElement;
+    if (!submitContainer || submitContainer.querySelector('[data-mmi-skip-inline="true"]')) {
+      return;
+    }
+
+    const inlineSkipLink = document.createElement('a');
+    inlineSkipLink.textContent = 'Skip for Now';
+    inlineSkipLink.href = '/?skip_for_now=1';
+    inlineSkipLink.setAttribute('data-mmi-skip-inline', 'true');
+    inlineSkipLink.className = 'btn btn-outline-secondary';
+
+    const tabSpace = document.createTextNode('\u00A0\u00A0\u00A0\u00A0');
+
+    submitContainer.appendChild(tabSpace);
+    submitContainer.appendChild(inlineSkipLink);
+  };
+
+  const runOnReady = (handler) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', handler, { once: true });
+      return;
+    }
+    handler();
+  };
+
   if (isRegistrationPage && hasSubmittedRegistrationParams() && persistSubmittedRegistration()) {
     const browserUserAgent = encodeURIComponent(navigator.userAgent || 'N/A');
     window.location.replace(
@@ -136,14 +193,21 @@
     return;
   }
 
-  const hasCookie = hasRegistrationCookie();
+  if (isRegistrationPage && hasSkipForNowParam) {
+    markSkippedRegistrationForSession();
+    window.location.replace(HOME_PAGE_PATH);
+    return;
+  }
 
-  if (!isRegistrationPage && !hasCookie) {
+  const hasCookie = hasRegistrationCookie();
+  const hasSkippedForSession = hasSkippedRegistrationForSession();
+
+  if (!isRegistrationPage && !hasCookie && !hasSkippedForSession) {
     window.location.replace(REGISTRATION_PATH);
     return;
   }
 
-  if (isRegistrationPage && hasCookie) {
+  if (isRegistrationPage && (hasCookie || hasSkippedForSession)) {
     window.location.replace(HOME_PAGE_PATH);
     return;
   }
@@ -151,4 +215,6 @@
   if (!isRegistrationPage) {
     return;
   }
+
+  runOnReady(addInlineSkipButtonNextToContinue);
 })();
