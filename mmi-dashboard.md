@@ -93,7 +93,7 @@ SELECT 'shell' AS component,
        'narrow' AS layout,
        true AS fixed_top_menu,
        './' AS link,
-       '/footer-links.js' AS javascript,
+    './footer-links.js' AS javascript,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
@@ -145,7 +145,7 @@ SELECT
     'Phone Number (with country code)' AS label,
     'tel' AS type,
     COALESCE(NULLIF($phone_number, ''), '+1') AS value,
-    true AS required;
+    false AS required;
 
 SELECT
     'organization' AS name,
@@ -183,32 +183,32 @@ SELECT 'html' AS component,
 SET registration_profile_cookie = sqlpage.cookie('medigy_mmi_registration_profile_v2');
 SET smtp_host = COALESCE(
     NULLIF(TRIM(sqlpage.environment_variable('EMAIL_HOST')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_HOST=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_HOST=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
     ''
 );
 SET smtp_port = COALESCE(
     NULLIF(TRIM(sqlpage.environment_variable('EMAIL_PORT')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_PORT=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_PORT=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
     ''
 );
 SET smtp_username = COALESCE(
     NULLIF(TRIM(sqlpage.environment_variable('EMAIL_USERNAME')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_USERNAME=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_USERNAME=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
     ''
 );
 SET smtp_password = COALESCE(
     NULLIF(TRIM(sqlpage.environment_variable('EMAIL_APP_PASSWORD')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_APP_PASSWORD=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_APP_PASSWORD=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
     ''
 );
 SET smtp_from = COALESCE(
     NULLIF(TRIM(sqlpage.environment_variable('EMAIL_FROM')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^EMAIL_FROM=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_FROM=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
     ''
 );
 SET recipient_email = COALESCE(
     NULLIF(TRIM(sqlpage.environment_variable('RECEIVER_EMAIL')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-lc', '[ -f .env ] && grep -m1 "^RECEIVER_EMAIL=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^RECEIVER_EMAIL=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
     ''
 );
 SET submitted_first_name = COALESCE(NULLIF($first_name, ''), '');
@@ -224,7 +224,7 @@ SET submitted_full_name = TRIM($submitted_first_name || ' ' || $submitted_second
 SET submitted_access_timestamp = STRFTIME('%Y-%m-%d %H:%M:%S UTC', 'now');
 SET submitted_ip_address = COALESCE(
     NULLIF(TRIM($ip_address), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-lc', 'hostname -I 2>/dev/null | awk ''{print $1}'' | tr -d ''[:space:]''')), ''),
+    NULLIF(TRIM(sqlpage.exec('sh', '-c', 'hostname -I 2>/dev/null | awk ''{print $1}'' | tr -d ''[:space:]''')), ''),
     'N/A'
 );
 SET submitted_user_agent = COALESCE(NULLIF(TRIM($user_agent), ''), 'N/A');
@@ -237,13 +237,15 @@ SET email_is_valid =
     (INSTR(SUBSTR($submitted_email_address, INSTR($submitted_email_address, '@') + 1), '.') > 0) *
     (SUBSTR($submitted_email_address, LENGTH($submitted_email_address), 1) != '.');
 
--- Phone validation: must start with +, digits-only body, length 6-15
-SET phone_is_valid =
-    (TRIM(COALESCE($submitted_phone_number, '')) != '') *
-    (SUBSTR($submitted_phone_number, 1, 1) = '+') *
-    (LENGTH($submitted_phone_number_sanitized) >= 6) *
-    (LENGTH($submitted_phone_number_sanitized) <= 15) *
-    ($submitted_phone_digits_stripped = '');
+-- Phone validation: optional — passes when empty; if provided must start with +, digits-only body, length 6-15
+SET phone_is_valid = CASE
+    WHEN TRIM(COALESCE($submitted_phone_number, '')) = '' THEN 1
+    ELSE
+        (SUBSTR($submitted_phone_number, 1, 1) = '+') *
+        (LENGTH($submitted_phone_number_sanitized) >= 6) *
+        (LENGTH($submitted_phone_number_sanitized) <= 15) *
+        ($submitted_phone_digits_stripped = '')
+    END;
 
 SET consent_is_valid = ($submitted_consent_acknowledged IN ('yes', 'on', 'true', '1'));
 
@@ -297,7 +299,7 @@ SET smtp_exec_command =
 
 SET smtp_exec_response = sqlpage.exec(
     'sh',
-    '-lc',
+    '-c',
     $smtp_exec_command
 );
 
@@ -316,7 +318,7 @@ SET email_log_line =
 
 SET email_log_append_status = sqlpage.exec(
     'sh',
-    '-lc',
+    '-c',
     'echo "' || $email_log_line || '" >> ' || sqlpage.current_working_directory() || '/sqlpage/email_send_status.txt; echo LOG_APPEND_OK'
 );
 
@@ -356,7 +358,7 @@ SELECT 'shell' AS component,
        'narrow' AS layout,
        true AS fixed_top_menu,
        './' AS link,
-       '/footer-links.js' AS javascript,
+    './footer-links.js' AS javascript,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
@@ -407,7 +409,7 @@ SELECT
     'Phone Number (with country code)' AS label,
     'tel' AS type,
     COALESCE(NULLIF($phone_number, ''), '+1') AS value,
-    true AS required;
+    false AS required;
 
 SELECT
     'organization' AS name,

@@ -2,11 +2,61 @@
   const COOKIE_NAME = 'medigy_mmi_registration_profile_v2';
   const SKIP_FOR_NOW_PARAM = 'skip_for_now';
   const SKIP_SESSION_KEY = 'mmi_registration_skip_once';
-  const REGISTRATION_PATH = '/';
-  const REGISTRATION_INDEX_PATH = '/index.sql';
-  const REGISTRATION_ALIAS_PATH = '/registration.sql';
-  const REGISTRATION_SUBMIT_PATH = '/registration-submit.sql';
-  const HOME_PAGE_PATH = '/mmi/home-overview.sql';
+  const ROUTE_SUFFIX_REGISTRATION = '/';
+  const ROUTE_SUFFIX_REGISTRATION_INDEX = '/index.sql';
+  const ROUTE_SUFFIX_REGISTRATION_ALIAS = '/registration.sql';
+  const ROUTE_SUFFIX_REGISTRATION_SUBMIT = '/registration-submit.sql';
+  const ROUTE_SUFFIX_HOME = '/mmi/home-overview.sql';
+
+  const normalizePath = (pathValue) => {
+    const asString = String(pathValue || '').trim();
+    if (!asString) {
+      return '/';
+    }
+    const trimmed = asString.length > 1 ? asString.replace(/\/+$/, '') : asString;
+    return trimmed || '/';
+  };
+
+  const resolveBasePath = (pathname) => {
+    const normalized = normalizePath(pathname);
+
+    if (normalized.includes('/mmi/')) {
+      return normalized.split('/mmi/')[0] || '';
+    }
+
+    const knownRouteSuffixes = [
+      ROUTE_SUFFIX_REGISTRATION_INDEX,
+      ROUTE_SUFFIX_REGISTRATION_ALIAS,
+      ROUTE_SUFFIX_REGISTRATION_SUBMIT
+    ];
+
+    for (const routeSuffix of knownRouteSuffixes) {
+      if (normalized.endsWith(routeSuffix)) {
+        return normalized.slice(0, -routeSuffix.length);
+      }
+    }
+
+    if (normalized === '/') {
+      return '';
+    }
+
+    return normalized;
+  };
+
+  const BASE_PATH = resolveBasePath(window.location.pathname || '/');
+
+  const buildPath = (routeSuffix) => {
+    if (routeSuffix === ROUTE_SUFFIX_REGISTRATION) {
+      return BASE_PATH ? `${BASE_PATH}/` : '/';
+    }
+    return `${BASE_PATH}${routeSuffix}`;
+  };
+
+  const REGISTRATION_PATH = buildPath(ROUTE_SUFFIX_REGISTRATION);
+  const REGISTRATION_INDEX_PATH = buildPath(ROUTE_SUFFIX_REGISTRATION_INDEX);
+  const REGISTRATION_ALIAS_PATH = buildPath(ROUTE_SUFFIX_REGISTRATION_ALIAS);
+  const REGISTRATION_SUBMIT_PATH = buildPath(ROUTE_SUFFIX_REGISTRATION_SUBMIT);
+  const HOME_PAGE_PATH = buildPath(ROUTE_SUFFIX_HOME);
 
   const getCookie = (name) => {
     const key = `${name}=`;
@@ -92,19 +142,17 @@
     }
   };
 
-  const rawPath = window.location.pathname || '/';
-  const normalizedPath = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
+  const normalizedPath = normalizePath(window.location.pathname || '/');
   const searchParams = new URLSearchParams(window.location.search || '');
   const isRegistrationPage =
-    normalizedPath === REGISTRATION_PATH ||
-    normalizedPath === REGISTRATION_INDEX_PATH ||
-    normalizedPath === REGISTRATION_ALIAS_PATH;
+    normalizedPath === normalizePath(REGISTRATION_PATH) ||
+    normalizedPath === normalizePath(REGISTRATION_INDEX_PATH) ||
+    normalizedPath === normalizePath(REGISTRATION_ALIAS_PATH);
   const hasSubmittedRegistrationParams = () => {
     return Boolean(
       String(searchParams.get('first_name') || '').trim() &&
       String(searchParams.get('second_name') || '').trim() &&
       String(searchParams.get('email_address') || '').trim() &&
-      String(searchParams.get('phone_number') || '').trim() &&
       String(searchParams.get('consent_acknowledged') || '').trim()
     );
   };
@@ -118,14 +166,16 @@
       secondName: String(searchParams.get('second_name') || '').trim(),
       fullName: `${String(searchParams.get('first_name') || '').trim()} ${String(searchParams.get('second_name') || '').trim()}`.trim(),
       emailAddress: String(searchParams.get('email_address') || '').trim(),
-      phoneNumber: normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '+1').trim()),
+      phoneNumber: String(searchParams.get('phone_number') || '').trim()
+        ? normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '').trim())
+        : '',
       organization: String(searchParams.get('organization') || '').trim(),
       purposeOfVisit: String(searchParams.get('purpose_of_visit') || '').trim(),
       consentAcknowledged: String(searchParams.get('consent_acknowledged') || '').trim().toLowerCase(),
       registeredAt: new Date().toISOString()
     };
 
-    if (!payload.firstName || !payload.secondName || !payload.emailAddress || !payload.phoneNumber || !payload.consentAcknowledged) {
+    if (!payload.firstName || !payload.secondName || !payload.emailAddress || !payload.consentAcknowledged) {
       return false;
     }
 
@@ -134,7 +184,7 @@
       return false;
     }
 
-    if (!isValidPhoneNumberWithCountryCode(payload.phoneNumber)) {
+    if (payload.phoneNumber && !isValidPhoneNumberWithCountryCode(payload.phoneNumber)) {
       window.location.replace(`${REGISTRATION_PATH}?error=invalid_phone`);
       return false;
     }
@@ -167,7 +217,7 @@
 
     const inlineSkipLink = document.createElement('a');
     inlineSkipLink.textContent = 'Skip for Now';
-    inlineSkipLink.href = '/?skip_for_now=1';
+    inlineSkipLink.href = `${REGISTRATION_PATH}?skip_for_now=1`;
     inlineSkipLink.setAttribute('data-mmi-skip-inline', 'true');
     inlineSkipLink.className = 'btn btn-outline-secondary';
 
@@ -187,8 +237,10 @@
 
   if (isRegistrationPage && hasSubmittedRegistrationParams() && persistSubmittedRegistration()) {
     const browserUserAgent = encodeURIComponent(navigator.userAgent || 'N/A');
+    const rawPhone = String(searchParams.get('phone_number') || '').trim();
+    const normalizedPhone = rawPhone ? normalizePhoneNumberWithCountryCode(rawPhone) : '';
     window.location.replace(
-      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&phone_number=${encodeURIComponent(normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '+1').trim()))}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&purpose_of_visit=${encodeURIComponent(String(searchParams.get('purpose_of_visit') || '').trim())}&consent_acknowledged=${encodeURIComponent(String(searchParams.get('consent_acknowledged') || '').trim().toLowerCase())}&user_agent=${browserUserAgent}&ip_address=${encodeURIComponent(String(searchParams.get('ip_address') || '').trim())}`
+      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&phone_number=${encodeURIComponent(normalizedPhone)}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&purpose_of_visit=${encodeURIComponent(String(searchParams.get('purpose_of_visit') || '').trim())}&consent_acknowledged=${encodeURIComponent(String(searchParams.get('consent_acknowledged') || '').trim().toLowerCase())}&user_agent=${browserUserAgent}&ip_address=${encodeURIComponent(String(searchParams.get('ip_address') || '').trim())}`
     );
     return;
   }
