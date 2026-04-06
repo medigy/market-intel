@@ -19,19 +19,11 @@ This application surfaces the Medigy CMS analytics pipeline built from
 
 ```bash prepare-db-deploy-server --descr "Ingest Medigy raw files, build normalized analytics tables, and package SQLPage UI."
 #!/bin/bash
-set -u
-
-# --- SOURCING THE ENVIRONMENT ---
-# Since this task runs from the platform root where the .md and .env live:
-if [ -f ".env" ]; then
-    set -a            # Export all variables in .env to the environment
-    source ".env"
-    set +a
-    echo "DEBUG: Environment sourced from $(pwd)/.env"
-else
-    echo "WARN: .env file not found in $(pwd). Ensure it exists at the platform root."
-fi
 set -euo pipefail
+
+# --- ENVIRONMENT ---
+# All required variables must be sourced/exported in the shell before running.
+# e.g.: source .env   (or export them via your CI/CD system / shell profile)
 
 # Start from a clean database to avoid previously ingested malformed resources.
 rm -f resource-surveillance.sqlite.*   
@@ -144,7 +136,7 @@ SELECT
     'phone_number' AS name,
     'Phone Number (with country code)' AS label,
     'tel' AS type,
-    COALESCE(NULLIF($phone_number, ''), '+1') AS value,
+    COALESCE(NULLIF($phone_number, ''), '') AS value,
     false AS required;
 
 SELECT
@@ -181,40 +173,16 @@ SELECT 'html' AS component,
 -- @route.description "Sends a welcome email after registration submit using SQLPage exec + SMTP, then redirects"
 
 SET registration_profile_cookie = sqlpage.cookie('medigy_mmi_registration_profile_v2');
-SET smtp_host = COALESCE(
-    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_HOST')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_HOST=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
-    ''
-);
-SET smtp_port = COALESCE(
-    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_PORT')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_PORT=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
-    ''
-);
-SET smtp_username = COALESCE(
-    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_USERNAME')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_USERNAME=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
-    ''
-);
-SET smtp_password = COALESCE(
-    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_APP_PASSWORD')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_APP_PASSWORD=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
-    ''
-);
-SET smtp_from = COALESCE(
-    NULLIF(TRIM(sqlpage.environment_variable('EMAIL_FROM')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^EMAIL_FROM=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
-    ''
-);
-SET recipient_email = COALESCE(
-    NULLIF(TRIM(sqlpage.environment_variable('RECEIVER_EMAIL')), ''),
-    NULLIF(TRIM(sqlpage.exec('sh', '-c', '[ -f .env ] && grep -m1 "^RECEIVER_EMAIL=" .env | cut -d= -f2- | tr -d "\r\n" || true')), ''),
-    ''
-);
+SET smtp_host = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_HOST')), ''), '');
+SET smtp_port = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_PORT')), ''), '');
+SET smtp_username = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_USERNAME')), ''), '');
+SET smtp_password = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_APP_PASSWORD')), ''), '');
+SET smtp_from = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_FROM')), ''), '');
+SET recipient_email = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('RECEIVER_EMAIL')), ''), '');
 SET submitted_first_name = COALESCE(NULLIF($first_name, ''), '');
 SET submitted_second_name = COALESCE(NULLIF($second_name, ''), '');
 SET submitted_email_address = COALESCE(NULLIF($email_address, ''), '');
-SET submitted_phone_number = TRIM(COALESCE(NULLIF($phone_number, ''), ''));
+SET submitted_phone_number = TRIM(COALESCE(NULLIF(NULLIF(TRIM($phone_number), ''), '+1'), ''));
 SET submitted_phone_number_sanitized = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number, '+', ''), ' ', ''), '-', ''), '(', ''), ')', ''), '.', '');
 SET submitted_phone_digits_stripped = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number_sanitized,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9','');
 SET submitted_organization = COALESCE(NULLIF($organization, ''), '');
@@ -293,9 +261,11 @@ SET smtp_exec_command =
     '<p>Regards,<br>System Notification</p>' ||
     '</body></html>' ||
     '\r\n"; ' ||
-    'printf "%b" "$MESSAGE" | ' ||
-    'curl --silent --show-error --url "smtp://' || $smtp_host || ':' || $smtp_port || '" --ssl-reqd --user "' || $smtp_username || ':' || $smtp_password || '" --mail-from "' || $smtp_from || '" --mail-rcpt "' || $recipient_email || '" --upload-file - 2>&1; ' ||
-    'CURL_EXIT_CODE=$?; echo CURL_EXIT_CODE:$CURL_EXIT_CODE; exit 0';
+    'printf "%b" "$MESSAGE" > /tmp/smtp_msg_$$.txt; ' ||
+    'CURLOUT=$(curl --no-progress-meter --verbose --url "smtp://' || $smtp_host || ':' || $smtp_port || '" --ssl-reqd --user "' || $smtp_username || ':' || $smtp_password || '" --mail-from "' || $smtp_from || '" --mail-rcpt "' || $recipient_email || '" --upload-file /tmp/smtp_msg_$$.txt 2>&1); ' ||
+    'CURL_EXIT_CODE=$?; rm -f /tmp/smtp_msg_$$.txt; ' ||
+    'echo "$CURLOUT" | grep -E "^[<*] " | tr -d "\r"; ' ||
+    'echo CURL_EXIT_CODE:$CURL_EXIT_CODE; exit 0';
 
 SET smtp_exec_response = sqlpage.exec(
     'sh',
@@ -306,20 +276,28 @@ SET smtp_exec_response = sqlpage.exec(
 SET email_send_status = CASE
     WHEN INSTR(COALESCE($smtp_exec_response, ''), 'SKIPPED_NO_EMAIL_RECIPIENT') > 0 THEN 'SKIPPED_NO_EMAIL'
     WHEN INSTR(COALESCE($smtp_exec_response, ''), 'SKIPPED_MISSING_SMTP_CONFIG') > 0 THEN 'SKIPPED_MISSING_SMTP_CONFIG'
-    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'CURL_EXIT_CODE:0') > 0 THEN 'SUCCESS'
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'CURL_EXIT_CODE:0') > 0
+         AND INSTR(COALESCE($smtp_exec_response, ''), '< 250') > 0 THEN 'SUCCESS'
+    WHEN INSTR(COALESCE($smtp_exec_response, ''), 'CURL_EXIT_CODE:0') > 0 THEN 'SENT_UNCONFIRMED'
     ELSE 'FAILED'
 END;
 
 SET email_log_line =
-    'timestamp=' || STRFTIME('%Y-%m-%dT%H:%M:%SZ', 'now') ||
-    '&status=' || sqlpage.url_encode($email_send_status) ||
-    '&email=' || sqlpage.url_encode($recipient_email) ||
-    '&response=' || sqlpage.url_encode(COALESCE($smtp_exec_response, ''));
+    '--- ' || STRFTIME('%Y-%m-%dT%H:%M:%SZ', 'now') || ' ---' ||
+    '\nstatus         : ' || $email_send_status ||
+    '\nto             : ' || $recipient_email ||
+    '\nfrom           : ' || $smtp_from ||
+    '\nsmtp_host      : ' || $smtp_host ||
+    '\nsmtp_port      : ' || $smtp_port ||
+    '\nsmtp_username  : ' || $smtp_username ||
+    '\ncookie         : isVerified=' || CASE WHEN $email_send_status = 'SUCCESS' THEN 'true' ELSE 'false' END || '; path=/; samesite=lax' ||
+    '\nprofile_cookie : ' || COALESCE(REPLACE($registration_profile_cookie, '"', ''''), 'not-set') ||
+    '\nsmtp_log       : ' || REPLACE(REPLACE(COALESCE($smtp_exec_response, 'none'), CHAR(13), ''), CHAR(10), ' | ');
 
 SET email_log_append_status = sqlpage.exec(
     'sh',
     '-c',
-    'echo "' || $email_log_line || '" >> ' || sqlpage.current_working_directory() || '/sqlpage/email_send_status.txt; echo LOG_APPEND_OK'
+    'printf "%b\n\n" "' || $email_log_line || '" >> ' || sqlpage.current_working_directory() || '/sqlpage/email_send_status.txt; echo LOG_APPEND_OK'
 );
 
 SELECT 'cookie' AS component,
@@ -408,7 +386,7 @@ SELECT
     'phone_number' AS name,
     'Phone Number (with country code)' AS label,
     'tel' AS type,
-    COALESCE(NULLIF($phone_number, ''), '+1') AS value,
+    COALESCE(NULLIF($phone_number, ''), '') AS value,
     false AS required;
 
 SELECT
