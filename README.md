@@ -1,14 +1,16 @@
-# Medigy Market Intelligence (MMI)
+# Medigy Market Intelligence (MMI) — Unified v2
 
-A CMS Medigy Part B analytics pipeline built with `surveilr` and `spry` that transforms raw public datasets into a navigable SQLPage business intelligence application. Designed to identify high-opportunity disease-specialty clusters through evidence-based commercial validation.
+A CMS Medicare analytics pipeline built with `surveilr` and `spry` that transforms raw public datasets into a navigable SQLPage business intelligence application. Designed to identify high-opportunity disease-specialty clusters through evidence-based commercial validation.
 
-> **Note:** Source code is on the main branch. `cms_provider.csv` is used by the pipeline but excluded from the repository due to file size.
+The v2 pipeline introduces a **unified extensible ELT architecture**: adding a new disease condition requires inserting exactly one row into `dim_condition_registry`. All downstream dimensions, facts, analytics views, and every page of the UI update automatically — no SQL or page logic changes needed.
+
+> **Note:** Source code is on the `main` branch. `cms_provider.csv` is used by the pipeline but excluded from the repository due to file size.
 
 ---
 
 ## Table of Contents
 
-- [Medigy Market Intelligence (MMI)](#medigy-market-intelligence-mmi)
+- [Medigy Market Intelligence (MMI) — Unified v2](#medigy-market-intelligence-mmi--unified-v2)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Architecture](#architecture)
@@ -16,35 +18,35 @@ A CMS Medigy Part B analytics pipeline built with `surveilr` and `spry` that tra
   - [Prerequisites](#prerequisites)
   - [Data Assets](#data-assets)
     - [SQLite Table Mapping](#sqlite-table-mapping)
-  - [Pipeline Stages](#pipeline-stages)
+  - [Pipeline Layers](#pipeline-layers)
   - [Data Model](#data-model)
+    - [Disease Condition Registry](#disease-condition-registry)
     - [Dimension Tables](#dimension-tables)
-      - [`dim_procedure` — Procedure Signal Classification](#dim_procedure--procedure-signal-classification)
-      - [`dim_diagnosis` — Disease State Tiers](#dim_diagnosis--disease-state-tiers)
-    - [Fact Tables](#fact-tables)
-    - [Analytical Views](#analytical-views)
-      - [Section 4 Evidence Tables](#section-4-evidence-tables)
+    - [Fact Table](#fact-table)
+    - [Analytics Views](#analytics-views)
   - [Opportunity Scoring](#opportunity-scoring)
   - [SQLPage Dashboard](#sqlpage-dashboard)
     - [Navigation Menu](#navigation-menu)
-    - [Reference Pages (linked from Home)](#reference-pages-linked-from-home)
   - [Deploy](#deploy)
+  - [Adding a New Disease Condition](#adding-a-new-disease-condition)
   - [Key Design Decisions](#key-design-decisions)
-    - [`fact_utilization` sources from `bygeography` + `specialty_by_state`](#fact_utilization-sources-from-bygeography--specialty_by_state)
-    - [Specialty normalization is inline CASE, not a lookup join](#specialty-normalization-is-inline-case-not-a-lookup-join)
-    - [Opportunity scoring bridges disease → specialty via body system](#opportunity-scoring-bridges-disease--specialty-via-body-system)
-    - [`condition_monitoring_proxy` uses disease-specific HCPCS filters](#condition_monitoring_proxy-uses-disease-specific-hcpcs-filters)
+    - [Single registry drives everything](#single-registry-drives-everything)
+    - [Multi-source fact table with heterogeneous procedure codes](#multi-source-fact-table-with-heterogeneous-procedure-codes)
+    - [URL parameter routing for the Condition Hub](#url-parameter-routing-for-the-condition-hub)
+    - [Opportunity scoring uses tier weights, not percentile rank, for strategic tiers](#opportunity-scoring-uses-tier-weights-not-percentile-rank-for-strategic-tiers)
+    - [GPCI cost-tier enrichment in the geography layer](#gpci-cost-tier-enrichment-in-the-geography-layer)
 
 ---
 
 ## Overview
 
-The pipeline ingests CMS public datasets, builds a normalized star schema in SQLite, runs 13 analytical views and an opportunity scoring engine, and packages everything into a multi-page SQLPage UI — all from a single Executable Markdown file (`mmi-dashboard.md`) and one SQL script (`medicare-analytics.sql`).
+The pipeline ingests CMS public datasets, builds a normalized star schema in SQLite, runs a suite of condition-agnostic analytics views and an opportunity scoring engine, then packages everything into a multi-page SQLPage UI — all from a single Executable Markdown file (`mmi-unified-dashboard.md`) and one SQL script (`medigy-unified-v2.sql`).
 
-The primary deliverable is `opportunity_scoring_view`: a composite Tier 1/2/3 ranking of every disease-state × specialty combination, scored on patient volume, interaction intensity, and economic weight.
+The primary deliverable is `opportunity_score`: a composite ranking of every active disease condition, scored on patient volume, Medicare allowed spend, and strategic tier weighting.
 
 **Dataset vintage:** CMS 2023  
-**Database engine:** SQLite (surveilr RSSD)
+**Database engine:** SQLite (surveilr RSSD)  
+**UI server port:** 9227
 
 ---
 
@@ -57,13 +59,13 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
  surveilr ingest          ← extracts and loads raw CSVs into SQLite RSSD
          │
          ▼
- surveilr orchestrate     ← transforms raw CSV ingestion into typed tables
+ surveilr orchestrate     ← transforms raw CSV ingestion into uniform_resource_* tables
          │
          ▼
- medigy-unified-v2 and medigy-ddl.sql   ← ELT pipeline: indexes → dims → facts → views → scoring
+ medigy-unified-v2.sql    ← ELT pipeline: indexes → registry → dims → fact → analytics
          │
          ▼
- spry + SQLPage           ← packages Executable Markdown into browser UI
+ spry + SQLPage            ← compiles Executable Markdown into browser UI
          │
          ▼
  resource-surveillance.sqlite.db   ← single-file output (RSSD)
@@ -75,12 +77,12 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
 
 ```text
 .
-├── medicare-ds/                         # CMS source CSV files (Git-ignored)
+├── medicare-ds/                        # CMS source CSV files (Git-ignored)
 ├── sql/
-│   └── medigy-unified-v2.sql           # Full ELT pipeline — run after ingestion
-│   └── medigy-ddl.sql                  # Data Provenance and other schema objects
-├── mmi-dashboard.md                     # Executable Markdown — UI definition + deploy script
-└── resource-surveillance.sqlite.db      # Output RSSD (SQLite, generated at runtime)
+│   ├── medigy-unified-v2.sql           # Unified ELT pipeline — run after ingestion
+│   └── medigy-ddl.sql                  # Data provenance and supplementary schema objects
+├── mmi-unified-dashboard.md            # Executable Markdown — UI definition + deploy script
+└── resource-surveillance.sqlite.db     # Output RSSD (SQLite, generated at runtime)
 ```
 
 ---
@@ -89,8 +91,12 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
 
 The following tools must be installed and available on your `PATH`:
 
-- [`surveilr`](https://www.surveilr.com)
-- [`spry`](https://github.com/netspective-labs/spry)
+| Tool | Purpose |
+|------|---------|
+| [`surveilr`](https://www.surveilr.com) | Ingest raw CSV files and execute SQL orchestration |
+| [`spry`](https://github.com/netspective-labs/spry) | Compile Executable Markdown into SQLPage SQL files |
+| `sqlite3` | Load compiled SQL into the RSSD database |
+| [`sqlpage`](https://sql.page/) | Serve the web UI (configured via `sqlpage/sqlpage.json`) |
 
 ---
 
@@ -99,18 +105,26 @@ The following tools must be installed and available on your `PATH`:
 All datasets are publicly available from CMS — no login required.
 
 | Local Filename | Description |
-|---|---|
-| `cms_provider.csv` | Provider-level Medicare utilization and payment metrics |
+| :--- | :--- |
+| `cms_bygeo_place_of_service_mapping.csv` | Mapping file for Place of Service (POS) codes by geographic region |
 | `cms_bygeography.csv` | HCPCS/CPT utilization by geography, including national totals |
-| `ref_icd10_diagnosis.csv` | ICD-10 diagnosis reference data |
-| `ref_condition_icd_mapping.csv` | Manual disease-state to ICD prefix mapping seed |
-| `ref_hcpcs_level_two_procedures.csv` | HCPCS Level II reference data |
-| `ref_procedure_code.csv` | Procedure code reference data |
-| `ref_rvu_qpp.csv` | RVU/QPP reference data |
-| `ref_geo_adjustment.csv` | CMS GPCI locality adjustment factors |
-| `ref_medicare_localities.csv` | Medicare locality definitions |
-| `ref_opps_price_cap.csv` | OPPS price cap reference |
-| `ref_anes_conversion_factor.csv` | CMS anesthesia conversion factors |
+| `cms_byproviderandservice.csv` | Granular Medicare data linked by specific provider NPI and service code |
+| `cms_inpatienthospitals_byproviderandservice.csv` | Inpatient hospital utilization by provider and DRG service |
+| `cms_outpatienthospitals_byproviderandservice.csv` | Outpatient hospital utilization by provider and APC service |
+| `cms_provider.csv` | Provider-level Medicare utilization and payment metrics |
+| `cms_providerandservice_pos.csv` | Provider service data categorized by Place of Service (e.g., Office vs. Facility) |
+| `copd_oxygen.csv` | Specific Medicare utilization data for COPD and oxygen therapy |
+| `diagnostics_data.csv` | Aggregate metrics for diagnostic testing and laboratory services |
+| `DME_CPAP_E0601_E0470_E0471.csv` | Specialized DME data for Sleep Apnea devices (CPAP/BiPAP) |
+| `dme_data.csv` | DMEPOS supplier utilization and payment data |
+| `ref_anes_conversion_factor.csv` | Anesthesia-specific base units and geographic conversion factors |
+| `ref_geo_adjustment.csv` | CMS GPCI locality adjustment factors (2026) |
+| `ref_hcpcs_level_two_procedures.csv` | HCPCS Level II reference data (supplies, drugs, and DME codes) |
+| `ref_icd10_diagnosis.csv` | ICD-10-CM diagnosis code reference data |
+| `ref_medicare_localities.csv` | Crosswalk of counties/zip codes to Medicare Locality IDs |
+| `ref_opps_price_cap.csv` | Outpatient Prospective Payment System (OPPS) price cap reference |
+| `ref_procedure_code.csv` | Procedure code reference with RVU data |
+| `ref_rvu_qpp.csv` | Relative Value Units (RVU) and Quality Payment Program (QPP) data |
 
 **Source:** [CMS Physician & Other Practitioners](https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners)
 
@@ -118,156 +132,143 @@ All datasets are publicly available from CMS — no login required.
 
 ### SQLite Table Mapping
 
-| SQLite Table | CMS Dataset | Key Columns Used |
+| SQLite Table | Source | Key Columns |
 |---|---|---|
-| `uniform_resource_cms_bygeography` | Physician & Other Practitioners — By Geography & Service | `HCPCS_Cd`, `Tot_Srvcs`, `Tot_Benes`, `Avg_Mdcr_Pymt_Amt`, `Rndrng_Prvdr_Geo_Cd`, `Place_Of_Srvc` |
-| `uniform_resource_cms_provider` | Physician & Other Practitioners — By Provider | `Rndrng_NPI`, `Rndrng_Prvdr_Type`, `Rndrng_Prvdr_State_Abrvtn` |
+| `uniform_resource_cms_bygeography` | Part B — By Geography & Service | `HCPCS_Cd`, `Rndrng_Prvdr_Geo_Lvl`, `Rndrng_Prvdr_Geo_Cd`, `Place_Of_Srvc`, `Tot_Benes`, `Tot_Srvcs`, `Avg_Mdcr_Alowd_Amt`, `Avg_Mdcr_Pymt_Amt` |
+| `uniform_resource_cms_provider` | Part B — By Provider & Service | `Rndrng_NPI`, `Rndrng_Prvdr_Type`, `Rndrng_Prvdr_State_Abrvtn` |
+| `uniform_resource_dme_data` | DMEPOS Supplier | `HCPCS_Cd`, `Rfrg_Prvdr_State_Abrvtn`, `Tot_Suplr_Benes`, `Tot_Suplr_Srvcs`, `Avg_Suplr_Mdcr_Alowd_Amt` |
+| `uniform_resource_cms_outpatienthospitals_byproviderandservice` | Outpatient Hospital | `APC_Cd`, `Rndrng_Prvdr_State_Abrvtn`, `Rndrng_Prvdr_CCN`, `Tot_Benes`, `Tot_Srvcs`, `Avg_Mdcr_Alowd_Amt` |
+| `uniform_resource_cms_inpatienthospitals_byproviderandservice` | Inpatient Hospital | `DRG_Cd`, `Rndrng_Prvdr_St`, `Rndrng_Prvdr_CCN` |
 | `uniform_resource_ref_icd10_diagnosis` | ICD-10-CM (CDC/NCHS) | `icd10_code`, `description_long` |
 | `uniform_resource_ref_procedure_code` | CMS Physician Fee Schedule | `HCPCS`, `WORK RVU`, `MEDICARE PAYMENT` |
 | `uniform_resource_ref_hcpcs_level_two_procedures` | CMS HCPCS Level II | `hcpcs_code`, `short_description` |
-| `uniform_resource_ref_geo_adjustment` | CMS GPCI 2026 | `State`, `PW GPCI` |
-| `uniform_resource_ref_anes_conversion_factor` | CMS Anesthesia Conversion Factor | `Contractor`, `Locality`, `Conversion Factor` |
+| `uniform_resource_ref_geo_adjustment` | CMS GPCI 2026 | `State`, `Locality Name`, `2026 PW GPCI (with 1.0 Floor)` |
+| `uniform_resource_ref_opps_price_cap` | CMS OPPS | `HCPCS` |
 
 ---
 
-## Pipeline Stages
+## Pipeline Layers
 
-`medicare-analytics.sql` executes end-to-end in five sequential sections.
+`medigy-unified-v2.sql` executes end-to-end across five layers.
 
-| Section | Objects Created | Purpose |
+| Layer | Objects Created | Purpose |
 |---|---|---|
-| **Section 0** | 14 indexes | Query performance on raw CMS source tables (million-row joins) |
-| **Section 1** | `dim_procedure`, `dim_diagnosis`, `dim_specialty`, `dim_geography`, `fips_state_map` | Star schema normalization — one clean lookup per domain |
-| **Section 2A** | `specialty_by_state`, `fact_utilization` | Core fact table: volume + economics per HCPCS × state × specialty |
-| **Section 2B** | `specialty_market_dynamics`, `condition_monitoring_proxy_table` | Specialty dominance ratio per HCPCS code nationally; condition-level repeat-interaction proxy |
-| **Section 3** | Views 1–12 | Business question layer (see Analytical Views below) |
-| **Section 4** | `opportunity_scoring_view`, `mdsd_global_opportunity_matrix`, `mdsd_economic_intensity_proof`, `mdsd_interaction_model_fit`, `mdsd_specialty_gatekeepers` | Primary deliverable — composite Tier 1/2/3 ranking + evidence tables |
-| **Section 5** | Queries A–I | Reference analyst queries (commented out, ready to run) |
+| **Layer 0** | ~20 indexes | Query performance on raw `uniform_resource_*` tables (million-row joins) |
+| **Layer 1** | `dim_condition_registry` | Master disease catalog — the single place to add a new condition |
+| **Layer 2** | `dim_diagnosis`, `dim_procedure`, `dim_specialty`, `dim_geography` | Derived star schema dimensions (auto-built from registry; never hand-edited) |
+| **Layer 3** | `fact_utilization_unified` | Multi-source fact table combining GEO + DME + HOSPITAL data per condition |
+| **Layer 4** | `condition_national_summary`, `condition_state_breakdown`, `condition_source_breakdown`, `condition_hcpcs_detail`, `executive_kpis`, `opportunity_score` | Condition-agnostic analytics views powering the dashboard |
 
 ---
 
 ## Data Model
 
+### Disease Condition Registry
+
+`dim_condition_registry` is the single seed table for the entire pipeline. All dimensions, the fact table, and every analytics view derive from it. Adding a row here and re-running the pipeline is all that is needed to bring a new disease into scope.
+
+| Column | Type | Description |
+|---|---|---|
+| `condition_name` | TEXT | Display name and primary key for all downstream joins |
+| `body_system` | TEXT | Clinical body system grouping |
+| `tier` | INTEGER | 1 = Flagship, 2 = Core, 3 = Baseline |
+| `icd10_prefix` | TEXT | Primary ICD-10 prefix (matched with `LIKE prefix || '%'`) |
+| `icd10_prefix_2` | TEXT | Optional secondary ICD-10 prefix |
+| `hcpcs_range_start` / `hcpcs_range_end` | TEXT | Inclusive CPT range for Part B geographic matching |
+| `hcpcs_exact_list` | TEXT | JSON array of exact HCPCS codes (overrides range) |
+| `dme_hcpcs_list` | TEXT | JSON array of HCPCS codes for DMEPOS matching |
+| `use_bygeo` / `use_dmepos` / `use_hospital` | INTEGER | Flags controlling which data source layers are included |
+| `specialty_domain` | TEXT | Clinical domain for opportunity scoring bridge |
+| `b2b_tier_primary` | TEXT | Primary B2B sales target specialty |
+| `em_share_pct` | REAL | Estimated fraction of E&M visits attributable to this condition |
+| `dme_cap_months` | INTEGER | DMEPOS rental cap in months (0 = purchase only) |
+| `icon` / `color` | TEXT | Tabler icon name and SQLPage color for the UI cards |
+| `is_active` | INTEGER | 1 = included in pipeline, 0 = excluded |
+
+**Current disease portfolio:**
+
+| Condition | Tier | Body System | Data Sources |
+|---|---|---|---|
+| Sleep Apnea | 1 — Flagship | Respiratory & Sleep | GEO + DME + Hospital |
+| COPD | 1 — Flagship | Respiratory & Sleep | GEO + DME + Hospital |
+| Hypertriglyceridaemia | 2 — Core | Endocrine & Metabolic | GEO |
+| Heart Failure | 2 — Core | Cardiovascular | GEO + Hospital |
+| Type 2 Diabetes | 2 — Core | Endocrine & Metabolic | GEO |
+| Parkinson's Disease | 2 — Core | Neurological & Mental Health | GEO |
+| Hypertension | 3 — Baseline | Cardiovascular | GEO |
+
 ### Dimension Tables
 
 | Table | Key Columns | Purpose |
 |---|---|---|
-| `dim_procedure` | `hcpcs_code`, `procedure_category`, `procedure_signal`, `is_monitoring_flag` | CPT + HCPCS Level II lookup with clinical categorization, commercial signal classification, and repeat-visit flag |
-| `dim_diagnosis` | `icd10_code`, `disease_state`, `body_system` | 17+ named disease clusters mapped from ICD-10-CM; `body_system` bridges to specialty domain in scoring |
-| `dim_specialty` | `raw_specialty_name`, `specialty_name`, `specialty_domain` | Canonical specialty names normalized from CMS `Rndrng_Prvdr_Type` strings |
-| `dim_geography` | `state_abbr`, `pw_gpci`, `cost_tier` | 2026 CMS GPCI factors for cost-adjusted market sizing |
-| `fips_state_map` | `fips_code`, `state_abbr` | Static 52-row FIPS-to-abbreviation bridge — required to join `bygeography` → `provider` |
+| `dim_diagnosis` | `icd10_code`, `disease_state`, `body_system` | ICD-10 codes joined to condition registry via prefix matching |
+| `dim_procedure` | `hcpcs_code`, `procedure_category`, `procedure_signal`, `linked_condition` | CPT/HCPCS codes classified by clinical category and commercial signal |
+| `dim_specialty` | `specialty_domain`, `b2b_tier_primary` | Specialty domains and B2B targeting labels derived from the registry |
+| `dim_geography` | `state_abbr`, `locality_name`, `pw_gpci`, `cost_tier`, `mac` | 2026 CMS GPCI factors and cost-tier classification per state |
 
-#### `dim_procedure` — Procedure Signal Classification
+### Fact Table
 
-The `procedure_signal` column classifies each HCPCS code into a commercial model context:
+`fact_utilization_unified` is the central fact table, combining rows from up to three source layers per condition:
 
-| Signal Value | Example Codes | Commercial Implication |
+| Source Type | Source Table | Procedure Code Column |
 |---|---|---|
-| `Sleep Lab (High Intensity)` | `95810`, `95811` | Diagnostic trigger — Model B |
-| `Neuro Assessment` | `95812`, `95819` | Diagnostic trigger |
-| `Cognitive Assessment` | `99483` | Diagnostic trigger — Alzheimer's |
-| `Respiratory Rehab (High Freq)` | `G0238` | SaaS / monitoring — Model C |
-| `Chronic Care Management` | `99490` | SaaS / monitoring |
-| `SUD/Opioid Treatment` | `G2086`, `G2087` | SaaS / monitoring |
-| `Standard E/M Visit` | `99214` | Low-margin baseline |
-| `Lab Screening (A1C)` | `83036` | Low-margin baseline |
+| `GEO` | `uniform_resource_cms_bygeography` | `HCPCS_Cd` |
+| `DME` | `uniform_resource_dme_data` and condition-specific DME tables | `HCPCS_Cd` |
+| `HOSPITAL_OUTPATIENT` | `uniform_resource_cms_outpatienthospitals_byproviderandservice` | `APC_Cd` |
+| `HOSPITAL_INPATIENT` | `uniform_resource_cms_inpatienthospitals_byproviderandservice` | `DRG_Cd` |
 
-#### `dim_diagnosis` — Disease State Tiers
+Key columns: `condition_name`, `source_type`, `hcpcs_code`, `state_abbr`, `total_beneficiaries`, `total_services`, `total_allowed_amt`, `total_medicare_payment`.
 
-| Priority | Disease States | Body System |
-|---|---|---|
-| Tier 1–2 (Core Targets) | Sleep Apnea, COPD, Parkinson's Disease, Heart Failure, Opioid Use Disorder | Respiratory & Sleep, Cardiovascular, Neurological & Mental Health |
-| Tier 3 (Baselines) | Hypertension, Type 2 Diabetes, Hypothyroidism, Asthma | Cardiovascular, Endocrine & Metabolic, Respiratory & Sleep |
-| Tier 4 (Mental Health) | Major Depression, Anxiety (GAD), PTSD, Bipolar Disorder | Neurological & Mental Health |
-| Tier 4 (Specialty/Niche) | Alzheimer's, Multiple Sclerosis, Oncology, Frailty/Vocal Disorders | Neurological & Mental Health, Oncology |
+### Analytics Views
 
-### Fact Tables
+All views in Layer 4 are condition-agnostic — they query `fact_utilization_unified` and filter by `condition_name` where needed.
 
-| Table | Key Columns | Purpose |
-|---|---|---|
-| `specialty_by_state` | `state_abbr`, `specialty_name`, `specialty_domain` | Deduplicated provider specialty lookup per state — intermediate bridge table |
-| `fact_utilization` | `specialty_name`, `specialty_domain`, `hcpcs_code`, `state_abbr`, `place_of_service`, `total_beneficiaries`, `total_services`, `total_medicare_payment` | Central fact table: volume, frequency, and economics per HCPCS × state × specialty |
-| `specialty_market_dynamics` | `specialty_name`, `hcpcs_code`, `specialty_dominance_ratio` | Each specialty's share of national patient volume per HCPCS code (0.0–1.0) |
-| `condition_monitoring_proxy_table` | `disease_state`, `body_system`, `monitoring_services_per_beneficiary`, `interaction_rank` | Condition-level repeat-interaction proxy using monitoring-flagged HCPCS only |
-
-### Analytical Views
-
-| # | View | Business Purpose |
-|---|---|---|
-| 1 | `specialty_activity_summary` | Top-line KPIs: total spend, patient reach, provider count, spend/patient, services/patient |
-| 2 | `specialty_economic_intensity` | Intensity index = spend/patient × services/patient, ranked within clinical domain |
-| 3 | `specialty_top_procedures` | Top 10 HCPCS codes per specialty by volume with spend rank alongside |
-| 4 | `specialty_market_concentration` | Specialty ownership share of national volume per code — market dominance signal |
-| 5 | `chronic_interaction_density` | Services per patient per code; tiered by business model fit (SaaS / Diagnostic / Maintenance) |
-| 6 | `monitoring_procedure_intensity` | % of specialty volume from repeat-monitoring codes; monitoring vs total spend |
-| 6B | `condition_monitoring_proxy` | Disease-specific monitoring interaction density; `interaction_rank` used in scoring |
-| 7 | `dme_supply_refill_metrics` | DME/supply refill velocity (units per patient) — chronic disease management signal |
-| 8 | `surgical_economic_metrics` | Anesthesia CPT codes scored by conversion factor — surgical economic load proxy |
-| 9 | `part_b_drug_intensity` | Part B drug administrations, patients, and spend per specialty by HCPCS code |
-| 10 | `geographic_market_opportunity` | State-level volume and GPCI cost-adjusted spend per specialty |
-| 11 | `facility_vs_office_split` | Office vs facility care setting mix — ambulatory ownership signal |
-| 12 | `disease_state_icd_coverage` | ICD-10 code count per disease cluster — mapping completeness validation |
-| 13 | `opportunity_scoring_view` | **Primary deliverable** — composite Tier 1/2/3 ranking of disease × specialty clusters |
-
-#### Section 4 Evidence Tables
-
-These materialized tables are produced from the scoring views for use in the dashboard and final report:
-
-| Table | Sourced From | Purpose |
-|---|---|---|
-| `mdsd_global_opportunity_matrix` | `opportunity_scoring_view` | High-level scoring for all mapped disease states, ordered by composite score |
-| `mdsd_economic_intensity_proof` | `specialty_economic_intensity` | Full specialty economic intensity ranking — all baselines included |
-| `mdsd_interaction_model_fit` | `condition_monitoring_proxy_table` | Per-condition model fit: SaaS (≥12 interactions/yr) vs Diagnostic (<4) |
-| `mdsd_specialty_gatekeepers` | `specialty_market_dynamics` + `dim_procedure` + `dim_diagnosis` | Primary specialty "owner" per disease-state × procedure signal pair — proves B2B sales targeting |
+| View | Purpose |
+|---|---|
+| `condition_national_summary` | Per-condition national KPIs: beneficiaries, services, allowed spend, allowed/patient, opportunity score, data source count |
+| `condition_state_breakdown` | State-level breakdown per condition with GPCI cost-tier enrichment |
+| `condition_source_breakdown` | Allowed spend split by data source layer (GEO / DME / Hospital) per condition |
+| `condition_hcpcs_detail` | Procedure-level analytics per condition with clinical descriptions |
+| `executive_kpis` | Portfolio totals across all active conditions |
+| `opportunity_score` | Composite ranked scoring across all conditions |
 
 ---
 
 ## Opportunity Scoring
 
-The `opportunity_scoring_view` produces the composite Tier 1/2/3 ranking across every disease × specialty intersection.
+`opportunity_score` produces the composite ranking across all active conditions.
 
 ```
-Composite Score = (0.35 × volume_percentile)
-                + (0.35 × intensity_percentile)
-                + (0.30 × economics_percentile)
-                + dominance_bonus (up to +10 pts)
+Composite Score = (0.40 × beneficiary_volume_percentile)
+                + (0.40 × medicare_allowed_percentile)
+                + (0.20 × strategic_tier_weight)
 
-Tier 1 — High Opportunity  : score ≥ 75
-Tier 2 — Moderate           : score ≥ 50
-Tier 3 — Low Priority       : score < 50
+Tier 1 — Flagship  : tier = 1  (weight = 1.0)
+Tier 2 — Core      : tier = 2  (weight = 0.65)
+Tier 3 — Baseline  : tier = 3  (weight = 0.35)
 ```
 
-All three dimensions are normalized to `NTILE(100)` percentile ranks before combining. The dominance bonus is derived from `specialty_market_dynamics.specialty_dominance_ratio × 10`.
-
-**Scoring bridge:** `dim_diagnosis.body_system` (e.g., `'Cardiovascular'`) maps to `fact_utilization.specialty_domain` (e.g., `'Cardiovascular'`). The `opportunity_scoring_view` joins on this bridge to score every disease × specialty intersection.
+Volume and spend dimensions are normalized to `NTILE(100)` percentile ranks before combining. The tier weight is applied as a fixed multiplier, not a percentile, ensuring flagship conditions carry a persistent strategic premium regardless of data volume.
 
 ---
 
 ## SQLPage Dashboard
 
-`mmi-dashboard.md` is the Executable Markdown file that defines both the deploy script and the full SQLPage UI. It runs on port `9227` against `resource-surveillance.sqlite.db`.
+`mmi-unified-dashboard.md` is the Executable Markdown file that defines both the deploy script and the full SQLPage UI. It runs on port `9227` against `resource-surveillance.sqlite.db`.
 
 ### Navigation Menu
 
 | Page | Route | Description |
 |---|---|---|
-| Home | `/` | Pipeline health check: specialties indexed, ICD clusters mapped, procedure codes, states in scope |
-| Executive Dashboard | `/mmi/executive-dashboard.sql` | Top-line KPIs across all specialties |
-| Opportunity Scores | `/mmi/opportunity-scoring.sql` | Full Tier 1/2/3 ranked output |
-| Evidence | `/mmi/sleep-apnea-evidence.sql` | Disease-specific evidence deep-dives |
-| Disease Mapping | `/mmi/disease-mapping.sql` | ICD-10 cluster browser |
-| Procedure Drilldown | `/mmi/procedure-drilldown.sql` | Per-HCPCS code analysis |
-| Data Dictionary | `/mmi/data-dictionary.sql` | Schema reference: all views, tables, and CMS source datasets |
+| Home | `/` | Pipeline health KPIs + dynamic disease condition cards (auto-generated from registry) |
+| Executive Dashboard | `/mmi/executive-dashboard.sql` | Portfolio totals, cross-condition comparison charts, full summary table |
+| Disease Conditions | `/mmi/conditions.sql` | Full condition registry — cards and table view |
+| Opportunity Scores | `/mmi/opportunity-scoring.sql` | Composite ranked opportunity matrix |
+| Geography | `/mmi/geography.sql` | State-level market sizing, cost tiers, and GPCI factors |
+| Procedure Drilldown | `/mmi/procedure-drilldown.sql` | HCPCS-level analytics with condition and code filters, paginated |
+| Data Dictionary | `/mmi/data-dictionary.sql` | Schema reference: derived objects, source tables, and performance indexes |
 
-### Reference Pages (linked from Home)
-
-| Page | Route | Content |
-|---|---|---|
-| Medical Specialties | `/mmi/medical-specialities.sql` | Searchable table of all indexed specialties and domains |
-| Procedure Inventory | `/mmi/procedures.sql` | Full HCPCS/CPT code inventory |
-| Geographic Scope | `/mmi/geography.sql` | States and GPCI locality cards |
-| Disease Clusters | `/mmi/disease-clusters.sql` | ICD-10 mapped disease cluster list |
+Every condition card on the landing page links to a universal **Condition Hub** (`/mmi/condition-hub.sql?condition=<name>`) that shows national KPIs, data source breakdown, top procedures, and geographic breakdown for that condition — all driven by the `?condition=` URL parameter. No new page is needed when a condition is added.
 
 ---
 
@@ -280,47 +281,77 @@ rm -f resource-surveillance.sqlite.*
 # 2. Ingest raw CMS CSV files into SQLite RSSD
 surveilr ingest files -r medicare-ds/
 
-# 3. Transform raw ingestion into typed reference tables
+# 3. Transform raw ingestion into typed uniform_resource_* tables
 surveilr orchestrate transform-csv
 
-# 4. Run the ELT pipeline — builds all dims, facts, views, and scoring
+# 4. Apply base DDL (data provenance and supplementary schema objects)
 surveilr shell sql/medigy-ddl.sql
+
+# 5. Run the unified ELT pipeline — builds all dims, fact, and analytics views
 surveilr shell sql/medigy-unified-v2.sql
 
-# 5. Configure SMTP environment variables for registration welcome emails
+
+# 6. Configure SMTP environment variables for registration welcome emails
 export EMAIL_HOST="<your-host>"
 export EMAIL_USERNAME="<your-user-name>"
 export EMAIL_APP_PASSWORD="<your-mailgun-app-password>"
 export EMAIL_FROM="<your-from-email>"
 export EMAIL_PORT="<your-port>"
 
-# 6. Package the SQLPage UI and load it into the database
-spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md \
+# 7. Compile the Executable Markdown UI and load it into the database
+spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-unified-dashboard.md \
   | sqlite3 resource-surveillance.sqlite.db
 
-echo "Medigy Market Intelligence database and SQLPage UI are ready."
+echo "Medigy Market Intelligence (Unified v2) is ready at http://localhost:9227"
 ```
 
-The SQLPage application will be served at `http://localhost:9227`.
+---
+
+## Adding a New Disease Condition
+
+1. Open `sql/medigy-unified-v2.sql` and locate the seed block under **Layer 1**.
+2. Insert one row into `dim_condition_registry` following the pattern of existing entries.
+3. Re-run the pipeline from step 5 of the deploy sequence above.
+
+The landing page card, Condition Hub drilldown, executive dashboard, opportunity score, geographic breakdown, and procedure table all update automatically.
+
+Example (Heart Failure was added this way):
+
+```sql
+INSERT OR IGNORE INTO dim_condition_registry
+(condition_name, body_system, tier, icd10_prefix,
+ hcpcs_range_start, hcpcs_range_end, hcpcs_exact_list,
+ use_bygeo, use_dmepos, use_hospital,
+ specialty_domain, b2b_tier_primary, em_share_pct, dme_cap_months,
+ icon, color)
+VALUES
+('Heart Failure', 'Cardiovascular', 2, 'I50',
+ '93000', '93999', '["93000","93303","93306","93350","93351","99490","99439"]',
+ 1, 0, 1,
+ 'Cardiovascular', 'Cardiology', 0.07, 0,
+ 'heart', 'red');
+```
 
 ---
 
 ## Key Design Decisions
 
-### `fact_utilization` sources from `bygeography` + `specialty_by_state`
+### Single registry drives everything
 
-The two core CMS datasets use incompatible state identifiers: `bygeography` uses numeric FIPS codes (`01`, `06`, `48`) while `cms_provider` uses state abbreviations (`AL`, `CA`, `TX`). A hardcoded `fips_state_map` table bridges them. Specialty is derived from `cms_provider.Rndrng_Prvdr_Type` via a deduplicated `specialty_by_state` materialized table (one row per state × specialty), joined to `bygeography` on the translated state abbreviation. This avoids both the Cartesian explosion (joining on state alone) and NULL specialty (joining on a mismatched key).
+All dimension tables, the unified fact table, and every analytics view derive from `dim_condition_registry`. This eliminates the need to modify SQL logic or page definitions when adding new conditions — the only file that ever changes is the registry seed block.
 
-### Specialty normalization is inline CASE, not a lookup join
+### Multi-source fact table with heterogeneous procedure codes
 
-`dim_specialty` exists as a reference table, but `fact_utilization` and `specialty_by_state` derive `specialty_name` and `specialty_domain` directly from `Rndrng_Prvdr_Type` using CASE expressions. This eliminates join failures caused by whitespace or case differences between raw CMS strings.
+`fact_utilization_unified` combines three structurally different CMS datasets, each using a different procedure code column: `HCPCS_Cd` (Part B geographic and DME), `APC_Cd` (outpatient hospital), and `DRG_Cd` (inpatient hospital). All are unified under a single `hcpcs_code` column in the fact table, with `source_type` distinguishing origin. This allows cross-source aggregation at the condition level while preserving source-layer drilldown in `condition_source_breakdown`.
 
-### Opportunity scoring bridges disease → specialty via body system
+### URL parameter routing for the Condition Hub
 
-`dim_diagnosis.body_system` (e.g., `'Cardiovascular'`) maps to `fact_utilization.specialty_domain` (e.g., `'Cardiovascular'`). The `opportunity_scoring_view` joins on this bridge to score every disease × specialty intersection. Scores are normalized via `NTILE` percentile ranking across three dimensions — volume (35%), interaction intensity (35%), and economic weight (30%) — with a market concentration bonus of up to +10 points from `specialty_dominance_ratio`.
+Rather than generating one SQL page per disease, a single `condition-hub.sql` page accepts a `?condition=` URL parameter and drives all queries from it. Condition names with spaces are encoded using `REPLACE(condition_name, ' ', '%20')` for SQLite compatibility. All filtering uses `LOWER(TRIM(...))` on both sides to guard against case and whitespace mismatches in the registry seed data.
 
-### `condition_monitoring_proxy` uses disease-specific HCPCS filters
+### Opportunity scoring uses tier weights, not percentile rank, for strategic tiers
 
-Rather than joining all monitoring codes to all disease states via body system (which collapses conditions to a uniform value), the view applies explicit per-disease filters (e.g., Sleep Apnea → `95810`/`95811`, COPD → `G0238`, Hypertension → `99214`). This ensures `interaction_rank` is meaningfully differentiated across conditions.
+The tier dimension (Flagship / Core / Baseline) is applied as a fixed multiplier (1.0 / 0.65 / 0.35) rather than being normalized into a percentile alongside volume and spend. This ensures that a Tier 1 condition with moderate data volume still outranks a Tier 3 condition with high volume — reflecting the intentional strategic prioritization in the registry, not just data size.
 
----
+### GPCI cost-tier enrichment in the geography layer
+
+`dim_geography` enriches each state with the 2026 CMS Physician Work GPCI factor and a derived cost tier (`High / Medium / Low`). This tier is surfaced in `condition_state_breakdown` and the Geography dashboard page, enabling cost-adjusted market sizing without post-processing.
