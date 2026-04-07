@@ -4,7 +4,7 @@ A CMS Medicare analytics pipeline built with `surveilr` and `spry` that transfor
 
 The v2 pipeline introduces a **unified extensible ELT architecture**: adding a new disease condition requires inserting exactly one row into `dim_condition_registry`. All downstream dimensions, facts, analytics views, and every page of the UI update automatically — no SQL or page logic changes needed.
 
-> **Note:** Source code is on the `main` branch. `cms_provider.csv` is used by the pipeline but excluded from the repository due to file size.
+> **Note:** Source code is on the `main` branch. `cms_provider.csv` ,`cms_byproviderandservice.csv`,`copd_oxygen.csv` is used by the pipeline but excluded from the repository due to file size.
 
 ---
 
