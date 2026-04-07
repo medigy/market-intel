@@ -305,7 +305,6 @@ The SQLPage application will be served at `http://localhost:9227`.
 
 ---
 
-
 ## Key Design Decisions
 
 ### `fact_utilization` sources from `bygeography` + `specialty_by_state`
