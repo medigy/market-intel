@@ -77,7 +77,7 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
 .
 ├── medicare-ds/                         # CMS source CSV files (Git-ignored)
 ├── sql/
-│   └── medigy-analytics.sql           # Full ELT pipeline — run after ingestion
+│   └── medigy-unified-v2.sql           # Full ELT pipeline — run after ingestion
 │   └── medigy-ddl.sql                  # Data Provenance and other schema objects
 ├── mmi-dashboard.md                     # Executable Markdown — UI definition + deploy script
 └── resource-surveillance.sqlite.db      # Output RSSD (SQLite, generated at runtime)
@@ -285,7 +285,7 @@ surveilr orchestrate transform-csv
 
 # 4. Run the ELT pipeline — builds all dims, facts, views, and scoring
 surveilr shell sql/medigy-ddl.sql
-surveilr shell sql/medigy-analytics.sql
+surveilr shell sql/medigy-unified-v2.sql
 
 # 5. Configure SMTP environment variables for registration welcome emails
 export EMAIL_HOST="<your-host>"
