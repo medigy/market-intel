@@ -60,7 +60,7 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
  surveilr orchestrate     ← transforms raw CSV ingestion into typed tables
          │
          ▼
- medigy-analytics.sql   ← ELT pipeline: indexes → dims → facts → views → scoring
+ medigy-unified-v2 and medigy-ddl.sql   ← ELT pipeline: indexes → dims → facts → views → scoring
          │
          ▼
  spry + SQLPage           ← packages Executable Markdown into browser UI
