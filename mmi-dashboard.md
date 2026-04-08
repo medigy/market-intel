@@ -5,13 +5,15 @@ sqlpage-conf:
   allow_exec: true
   port: 9227
 ---
-# Medigy Market Intelligence — Unified SQLPage Application (v3)
+# Medigy Market Intelligence — Unified SQLPage Application 
 
 This application is built on the **unified extensible pipeline** (`medigy-unified-v2.sql`).
 
 **Architecture principle:** Adding a new disease condition requires inserting
 one row into `dim_condition_registry`. The landing page, drilldown pages,
 and all analytics update automatically — no SQL or page logic changes required.
+
+---
 
 **v3 changes:**
 
@@ -32,9 +34,8 @@ rm -f resource-surveillance.sqlite.*
 
 surveilr ingest files -r medicare-ds/ 
 surveilr orchestrate transform-csv
-surveilr shell sql/medigy-ddl.sql
 surveilr shell sql/medigy-unified-v2.sql
-surveilr shell sql/medigy-materialized.sql
+surveilr shell sql/medigy-ddl.sql
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
 echo "Medigy Market Intelligence (v3) is ready."
 ```
@@ -70,6 +71,14 @@ SELECT 'shell' AS component,
 ```sql index.sql { route: { caption: "Registration" } }
 -- @route.description "User registration gate before entering the dashboard"
 
+-- Early server-side redirect: if the registration profile cookie is already present,
+-- skip the form immediately — this prevents the shell/hero/form from being rendered
+-- and sent to the browser, eliminating the flicker that occurred when the JS redirect
+-- in footer-links.js fired after the page was already painted.
+SELECT 'redirect' AS component,
+       '/mmi/home-overview.sql' AS link
+WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
+
 SELECT 'cookie' AS component,
        'isVerified' AS name,
        'false' AS value,
@@ -78,7 +87,7 @@ SELECT 'cookie' AS component,
 WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
 
 SELECT 'shell' AS component,
-       'Medigy Market Intelligence — Registration' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'narrow' AS layout,
        true AS fixed_top_menu,
@@ -314,13 +323,17 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 ./footer-links.js .
 ./custom-dashboard.css .
 ```
-
 ---
 
 ## Home Page
 
 ```sql registration.sql { route: { caption: "Registration Alias" } }
 -- @route.description "Alias route for user registration gate"
+
+-- Early server-side redirect: mirrors the same guard in index.sql.
+SELECT 'redirect' AS component,
+       '/mmi/home-overview.sql' AS link
+WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
 
 SELECT 'cookie' AS component,
        'isVerified' AS name,
@@ -413,7 +426,6 @@ SELECT 'html' AS component,
     '<p style="text-align:center; margin-top:8px;">Your information is safe and will be handled securely.</p>' AS html;
 
 ```
-
 
 ---
 
@@ -544,7 +556,7 @@ ORDER BY SUM(total_allowed_amt) DESC;
 
 -- ── Disease Condition Cards — Fully Dynamic ───────────────────────────────────
 SELECT 'html' AS component, '<div id="disease-conditions-section"></div>' AS html;
-SELECT 'divider' AS component, 'Disease Conditions — Click to Explore' AS label;
+SELECT 'divider' AS component, 'Disease Conditions — Click to Explore' AS contents;
 SELECT 'card' AS component, 3 AS columns;
 
 SELECT
@@ -561,7 +573,7 @@ FROM mat_condition_national_summary s
 ORDER BY s.tier, s.opportunity_score DESC;
 
 -- ── Analytics Navigation ──────────────────────────────────────────────────────
-SELECT 'divider' AS component, 'Analytics Modules' AS label;
+SELECT 'divider' AS component, 'Analytics Modules' AS contents;
 SELECT 'card' AS component, 3 AS columns;
 
 SELECT 'Executive Dashboard'  AS title,
@@ -1126,7 +1138,7 @@ FROM dim_condition_registry WHERE is_active = 1 AND tier = 1;
 
 SELECT 'Tier 2 — Core' AS title,
        COUNT(*) || '' AS description,
-       'blue' AS color, 'layers' AS icon,
+       'blue' AS color, 'stack-front' AS icon,
        'kpi-card' AS class,
        '#registry-table' AS link
 FROM dim_condition_registry WHERE is_active = 1 AND tier = 2;
@@ -1458,7 +1470,7 @@ FROM data_tables_derived WHERE category = 'Materialized Table';
 
 SELECT 'Core Fact Tables' AS title,
        COUNT(*) || '' AS description,
-       'indigo' AS color, 'layers' AS icon,
+       'indigo' AS color, 'layers-linked' AS icon,
        'dict-stat-card' AS class,
        '#objects-table' AS link
 FROM data_tables_derived WHERE category = 'Core Fact';
@@ -1471,6 +1483,7 @@ SELECT 'Performance Indexes' AS title,
 FROM data_dictionary_indexes;
 
 -- ── Data Sources ──────────────────────────────────────────────────────────────
+SELECT 'divider' AS component;
 SELECT 'text' AS component, 'External Data Sources' AS contents_md;
 SELECT 'list' AS component;
 SELECT 
@@ -1481,23 +1494,6 @@ WHERE object_type = 'external_source';
 
 -- NEW: Data freshness cards
 SELECT 'divider' AS component, 'Data Ingestion Timeline' AS contents;
-SELECT 'card' AS component, 3 AS columns;
-SELECT 
-    title AS title,
-    DATE(ingested_at) AS description,
-    'blue' AS color,
-    'calendar' AS icon
-FROM data_provenance
-WHERE object_type = 'external_source'
-ORDER BY ingested_at DESC;
-
--- ── Master & Reference Tables ─────────────────────────────────────────────────
-SELECT 'text' AS component, 'Master & Reference Tables' AS contents_md;
-SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
-SELECT name AS "Table Name"
-FROM sqlite_schema s
-WHERE (name LIKE 'dim_%' OR name LIKE 'uniform_resource_ref_%')
-ORDER BY name;
 
 -- ── Derived Objects Inventory ─────────────────────────────────────────────────
 SELECT 'html' AS component, '<div id="objects-table"></div>' AS html;
@@ -1574,7 +1570,7 @@ SET current_page_mat = COALESCE(CAST($page_mat AS INT), 1);
 
 SELECT 'table' AS component, TRUE AS hover, TRUE AS striped_rows;
 SELECT 
-    object_name, object_type, category
+    object_name, category
 FROM data_tables_derived
  WHERE category = 'Materialized Table' 
 ORDER BY category, object_name 
