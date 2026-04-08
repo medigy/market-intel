@@ -62,6 +62,14 @@ SELECT 'shell' AS component,
 ```sql index.sql { route: { caption: "Registration" } }
 -- @route.description "User registration gate before entering the dashboard"
 
+-- Early server-side redirect: if the registration profile cookie is already present,
+-- skip the form immediately — this prevents the shell/hero/form from being rendered
+-- and sent to the browser, eliminating the flicker that occurred when the JS redirect
+-- in footer-links.js fired after the page was already painted.
+SELECT 'redirect' AS component,
+       '/mmi/home-overview.sql' AS link
+WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
+
 SELECT 'cookie' AS component,
        'isVerified' AS name,
        'false' AS value,
@@ -70,7 +78,7 @@ SELECT 'cookie' AS component,
 WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
 
 SELECT 'shell' AS component,
-       'Medigy Market Intelligence — Registration' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'narrow' AS layout,
        true AS fixed_top_menu,
@@ -312,6 +320,11 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
 ```sql registration.sql { route: { caption: "Registration Alias" } }
 -- @route.description "Alias route for user registration gate"
+
+-- Early server-side redirect: mirrors the same guard in index.sql.
+SELECT 'redirect' AS component,
+       '/mmi/home-overview.sql' AS link
+WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
 
 SELECT 'cookie' AS component,
        'isVerified' AS name,
