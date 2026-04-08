@@ -59,7 +59,38 @@ VALUES (
     'external_source',
     'DMEPOS non-institutional claims aggregated by State and HCPCS, including rental indicators.'
 );
+-- Source 5: Medicare Outpatient Hospitals
+INSERT OR IGNORE INTO data_provenance (title, link, version_year, ingested_at, object_type, description)
+VALUES (
+    'Medicare Outpatient Hospitals - by Provider and Service',
+    'https://data.cms.gov/provider-summary-by-type-of-service/medicare-outpatient-hospitals/medicare-outpatient-hospitals-by-provider-and-service',
+    2023,
+    '2026-04-01 10:00:00',
+    'external_source',
+    'Institutional outpatient claims aggregated by Provider and APC code.'
+);
 
+-- Source 6: Medicare Diagnostics Data
+INSERT OR IGNORE INTO data_provenance (title, link, version_year, ingested_at, object_type, description)
+VALUES (
+    'Medicare Physician & Other Practitioners - Diagnostics Data',
+    'https://data.cms.gov/provider-summary-by-type-of-service/medicare-physician-other-practitioners/medicare-physician-other-practitioners-by-geography-and-service',
+    2023,
+    '2026-04-01 10:00:00',
+    'external_source',
+    'Specialized diagnostics utilization and payment metrics by HCPCS.'
+);
+
+-- Source 7: Medicare Inpatient Hospitals
+INSERT OR IGNORE INTO data_provenance (title, link, version_year, ingested_at, object_type, description)
+VALUES (
+    'Medicare Inpatient Hospitals - by Provider and Service',
+    'https://data.cms.gov/provider-summary-by-type-of-service/medicare-inpatient-hospitals/medicare-inpatient-hospitals-by-provider-and-service',
+    2023,
+    '2026-04-01 10:00:00',
+    'external_source',
+    'Institutional inpatient claims aggregated by Provider and MS-DRG code.'
+);
 
 
 CREATE VIEW IF NOT EXISTS data_tables_derived AS
@@ -70,6 +101,7 @@ SELECT
         WHEN s.name LIKE 'dim_%' THEN 'Dimensional Table'
         WHEN s.name LIKE 'uniform_resource_ref_%' THEN 'Master Reference'
         WHEN s.name LIKE 'fact_%' THEN 'Core Fact'
+        WHEN s.name LIKE 'mat_%' THEN 'Materialized Table'
         WHEN s.type = 'view' THEN 'Analytical View'
         ELSE 'Derived Table'
     END AS category

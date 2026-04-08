@@ -304,6 +304,7 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
 ```contribute sqlpage_files --base .
 ./footer-links.js .
+./custom-dashboard.css .
 ```
 
 ---
@@ -420,6 +421,7 @@ SELECT 'shell' AS component,
        true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
        '/footer-links.js' AS javascript,
+       '/custom-dashboard.css' AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -438,34 +440,75 @@ SELECT 'hero' AS component,
        'azure' AS color;
 
 -- ── Pipeline Health KPIs ──────────────────────────────────────────────────────
-SELECT 'big_number' AS component, 'Pipeline Health' AS title;
+-- SELECT 'big_number' AS component, 'Pipeline Health' AS title;
 
-SELECT 'Active Conditions'    AS title,
-       total_conditions        AS value,
-       'teal'                  AS color,
-       'In registry'           AS description
+-- SELECT 'Active Conditions'    AS title,
+--        total_conditions        AS value,
+--        'teal'                  AS color,
+--        'In registry'           AS description
+-- FROM executive_kpis;
+
+-- SELECT 'Total Beneficiaries'  AS title,
+--        printf('%,.0f', total_beneficiaries) AS value,
+--        'azure'                 AS color,
+--        'Medicare patients'     AS description
+-- FROM executive_kpis;
+
+-- SELECT 'Medicare Allowed'     AS title,
+--        '$' || printf('%,.0f', total_allowed_amt) AS value,
+--        'indigo'                AS color,
+--        'Across all conditions' AS description
+-- FROM executive_kpis;
+
+-- SELECT 'Data Sources'         AS title,
+--        active_data_sources     AS value,
+--        'orange'                AS color,
+--        'GEO + DME + Hospital'  AS description
+-- FROM executive_kpis;
+
+-- ── Portfolio Totals (Large Value Navigable Cards) ───────────────────────────
+SELECT 'card' AS component, 4 AS columns;
+
+SELECT 
+    'Disease Conditions' AS title,
+     printf('%,.0f', total_conditions) AS description,    
+    'teal' AS color,
+    'activity' AS icon,
+    'kpi-card' AS class, -- Applies external CSS
+    '#disease-conditions-section' AS link
 FROM executive_kpis;
 
-SELECT 'Total Beneficiaries'  AS title,
-       printf('%,.0f', total_beneficiaries) AS value,
-       'azure'                 AS color,
-       'Medicare patients'     AS description
+SELECT 
+    'Total Beneficiaries/Patients' AS title,
+     printf('%,.0f', total_beneficiaries)  AS description,   
+    'kpi-card' AS class, -- Applies external CSS
+    'azure' AS color,
+    'users' AS icon,
+    '/mmi/executive-dashboard.sql' AS link
 FROM executive_kpis;
 
-SELECT 'Medicare Allowed'     AS title,
-       '$' || printf('%,.0f', total_allowed_amt) AS value,
-       'indigo'                AS color,
-       'Across all conditions' AS description
+SELECT 
+    'Total Medicare Allowed Amount' AS title,
+    '$' || printf('%,.0f', total_allowed_amt)  AS description,     
+    'indigo' AS color,
+    'currency-dollar' AS icon,
+    'kpi-card' AS class, -- Applies external CSS
+    '/mmi/executive-dashboard.sql' AS link
 FROM executive_kpis;
 
-SELECT 'Data Sources'         AS title,
-       active_data_sources     AS value,
-       'orange'                AS color,
-       'GEO + DME + Hospital'  AS description
-FROM executive_kpis;
+
+-- Corrected Data Sources logic to pull from data_provenance
+SELECT 
+    'External Data Sources' AS title,
+    ''||(SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source')||'' AS description,    
+    'orange' AS color,
+    'database' AS icon,
+    '/mmi/data-dictionary.sql' AS link;
 
 -- ── Disease Condition Cards — Fully Dynamic ───────────────────────────────────
-SELECT 'divider' AS component, 'Disease Conditions — Click to Explore' AS label;
+
+SELECT 'html' AS component, '<div id="disease-conditions-section"></div>' AS html;
+SELECT 'divider' AS component, 'Disease Conditions — Click to Explore' AS contents;
 SELECT 'card' AS component, 3 AS columns;
 
 SELECT
