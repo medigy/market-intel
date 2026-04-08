@@ -52,8 +52,8 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -75,8 +75,9 @@ SELECT 'shell' AS component,
 -- skip the form immediately — this prevents the shell/hero/form from being rendered
 -- and sent to the browser, eliminating the flicker that occurred when the JS redirect
 -- in footer-links.js fired after the page was already painted.
+-- Relative redirect: browser resolves against the current URL, so it works at any deployment base path.
 SELECT 'redirect' AS component,
-       '/mmi/home-overview.sql' AS link
+       'mmi/home-overview.sql' AS link
 WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
 
 SELECT 'cookie' AS component,
@@ -314,8 +315,9 @@ SELECT 'cookie' AS component,
        'lax' AS same_site
 WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
+-- Relative redirect: browser resolves against the current URL, so it works at any deployment base path.
 SELECT 'redirect' AS component,
-       '/mmi/home-overview.sql' AS link
+       'mmi/home-overview.sql' AS link
 WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 ```
 
@@ -331,8 +333,9 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 -- @route.description "Alias route for user registration gate"
 
 -- Early server-side redirect: mirrors the same guard in index.sql.
+-- Relative redirect: browser resolves against the current URL, so it works at any deployment base path.
 SELECT 'redirect' AS component,
-       '/mmi/home-overview.sql' AS link
+       'mmi/home-overview.sql' AS link
 WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
 
 SELECT 'cookie' AS component,
@@ -438,8 +441,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -612,8 +615,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -843,8 +846,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -1011,8 +1014,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -1100,8 +1103,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -1194,8 +1197,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -1314,8 +1317,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
@@ -1431,8 +1434,8 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Dashboard"}' AS menu_item,
