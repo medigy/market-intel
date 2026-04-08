@@ -70,7 +70,7 @@ SELECT 'cookie' AS component,
 WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
 
 SELECT 'shell' AS component,
-       'Medigy Market Intelligence — Registration' AS title,
+       'Medigy Market Intelligence' AS title,
        NULL AS icon,
        'narrow' AS layout,
        true AS fixed_top_menu,
