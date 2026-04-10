@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+  xmlns="http://medigy.ontology/surveilr#"
+  xml:base="http://medigy.ontology/surveilr#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+  <owl:Ontology rdf:about="http://medigy.ontology/surveilr#">
+    <rdfs:label>Medigy Tables TBox Schema Ontology</rdfs:label>
+    <rdfs:comment>Pure TBox (schema-only) OWL for MCP chat. Covers dimension tables, fact tables, materialized analytics, uniform resource CMS/DME/reference tables, and views derived from the medigy_tables DDL. No ABox instance data — MCP server queries live SQLite at runtime. Primary joins: fact_utilization_unified links to dim_procedure (hcpcs_code), dim_specialty (specialty_domain), dim_geography (state_abbr), dim_condition_registry (condition_name).</rdfs:comment>
+    <owl:versionInfo>1.0</owl:versionInfo>
+  </owl:Ontology>
+
+  <!-- ═══ ABSTRACT DOMAIN CLASSES (groupings only, not SQL tables) ═══ -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#ClinicalDimension">
+    <rdfs:label>ClinicalDimension</rdfs:label>
+    <rdfs:comment>Dimension tables for clinical analysis: procedure, diagnosis, specialty, geography, condition registry</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#ClinicalFact">
+    <rdfs:label>ClinicalFact</rdfs:label>
+    <rdfs:comment>Core fact table capturing unified utilization events (services, beneficiaries, payments) across conditions and specialties</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#MaterializedAnalytics">
+    <rdfs:label>MaterializedAnalytics</rdfs:label>
+    <rdfs:comment>Pre-computed materialized tables for condition summaries, opportunity scores, state breakdowns, and executive KPIs (MCP-ready outputs)</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#CMSAggregation">
+    <rdfs:label>CMSAggregation</rdfs:label>
+    <rdfs:comment>CMS aggregated data: by geography, by provider, inpatient/outpatient hospitals, place-of-service mapping</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#DMEData">
+    <rdfs:label>DMEData</rdfs:label>
+    <rdfs:comment>Durable Medical Equipment (DME) referral and utilization data including CPAP, oxygen, and general DME datasets</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#ClinicalReference">
+    <rdfs:label>ClinicalReference</rdfs:label>
+    <rdfs:comment>CMS/HCPCS/ICD-10/RVU/QPP reference code and pricing tables for procedures, localities, geography adjustments, and OPPS price caps</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#PolicyMonitoring">
+    <rdfs:label>PolicyMonitoring</rdfs:label>
+    <rdfs:comment>Data provenance tracking for ingested external sources and policy/compliance metadata</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#SummaryView">
+    <rdfs:label>SummaryView</rdfs:label>
+    <rdfs:comment>SQL views exposing materialized analytics and data dictionary metadata as named query surfaces</rdfs:comment>
+  </owl:Class>
+
+  <!-- ═══ TABLE CLASSES (each maps 1:1 to a SQLite table) ═══ -->
+
+  <!-- ── ClinicalDimension tables ── -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_condition_registry">
+    <rdfs:label>dim_condition_registry</rdfs:label>
+    <rdfs:comment>SQLite table: dim_condition_registry | PK: condition_id | Columns: condition_id (INTEGER PK AUTOINCREMENT), condition_name (TEXT UNIQUE NOT NULL), body_system (TEXT NOT NULL), tier (INTEGER NOT NULL DEFAULT 2, 1=Flagship, 2=Core) | Registry of all tracked clinical conditions with body system classification and commercial tier</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalDimension"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_diagnosis">
+    <rdfs:label>dim_diagnosis</rdfs:label>
+    <rdfs:comment>SQLite table: dim_diagnosis | Columns: icd10_code (TEXT), diagnosis_description (TEXT), disease_state, body_system | ICD-10 diagnosis code dimension linking codes to disease states and body systems</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalDimension"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_geography">
+    <rdfs:label>dim_geography</rdfs:label>
+    <rdfs:comment>SQLite table: dim_geography | Columns: state_abbr (TEXT), mac_name (TEXT), locality_name (TEXT), pw_gpci (REAL), cost_tier | Geographic dimension with Medicare Administrative Contractor mapping, locality name, and Practice Work GPCI cost adjustment</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalDimension"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_procedure">
+    <rdfs:label>dim_procedure</rdfs:label>
+    <rdfs:comment>SQLite table: dim_procedure | Columns: hcpcs_code (TEXT), procedure_description, procedure_category, procedure_signal, linked_condition (TEXT) | HCPCS procedure code dimension with clinical categorization and condition linkage</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalDimension"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_specialty">
+    <rdfs:label>dim_specialty</rdfs:label>
+    <rdfs:comment>SQLite table: dim_specialty | Columns: raw_specialty_name (TEXT), specialty_name, specialty_domain | Provider specialty dimension mapping raw CMS specialty names to normalized specialty domain groupings</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalDimension"/>
+  </owl:Class>
+
+  <!-- ── ClinicalFact tables ── -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#fact_utilization_unified">
+    <rdfs:label>fact_utilization_unified</rdfs:label>
+    <rdfs:comment>SQLite table: fact_utilization_unified | Columns: source_type, state_abbr, hcpcs_code (TEXT), condition_name, body_system (TEXT), specialty_domain (TEXT), tier (INT), b2b_tier_primary (TEXT), icon (TEXT), color (TEXT), total_beneficiaries, total_services | Core unified fact table integrating utilization events across all CMS data sources; links to dim_procedure (hcpcs_code), dim_geography (state_abbr), dim_specialty (specialty_domain), dim_condition_registry (condition_name)</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalFact"/>
+  </owl:Class>
+
+  <!-- ── MaterializedAnalytics tables ── -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_hcpcs_detail">
+    <rdfs:label>mat_condition_hcpcs_detail</rdfs:label>
+    <rdfs:comment>SQLite table: mat_condition_hcpcs_detail | Columns: condition_name, hcpcs_code (TEXT), procedure_description, procedure_category, source_type, total_beneficiaries, total_services, total_allowed_amt, avg_allowed_per_service | Materialized detail of HCPCS procedure utilization per condition, including average allowed amounts per service</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#MaterializedAnalytics"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_national_summary">
+    <rdfs:label>mat_condition_national_summary</rdfs:label>
+    <rdfs:comment>SQLite table: mat_condition_national_summary | Columns: condition_name, specialty_domain (TEXT), tier (INT), b2b_tier_primary (TEXT), icon (TEXT), color (TEXT), opportunity_score, data_sources, states_with_data, total_beneficiaries, total_services, total_allowed_amt | National-level rollup per condition with opportunity score, commercial tier classification, and multi-source aggregation</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#MaterializedAnalytics"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_source_breakdown">
+    <rdfs:label>mat_condition_source_breakdown</rdfs:label>
+    <rdfs:comment>SQLite table: mat_condition_source_breakdown | Columns: condition_name, source_type, total_beneficiaries, total_services, total_allowed_amt, total_medicare_payment | Breakdown of condition utilization by CMS data source type (e.g., physician, outpatient, DME)</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#MaterializedAnalytics"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_state_breakdown">
+    <rdfs:label>mat_condition_state_breakdown</rdfs:label>
+    <rdfs:comment>SQLite table: mat_condition_state_breakdown | Columns: condition_name, state_abbr, locality_name (TEXT), cost_tier, pw_gpci (REAL), total_beneficiaries, total_services, total_allowed_amt, total_medicare_payment, allowed_per_patient | State-level breakdown of condition utilization with geographic cost adjustment (GPCI) and per-patient allowed amounts</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#MaterializedAnalytics"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_executive_kpis">
+    <rdfs:label>mat_executive_kpis</rdfs:label>
+    <rdfs:comment>SQLite table: mat_executive_kpis | Columns: total_conditions, total_states, total_procedures, total_beneficiaries, total_allowed_amt, total_medicare_payment, active_data_sources | Single-row executive dashboard KPI snapshot across all conditions, procedures, and financial totals</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#MaterializedAnalytics"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_opportunity_score">
+    <rdfs:label>mat_opportunity_score</rdfs:label>
+    <rdfs:comment>SQLite table: mat_opportunity_score | Columns: condition_name, specialty_domain (TEXT), tier (INT), b2b_tier_primary (TEXT), icon (TEXT), color (TEXT), total_benes, total_allowed, opportunity_score | Ranked commercial opportunity scores per condition with specialty domain classification, beneficiary counts, and total allowed amounts</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#MaterializedAnalytics"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_top_states_by_condition">
+    <rdfs:label>mat_top_states_by_condition</rdfs:label>
+    <rdfs:comment>SQLite table: mat_top_states_by_condition | Columns: condition_name, state_abbr, total_beneficiaries, total_allowed_amt, total_medicare_payment, allowed_per_patient, state_rank | Ranked list of top states by condition utilization volume, allowed amounts, and per-patient cost</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#MaterializedAnalytics"/>
+  </owl:Class>
+
+  <!-- ── PolicyMonitoring tables ── -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#data_provenance">
+    <rdfs:label>data_provenance</rdfs:label>
+    <rdfs:comment>SQLite table: data_provenance | PK: id (INTEGER AUTOINCREMENT) | Columns: title (TEXT NOT NULL), link (TEXT NOT NULL), version_year (INTEGER), ingested_at (DATETIME), object_type (TEXT NOT NULL, e.g. external_source), description (TEXT) | Tracks lineage and provenance of ingested external data sources including CMS, HCPCS, ICD-10 reference files</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#PolicyMonitoring"/>
+  </owl:Class>
+
+  <!-- ── CMSAggregation tables ── -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_bygeo_place_of_service_mapping">
+    <rdfs:label>uniform_resource_cms_bygeo_place_of_service_mapping</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_cms_bygeo_place_of_service_mapping | Columns: pos_code (TEXT), pos_description (TEXT), pos_category (TEXT), tenant_id, tenant_name, uniform_resource_id | Maps CMS place-of-service codes to descriptive categories for geographic utilization data</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#CMSAggregation"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_bygeography">
+    <rdfs:label>uniform_resource_cms_bygeography</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_cms_bygeography | Columns: Rndrng_Prvdr_Geo_Lvl (TEXT), Rndrng_Prvdr_Geo_Cd (TEXT), Rndrng_Prvdr_Geo_Desc (TEXT), HCPCS_Cd (TEXT), HCPCS_Desc (TEXT), HCPCS_Drug_Ind (TEXT), Place_Of_Srvc (TEXT), Tot_Rndrng_Prvdrs (TEXT), Tot_Benes (TEXT) | CMS Medicare Physician and Other Practitioners utilization aggregated by geographic locality and HCPCS code</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#CMSAggregation"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_inpatienthospitals_byproviderandservice">
+    <rdfs:label>uniform_resource_cms_inpatienthospitals_byproviderandservice</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_cms_inpatienthospitals_byproviderandservice | Columns: Rndrng_Prvdr_CCN (TEXT), Rndrng_Prvdr_Org_Name (TEXT), Rndrng_Prvdr_City (TEXT), Rndrng_Prvdr_St (TEXT), Rndrng_Prvdr_State_FIPS (TEXT), Rndrng_Prvdr_Zip5 (TEXT) | CMS inpatient hospital utilization by provider (CCN) and DRG service, including charges and payments</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#CMSAggregation"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_outpatienthospitals_byproviderandservice">
+    <rdfs:label>uniform_resource_cms_outpatienthospitals_byproviderandservice</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_cms_outpatienthospitals_byproviderandservice | Columns: Rndrng_Prvdr_CCN (TEXT), Rndrng_Prvdr_Org_Name (TEXT), Rndrng_Prvdr_St (TEXT), Rndrng_Prvdr_City (TEXT), Rndrng_Prvdr_State_Abrvtn (TEXT), Rndrng_Prvdr_State_FIPS (TEXT) | CMS outpatient hospital utilization by provider (CCN) and APC service, including allowed amounts and payments</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#CMSAggregation"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_provider">
+    <rdfs:label>uniform_resource_cms_provider</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_cms_provider | Columns: Rndrng_NPI (TEXT), Rndrng_Prvdr_Last_Org_Name (TEXT), Rndrng_Prvdr_First_Name (TEXT), Rndrng_Prvdr_MI (TEXT), Rndrng_Prvdr_Crdntls (TEXT), Rndrng_Prvdr_Ent_Cd (TEXT), Rndrng_Prvdr_St1 (TEXT), Rndrng_Prvdr_St2 (TEXT) | CMS Medicare provider-level utilization with NPI, specialty, and service/payment totals</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#CMSAggregation"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_providerandservice_pos">
+    <rdfs:label>uniform_resource_cms_providerandservice_pos</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_cms_providerandservice_pos | Columns: Place of Service Code (TEXT), Place of Service Description (TEXT), Place of Service (TEXT), tenant_id, tenant_name, uniform_resource_id | CMS place-of-service reference mapping for provider and service utilization records</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#CMSAggregation"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_diagnostics_data">
+    <rdfs:label>uniform_resource_diagnostics_data</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_diagnostics_data | Columns: Rndrng_Prvdr_Geo_Lvl (TEXT), Rndrng_Prvdr_Geo_Cd (TEXT), Rndrng_Prvdr_Geo_Desc (TEXT), HCPCS_Cd (TEXT), HCPCS_Desc (TEXT), HCPCS_Drug_Ind (TEXT), Place_Of_Srvc (TEXT), Tot_Rndrng_Prvdrs (TEXT), Tot_Benes (TEXT) | CMS diagnostics/imaging utilization aggregated by geography and HCPCS code</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#CMSAggregation"/>
+  </owl:Class>
+
+  <!-- ── DMEData tables ── -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_copd_oxygen">
+    <rdfs:label>uniform_resource_copd_oxygen</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_copd_oxygen | Columns: Rfrg_NPI (TEXT), Rfrg_Prvdr_Last_Name_Org (TEXT), Rfrg_Prvdr_First_Name (TEXT), Rfrg_Prvdr_MI (TEXT), Rfrg_Prvdr_Crdntls (TEXT), Rfrg_Prvdr_Ent_Cd (TEXT), Rfrg_Prvdr_St1 (TEXT), Rfrg_Prvdr_St2 (TEXT) | CMS DME referral data for COPD home oxygen therapy (HCPCSs E0431, E1390, etc.) by referring provider NPI</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#DMEData"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_dme_cpap_e0601_e0470_e0471">
+    <rdfs:label>uniform_resource_dme_cpap_e0601_e0470_e0471</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_dme_cpap_e0601_e0470_e0471 | Columns: Rfrg_NPI (TEXT), Rfrg_Prvdr_Last_Name_Org (TEXT), Rfrg_Prvdr_First_Name (TEXT), Rfrg_Prvdr_MI (TEXT), Rfrg_Prvdr_Crdntls (TEXT), Rfrg_Prvdr_Ent_Cd (TEXT), Rfrg_Prvdr_St1 (TEXT), Rfrg_Prvdr_St2 (TEXT) | CMS DME referral data for CPAP/BiPAP devices (E0601 CPAP, E0470/E0471 BiPAP) by referring provider NPI</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#DMEData"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_dme_data">
+    <rdfs:label>uniform_resource_dme_data</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_dme_data | Columns: Rfrg_NPI (TEXT), Rfrg_Prvdr_Last_Name_Org (TEXT), Rfrg_Prvdr_First_Name (TEXT), Rfrg_Prvdr_MI (TEXT), Rfrg_Prvdr_Crdntls (TEXT), Rfrg_Prvdr_Ent_Cd (TEXT), Rfrg_Prvdr_St1 (TEXT), Rfrg_Prvdr_St2 (TEXT) | General CMS Durable Medical Equipment utilization and referral data by referring provider NPI, item, and supplier</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#DMEData"/>
+  </owl:Class>
+
+  <!-- ── ClinicalReference tables ── -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_anes_conversion_factor">
+    <rdfs:label>uniform_resource_ref_anes_conversion_factor</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_anes_conversion_factor | Columns: Contractor (TEXT), Locality (TEXT), Locality Name (TEXT), Qualifying APM National Anes CF (with 2.5% statutory increase) of 20.599835 (TEXT), Non-Qualifying APM National Anes CF (with 2.5% statutory increase) (TEXT) | CMS anesthesia conversion factors by MAC contractor and locality, including QPM qualifying and non-qualifying rates</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_geo_adjustment">
+    <rdfs:label>uniform_resource_ref_geo_adjustment</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_geo_adjustment | Columns: Medicare Administrative Contractor (MAC) (TEXT), State (TEXT), Locality Number (TEXT), Locality Name (TEXT), 2026 PW GPCI without 1.0 Floor (TEXT), 2026 PW GPCI with 1.0 Floor (TEXT) | 2026 CMS geographic practice cost index (GPCI) adjustments for Practice Work, PE, and Malpractice by MAC locality</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_hcpcs_level_two_procedures">
+    <rdfs:label>uniform_resource_ref_hcpcs_level_two_procedures</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_hcpcs_level_two_procedures | Columns: hcpcs_code (TEXT), seq_num (TEXT), record_id (TEXT), long_description (TEXT), short_description (TEXT), tenant_id, tenant_name, uniform_resource_id | HCPCS Level II (non-physician supply/DME/drug) procedure code master with long and short descriptions</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_icd10_diagnosis">
+    <rdfs:label>uniform_resource_ref_icd10_diagnosis</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_icd10_diagnosis | Columns: sort_order (TEXT), icd10_code (TEXT), is_billable (TEXT), description_short (TEXT), description_long (TEXT), tenant_id, tenant_name, uniform_resource_id | Complete ICD-10-CM diagnosis code master with billability flag and short/long descriptions</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_medicare_localities">
+    <rdfs:label>uniform_resource_ref_medicare_localities</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_medicare_localities | Columns: Medicare Administrative Contractor (TEXT), Locality Number (TEXT), State (TEXT), Fee Schedule Area (TEXT), Counties (TEXT), tenant_id, tenant_name, uniform_resource_id | CMS Medicare fee schedule locality master mapping MACs, locality numbers, states, and constituent counties</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_opps_price_cap">
+    <rdfs:label>uniform_resource_ref_opps_price_cap</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_opps_price_cap | Columns: HCPCS (TEXT), MOD (TEXT), PROCSTAT (TEXT), CARRIER (TEXT), LOCALITY (TEXT), FACILITY PRICE (TEXT), NON-FACILITY PRICE (TEXT), tenant_id, tenant_name, uniform_resource_id | CMS Outpatient Prospective Payment System (OPPS) price caps by HCPCS, modifier, carrier, and locality</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_procedure_code">
+    <rdfs:label>uniform_resource_ref_procedure_code</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_procedure_code | Columns: HCPCS (TEXT), MOD (TEXT), DESCRIPTION (TEXT), STATUS CODE (TEXT), MEDICARE PAYMENT (TEXT), WORK RVU (TEXT), NON-FAC PE RVU (TEXT), NON-FAC NA INDICATOR (TEXT), FACILITY PE RVU (TEXT) | CMS Medicare Physician Fee Schedule procedure code master with RVU components, status codes, and facility/non-facility payment rates</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_rvu_qpp">
+    <rdfs:label>uniform_resource_ref_rvu_qpp</rdfs:label>
+    <rdfs:comment>SQLite table: uniform_resource_ref_rvu_qpp | Columns: HCPCS (TEXT), MOD (TEXT), DESCRIPTION (TEXT), STATUS CODE (TEXT), MEDICARE PAYMENT (TEXT), WORK RVU (TEXT), NON-FAC PE RVU (TEXT), NON-FAC NA INDICATOR (TEXT), FACILITY PE RVU (TEXT), FACILITY NA INDICATOR (TEXT) | CMS RVU and Quality Payment Program (QPP) data per HCPCS/modifier, used for MIPS/APM participation and value-based care analytics</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#ClinicalReference"/>
+  </owl:Class>
+
+  <!-- ═══ VIEW CLASSES (each maps 1:1 to a SQLite view) ═══ -->
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#data_dictionary_indexes">
+    <rdfs:label>data_dictionary_indexes</rdfs:label>
+    <rdfs:comment>SQLite view: data_dictionary_indexes | Exposes index_name, table_name, description for all non-system indexes in sqlite_schema; used by MCP agents for schema introspection</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#SummaryView"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#data_tables_derived">
+    <rdfs:label>data_tables_derived</rdfs:label>
+    <rdfs:comment>SQLite view: data_tables_derived | Classifies all schema objects (tables/views) into semantic categories: Dimensional Table, Master Reference, Uniform Resource, Materialized Analytics, etc. using CASE logic on object name prefixes</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#SummaryView"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#executive_kpis">
+    <rdfs:label>executive_kpis</rdfs:label>
+    <rdfs:comment>SQLite view: executive_kpis | SELECT * FROM mat_executive_kpis — convenience alias exposing single-row executive KPI snapshot (total conditions, states, procedures, beneficiaries, allowed amounts, Medicare payments, active data sources)</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#SummaryView"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#opportunity_score">
+    <rdfs:label>opportunity_score</rdfs:label>
+    <rdfs:comment>SQLite view: opportunity_score | SELECT * FROM mat_opportunity_score — convenience alias exposing ranked commercial opportunity scores per condition with specialty domain, tier, beneficiary counts, and total allowed amounts</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#SummaryView"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#top_states_by_condition">
+    <rdfs:label>top_states_by_condition</rdfs:label>
+    <rdfs:comment>SQLite view: top_states_by_condition | SELECT * FROM mat_top_states_by_condition — convenience alias exposing ranked top states by condition utilization, allowed amounts, Medicare payments, and per-patient cost</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://medigy.ontology/surveilr#SummaryView"/>
+  </owl:Class>
+
+  <!-- ═══ OBJECT PROPERTIES (join relationships between tables) ═══ -->
+
+  <!-- fact_utilization_unified → dim_procedure (hcpcs_code) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#fact_utilization_unified__hcpcs_code__ref__dim_procedure">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#fact_utilization_unified"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:label>hcpcs_code → dim_procedure.hcpcs_code</rdfs:label>
+    <rdfs:comment>JOIN: fact_utilization_unified.hcpcs_code → dim_procedure.hcpcs_code</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- fact_utilization_unified → dim_geography (state_abbr) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#fact_utilization_unified__state_abbr__ref__dim_geography">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#fact_utilization_unified"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_geography"/>
+    <rdfs:label>state_abbr → dim_geography.state_abbr</rdfs:label>
+    <rdfs:comment>JOIN: fact_utilization_unified.state_abbr → dim_geography.state_abbr</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- fact_utilization_unified → dim_specialty (specialty_domain) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#fact_utilization_unified__specialty_domain__ref__dim_specialty">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#fact_utilization_unified"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_specialty"/>
+    <rdfs:label>specialty_domain → dim_specialty.specialty_domain</rdfs:label>
+    <rdfs:comment>JOIN: fact_utilization_unified.specialty_domain → dim_specialty.specialty_domain</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- fact_utilization_unified → dim_condition_registry (condition_name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#fact_utilization_unified__condition_name__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#fact_utilization_unified"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>condition_name → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: fact_utilization_unified.condition_name → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- dim_procedure → dim_condition_registry (linked_condition) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#dim_procedure__linked_condition__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>linked_condition → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: dim_procedure.linked_condition → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- dim_diagnosis → dim_condition_registry (disease_state / body_system) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#dim_diagnosis__body_system__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#dim_diagnosis"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>body_system → dim_condition_registry.body_system</rdfs:label>
+    <rdfs:comment>JOIN: dim_diagnosis.body_system → dim_condition_registry.body_system (logical grouping)</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_condition_hcpcs_detail → dim_condition_registry (condition_name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_condition_hcpcs_detail__condition_name__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_condition_hcpcs_detail"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>condition_name → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: mat_condition_hcpcs_detail.condition_name → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_condition_hcpcs_detail → dim_procedure (hcpcs_code) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_condition_hcpcs_detail__hcpcs_code__ref__dim_procedure">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_condition_hcpcs_detail"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:label>hcpcs_code → dim_procedure.hcpcs_code</rdfs:label>
+    <rdfs:comment>JOIN: mat_condition_hcpcs_detail.hcpcs_code → dim_procedure.hcpcs_code</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_condition_national_summary → dim_condition_registry (condition_name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_condition_national_summary__condition_name__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_condition_national_summary"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>condition_name → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: mat_condition_national_summary.condition_name → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_condition_source_breakdown → dim_condition_registry (condition_name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_condition_source_breakdown__condition_name__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_condition_source_breakdown"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>condition_name → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: mat_condition_source_breakdown.condition_name → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_condition_state_breakdown → dim_condition_registry (condition_name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_condition_state_breakdown__condition_name__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_condition_state_breakdown"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>condition_name → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: mat_condition_state_breakdown.condition_name → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_condition_state_breakdown → dim_geography (state_abbr) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_condition_state_breakdown__state_abbr__ref__dim_geography">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_condition_state_breakdown"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_geography"/>
+    <rdfs:label>state_abbr → dim_geography.state_abbr</rdfs:label>
+    <rdfs:comment>JOIN: mat_condition_state_breakdown.state_abbr → dim_geography.state_abbr</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_opportunity_score → dim_condition_registry (condition_name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_opportunity_score__condition_name__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_opportunity_score"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>condition_name → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: mat_opportunity_score.condition_name → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_top_states_by_condition → dim_condition_registry (condition_name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_top_states_by_condition__condition_name__ref__dim_condition_registry">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_top_states_by_condition"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_condition_registry"/>
+    <rdfs:label>condition_name → dim_condition_registry.condition_name</rdfs:label>
+    <rdfs:comment>JOIN: mat_top_states_by_condition.condition_name → dim_condition_registry.condition_name</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- mat_top_states_by_condition → dim_geography (state_abbr) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#mat_top_states_by_condition__state_abbr__ref__dim_geography">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#mat_top_states_by_condition"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_geography"/>
+    <rdfs:label>state_abbr → dim_geography.state_abbr</rdfs:label>
+    <rdfs:comment>JOIN: mat_top_states_by_condition.state_abbr → dim_geography.state_abbr</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_cms_bygeography → dim_procedure (HCPCS_Cd) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_bygeography__HCPCS_Cd__ref__dim_procedure">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_cms_bygeography"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:label>HCPCS_Cd → dim_procedure.hcpcs_code</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_cms_bygeography.HCPCS_Cd → dim_procedure.hcpcs_code</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_diagnostics_data → dim_procedure (HCPCS_Cd) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_diagnostics_data__HCPCS_Cd__ref__dim_procedure">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_diagnostics_data"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:label>HCPCS_Cd → dim_procedure.hcpcs_code</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_diagnostics_data.HCPCS_Cd → dim_procedure.hcpcs_code</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_ref_procedure_code → dim_procedure (HCPCS) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_procedure_code__HCPCS__ref__dim_procedure">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_ref_procedure_code"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:label>HCPCS → dim_procedure.hcpcs_code</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_ref_procedure_code.HCPCS → dim_procedure.hcpcs_code (RVU reference enrichment)</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_ref_rvu_qpp → dim_procedure (HCPCS) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_rvu_qpp__HCPCS__ref__dim_procedure">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_ref_rvu_qpp"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:label>HCPCS → dim_procedure.hcpcs_code</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_ref_rvu_qpp.HCPCS → dim_procedure.hcpcs_code (QPP value-based care enrichment)</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_ref_opps_price_cap → dim_procedure (HCPCS) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_opps_price_cap__HCPCS__ref__dim_procedure">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_ref_opps_price_cap"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_procedure"/>
+    <rdfs:label>HCPCS → dim_procedure.hcpcs_code</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_ref_opps_price_cap.HCPCS → dim_procedure.hcpcs_code (OPPS price cap enrichment)</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_ref_icd10_diagnosis → dim_diagnosis (icd10_code) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_icd10_diagnosis__icd10_code__ref__dim_diagnosis">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_ref_icd10_diagnosis"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_diagnosis"/>
+    <rdfs:label>icd10_code → dim_diagnosis.icd10_code</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_ref_icd10_diagnosis.icd10_code → dim_diagnosis.icd10_code (diagnosis master enrichment)</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_ref_geo_adjustment → dim_geography (State / Locality Name) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_geo_adjustment__State__ref__dim_geography">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_ref_geo_adjustment"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_geography"/>
+    <rdfs:label>State → dim_geography.state_abbr</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_ref_geo_adjustment.State → dim_geography.state_abbr (GPCI enrichment)</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- uniform_resource_ref_medicare_localities → dim_geography (State) -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_medicare_localities__State__ref__dim_geography">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#uniform_resource_ref_medicare_localities"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#dim_geography"/>
+    <rdfs:label>State → dim_geography.state_abbr</rdfs:label>
+    <rdfs:comment>JOIN: uniform_resource_ref_medicare_localities.State → dim_geography.state_abbr (locality master enrichment)</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- view: executive_kpis → mat_executive_kpis -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#executive_kpis__view__ref__mat_executive_kpis">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#executive_kpis"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#mat_executive_kpis"/>
+    <rdfs:label>view alias → mat_executive_kpis</rdfs:label>
+    <rdfs:comment>VIEW: executive_kpis is a direct SELECT * alias over mat_executive_kpis</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- view: opportunity_score → mat_opportunity_score -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#opportunity_score__view__ref__mat_opportunity_score">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#opportunity_score"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#mat_opportunity_score"/>
+    <rdfs:label>view alias → mat_opportunity_score</rdfs:label>
+    <rdfs:comment>VIEW: opportunity_score is a direct SELECT * alias over mat_opportunity_score</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- view: top_states_by_condition → mat_top_states_by_condition -->
+  <owl:ObjectProperty rdf:about="http://medigy.ontology/surveilr#top_states_by_condition__view__ref__mat_top_states_by_condition">
+    <rdfs:domain rdf:resource="http://medigy.ontology/surveilr#top_states_by_condition"/>
+    <rdfs:range rdf:resource="http://medigy.ontology/surveilr#mat_top_states_by_condition"/>
+    <rdfs:label>view alias → mat_top_states_by_condition</rdfs:label>
+    <rdfs:comment>VIEW: top_states_by_condition is a direct SELECT * alias over mat_top_states_by_condition</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <!-- ═══ MCP QUERY HINTS ═══ -->
+  <owl:AnnotationProperty rdf:about="http://medigy.ontology/surveilr#mcpQueryHint">
+    <rdfs:label>MCP Query Hint</rdfs:label>
+    <rdfs:comment>Example SQL SELECT for MCP agents to retrieve data from this table/view</rdfs:comment>
+  </owl:AnnotationProperty>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#fact_utilization_unified">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT source_type, state_abbr, hcpcs_code, condition_name, body_system, specialty_domain, tier, total_beneficiaries, total_services FROM fact_utilization_unified LIMIT 100</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_condition_registry">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_id, condition_name, body_system, tier FROM dim_condition_registry</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_procedure">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT hcpcs_code, procedure_description, procedure_category, procedure_signal, linked_condition FROM dim_procedure</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_diagnosis">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT icd10_code, diagnosis_description, disease_state, body_system FROM dim_diagnosis</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_specialty">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT raw_specialty_name, specialty_name, specialty_domain FROM dim_specialty</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#dim_geography">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT state_abbr, mac_name, locality_name, pw_gpci, cost_tier FROM dim_geography</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_national_summary">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, specialty_domain, tier, opportunity_score, states_with_data, total_beneficiaries, total_services, total_allowed_amt FROM mat_condition_national_summary ORDER BY opportunity_score DESC LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_opportunity_score">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, specialty_domain, tier, total_benes, total_allowed, opportunity_score FROM mat_opportunity_score ORDER BY opportunity_score DESC LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_executive_kpis">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT total_conditions, total_states, total_procedures, total_beneficiaries, total_allowed_amt, total_medicare_payment, active_data_sources FROM mat_executive_kpis</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_state_breakdown">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, state_abbr, locality_name, cost_tier, pw_gpci, total_beneficiaries, total_allowed_amt, allowed_per_patient FROM mat_condition_state_breakdown LIMIT 100</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_hcpcs_detail">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, hcpcs_code, procedure_description, procedure_category, source_type, total_beneficiaries, total_services, total_allowed_amt, avg_allowed_per_service FROM mat_condition_hcpcs_detail LIMIT 100</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_top_states_by_condition">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, state_abbr, total_beneficiaries, total_allowed_amt, allowed_per_patient, state_rank FROM mat_top_states_by_condition ORDER BY state_rank LIMIT 100</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#mat_condition_source_breakdown">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, source_type, total_beneficiaries, total_services, total_allowed_amt, total_medicare_payment FROM mat_condition_source_breakdown LIMIT 100</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_provider">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT Rndrng_NPI, Rndrng_Prvdr_Last_Org_Name, Rndrng_Prvdr_First_Name, Rndrng_Prvdr_Crdntls FROM uniform_resource_cms_provider LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_cms_bygeography">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT Rndrng_Prvdr_Geo_Lvl, Rndrng_Prvdr_Geo_Desc, HCPCS_Cd, HCPCS_Desc, Place_Of_Srvc, Tot_Benes FROM uniform_resource_cms_bygeography LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_procedure_code">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT HCPCS, MOD, DESCRIPTION, "STATUS CODE", "MEDICARE PAYMENT", "WORK RVU", "NON-FAC PE RVU", "FACILITY PE RVU" FROM uniform_resource_ref_procedure_code LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_ref_rvu_qpp">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT HCPCS, MOD, DESCRIPTION, "MEDICARE PAYMENT", "WORK RVU" FROM uniform_resource_ref_rvu_qpp LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_dme_data">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT Rfrg_NPI, Rfrg_Prvdr_Last_Name_Org, Rfrg_Prvdr_First_Name FROM uniform_resource_dme_data LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_dme_cpap_e0601_e0470_e0471">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT Rfrg_NPI, Rfrg_Prvdr_Last_Name_Org, Rfrg_Prvdr_First_Name FROM uniform_resource_dme_cpap_e0601_e0470_e0471 LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#uniform_resource_copd_oxygen">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT Rfrg_NPI, Rfrg_Prvdr_Last_Name_Org, Rfrg_Prvdr_First_Name FROM uniform_resource_copd_oxygen LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#data_provenance">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT id, title, link, version_year, ingested_at, object_type, description FROM data_provenance</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#executive_kpis">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT total_conditions, total_states, total_procedures, total_beneficiaries, total_allowed_amt, total_medicare_payment, active_data_sources FROM executive_kpis</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#opportunity_score">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, specialty_domain, tier, total_benes, total_allowed, opportunity_score FROM opportunity_score ORDER BY opportunity_score DESC LIMIT 50</mcpQueryHint>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://medigy.ontology/surveilr#top_states_by_condition">
+    <mcpQueryHint xmlns="http://medigy.ontology/surveilr#">SELECT condition_name, state_abbr, total_beneficiaries, total_allowed_amt, allowed_per_patient, state_rank FROM top_states_by_condition ORDER BY state_rank LIMIT 100</mcpQueryHint>
+  </owl:Class>
+
+</rdf:RDF>

@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "medigy": {
+      "command": "C:\\Windows\\System32\\wsl.exe",
+      "args": [
+        "--distribution",
+        "Ubuntu-22.04",
+        "--exec",
+        "/home/.local/bin/surveilr",
+        "mcp",
+        "server",
+        "-d",
+        "/home/workspaces/medicare/resource-surveillance.sqlite.db"
+      ]
+    }
+  },
+  "preferences": {
+    "coworkScheduledTasksEnabled": false,
+    "sidebarMode": "chat",
+    "coworkWebSearchEnabled": true,
+    "ccdScheduledTasksEnabled": false
+  }
+}
