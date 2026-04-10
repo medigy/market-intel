@@ -325,6 +325,7 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 ./footer-links.js .
 ./custom-dashboard.css .
 ```
+
 ---
 
 ## Home Page
@@ -455,15 +456,31 @@ SELECT 'shell' AS component,
 -- Hero
 SELECT 'hero' AS component,
        'Medigy Market Intelligence' AS title,
-       'Unified CMS Medicare analytics across all disease conditions — Part B, DMEPOS, and Hospital data.' AS description,
+       'Healthcare decisions powered by 2023 CMS data—unlock Medicare insights across Part B, DMEPOS, and hospital datasets covering all major disease conditions.' AS description,
        'azure' AS color;
 
--- ── Portfolio Totals — Navigable KPI Cards (replaces big_number) ──────────────
+-- ── Portfolio Totals —
+SELECT 'text' AS component,
+       'Healthcare Markets, Quantified Using Real CMS Data (2023)' AS title,
+       'Explore patient volume, total spend, and high-value opportunities across all disease conditions.' AS contents_md;
+
+SELECT 'text' AS component,
+       'If you can’t prove it with data, it’s just a guess.' AS contents_md;
+
+-- ── KPI SECTION INTRO ────────────────────────────────────────────────────────
+SELECT 'divider' AS component,
+       'Your Healthcare Market at a Glance' AS label;
+
+SELECT 'text' AS component,
+       'These metrics represent real Medicare scale across patients, providers, and financial impact.' AS contents_md;
+
+-- ── KPI CARDS ────────────────────────────────────────────────────────────────
+
 -- Cards link to relevant sections/pages; same-page anchors via HTML id elements.
 SELECT 'card' AS component, 4 AS columns;
 
 SELECT 
-    'Disease Conditions' AS title,
+    'Active Disease Markets' AS title,
     printf('%,.0f', total_conditions) AS description,    
     'teal' AS color, 'activity' AS icon,
     'kpi-card' AS class,
@@ -471,7 +488,7 @@ SELECT
 FROM mat_executive_kpis;
 
 SELECT 
-    'Total Beneficiaries' AS title,
+    'Patients Impacted (Medicare)' AS title,
     printf('%,.0f', total_beneficiaries) AS description,
     'azure' AS color, 'users' AS icon,
     'kpi-card' AS class,
@@ -479,7 +496,7 @@ SELECT
 FROM mat_executive_kpis;
 
 SELECT 
-    'Medicare Allowed ($)' AS title,
+    'Total Market Spend ($)' AS title,
     '$' || printf('%,.0f', total_allowed_amt) AS description,
     'indigo' AS color, 'currency-dollar' AS icon,
     'kpi-card' AS class,
@@ -487,7 +504,7 @@ SELECT
 FROM mat_executive_kpis;
 
 SELECT 
-    'External Data Sources' AS title,
+    'Data Sources Integrated' AS title,
     '' || (SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source') || '' AS description,
     'orange' AS color, 'database' AS icon,
     'kpi-card' AS class,
@@ -497,7 +514,7 @@ SELECT
 SELECT 'card' AS component, 4 AS columns;
 
 SELECT 
-    'Active States' AS title,
+    'Markets Covered (States)' AS title,
     printf('%,.0f', total_states) AS description,
     'blue' AS color, 'map-pin' AS icon,
     'kpi-card' AS class,
@@ -505,7 +522,7 @@ SELECT
 FROM mat_executive_kpis;
 
 SELECT 
-    'Unique Procedures' AS title,
+    'Clinical Procedures Tracked' AS title,
     printf('%,.0f', total_procedures) AS description,
     'grape' AS color, 'clipboard-list' AS icon,
     'kpi-card' AS class,
@@ -513,7 +530,7 @@ SELECT
 FROM mat_executive_kpis;
 
 SELECT 
-    'Medicare Paid ($)' AS title,
+    'Actual Medicare Payout ($)' AS title,
     '$' || printf('%,.0f', total_medicare_payment) AS description,
     'teal' AS color, 'receipt' AS icon,
     'kpi-card' AS class,
@@ -521,17 +538,22 @@ SELECT
 FROM mat_executive_kpis;
 
 SELECT 
-    'Opportunity Scores' AS title,
-    (SELECT COUNT(*) FROM mat_opportunity_score) || ' ranked' AS description,
+    'Ranked Market Opportunities' AS title,
+    (SELECT COUNT(*) FROM mat_opportunity_score) || ' conditions' AS description,
     'orange' AS color, 'trophy' AS icon,
     'kpi-card' AS class,
     '/mmi/opportunity-scoring.sql' AS link;
 
 -- ── NEW: Opportunity Snapshot Chart ──────────────────────────────────────────
-SELECT 'divider' AS component, 'Market Opportunity Snapshot' AS label;
+SELECT 'divider' AS component, 
+       'Where the Biggest Healthcare Opportunities Exist' AS label;
+
+SELECT 'text' AS component,
+       'These insights highlight high-value disease markets based on real CMS 2023 data.' AS contents_md;
+
 
 SELECT 'chart' AS component,
-       'Opportunity Score by Condition' AS title,
+       'Top Disease Markets Ranked by Opportunity' AS title,
        'bar' AS type, 8 AS width;
 SELECT condition_name AS label, opportunity_score AS value, color AS color
 FROM mat_opportunity_score
@@ -539,7 +561,7 @@ ORDER BY opportunity_score DESC;
 
 -- ── NEW: Portfolio Mix by Tier (donut) ───────────────────────────────────────
 SELECT 'chart' AS component,
-       'Portfolio Distribution by Tier' AS title,
+       'How Your Portfolio is Strategically Distributed' AS title,
        'donut' AS type, 4 AS width;
 SELECT 
     'Tier ' || tier || ' — ' || CASE tier WHEN 1 THEN 'Flagship' WHEN 2 THEN 'Core' ELSE 'Baseline' END AS label,
@@ -550,7 +572,7 @@ ORDER BY tier;
 
 -- ── NEW: Data Source Mix (bar) ────────────────────────────────────────────────
 SELECT 'chart' AS component,
-       'Medicare Allowed by Data Source (All Conditions)' AS title,
+       'Where the Money Flows Across Care Settings' AS title,
        'bar' AS type, 4 AS width;
 SELECT source_type AS label, SUM(total_allowed_amt) AS value
 FROM mat_condition_source_breakdown
@@ -559,7 +581,13 @@ ORDER BY SUM(total_allowed_amt) DESC;
 
 -- ── Disease Condition Cards — Fully Dynamic ───────────────────────────────────
 SELECT 'html' AS component, '<div id="disease-conditions-section"></div>' AS html;
-SELECT 'divider' AS component, 'Disease Conditions — Click to Explore' AS contents;
+
+SELECT 'divider' AS component, 
+       'Explore High-Value Disease Markets' AS contents;
+
+SELECT 'text' AS component,
+       'Each condition below represents a measurable market opportunity — click to explore deeper insights.' AS contents_md;
+
 SELECT 'card' AS component, 3 AS columns;
 
 SELECT
@@ -576,33 +604,41 @@ FROM mat_condition_national_summary s
 ORDER BY s.tier, s.opportunity_score DESC;
 
 -- ── Analytics Navigation ──────────────────────────────────────────────────────
-SELECT 'divider' AS component, 'Analytics Modules' AS contents;
+
+SELECT 'divider' AS component, 
+       'Analyze, Validate, and Act' AS contents;
 SELECT 'card' AS component, 3 AS columns;
 
 SELECT 'Executive Dashboard'  AS title,
-       'Top-line KPIs across all conditions and specialties.' AS description,
+       'View total market size, spend, and patient volume across conditions.' AS description,
        '/mmi/executive-dashboard.sql' AS link,
        'layout-dashboard' AS icon, 'teal' AS color;
 SELECT 'Opportunity Scoring'  AS title,
-       'Composite ranking of all disease conditions by patient volume and spend.' AS description,
+       'Identify the most promising disease markets using real data.' AS description,
        '/mmi/opportunity-scoring.sql' AS link,
        'trophy' AS icon, 'azure' AS color;
 SELECT 'Geographic Intelligence' AS title,
-       'State-level market sizing and cost-tier mapping.' AS description,
+       'Pinpoint high-growth regions and underserved markets.' AS description,
        '/mmi/geography.sql' AS link,
        'map-pin' AS icon, 'indigo' AS color;
 SELECT 'Procedure Drilldown'  AS title,
-       'HCPCS-level analytics across all conditions.' AS description,
+       'Understand care delivery patterns at procedure level.' AS description,
        '/mmi/procedure-drilldown.sql' AS link,
        'clipboard-list' AS icon, 'orange' AS color;
 SELECT 'Disease Conditions'   AS title,
-       'Full directory of conditions in the registry.' AS description,
+       'Explore and compare all healthcare markets in the registry.' AS description,
        '/mmi/conditions.sql' AS link,
        'virus' AS icon, 'grape' AS color;
 SELECT 'Data Dictionary'      AS title,
-       'Table and column reference for the unified pipeline.' AS description,
+       'Full transparency into datasets, tables, and structure.' AS description,
        '/mmi/data-dictionary.sql' AS link,
        'book' AS icon, 'blue' AS color;
+
+SELECT 'divider' AS component;
+
+SELECT 'text' AS component,
+       'Start identifying your next healthcare opportunity using real CMS data.' AS contents_md;
+
 ```
 
 ---
@@ -1490,10 +1526,19 @@ SELECT 'divider' AS component;
 SELECT 'text' AS component, 'External Data Sources' AS contents_md;
 SELECT 'list' AS component;
 SELECT 
-    title, description, link,
-    'external-link' AS icon, 'blue' AS color
+    title,
+    description || 
+        CASE 
+            WHEN version_year IS NOT NULL 
+            THEN ' (Data Year: ' || version_year || ')' 
+            ELSE '' 
+        END AS description,
+    link,
+    'external-link' AS icon, 
+    'blue' AS color
 FROM data_provenance 
-WHERE object_type = 'external_source';
+WHERE object_type = 'external_source'
+ORDER BY version_year DESC, title;
 
 -- NEW: Data freshness cards
 SELECT 'divider' AS component, 'Data Ingestion Timeline' AS contents;
