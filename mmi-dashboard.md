@@ -37,6 +37,35 @@ surveilr orchestrate transform-csv
 surveilr shell sql/medigy-unified-v2.sql
 surveilr shell sql/medigy-ddl.sql
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
+
+# ── Load .env so POSTHOG_API_KEY / POSTHOG_HOST are available ────────────────
+# Parsed with grep/cut rather than `source` so it works in fish and bash alike.
+if [ -f .env ]; then
+  POSTHOG_API_KEY=$(grep '^POSTHOG_API_KEY=' .env | cut -d= -f2-)
+  POSTHOG_HOST=$(grep '^POSTHOG_HOST=' .env | cut -d= -f2-)
+  export POSTHOG_API_KEY POSTHOG_HOST
+fi
+
+# ── footer-links.js: substitute placeholders from .env then re-insert ────────
+# spry --package embeds the source file with __POSTHOG_API_KEY__ placeholders;
+# we overwrite the DB row with the substituted version so secrets are never
+# committed to the source file.
+sed "s|__POSTHOG_API_KEY__|${POSTHOG_API_KEY}|g; s|__POSTHOG_HOST__|${POSTHOG_HOST}|g" \
+  footer-links.js > footer-links-dist.js
+sqlite3 resource-surveillance.sqlite.db \
+  "INSERT OR REPLACE INTO sqlpage_files (path, contents) VALUES ('footer-links.js', readfile('footer-links-dist.js'));"
+rm -f footer-links-dist.js
+
+# ── posthog-array.js: serve from same origin to satisfy strict CSP ───────────
+# spry --package overwrites sqlpage_files, so we re-insert it every time.
+# Refresh the local copy if it is older than 30 days.
+if [ ! -f posthog-array.js ] || find posthog-array.js -mtime +30 | grep -q .; then
+  echo "Refreshing posthog-array.js from PostHog CDN..."
+  curl -sL "https://us-assets.i.posthog.com/static/array.js" -o posthog-array.js
+fi
+sqlite3 resource-surveillance.sqlite.db \
+  "INSERT OR REPLACE INTO sqlpage_files (path, contents) VALUES ('posthog-array.js', readfile('posthog-array.js'));"
+
 echo "Medigy Market Intelligence (v3) is ready."
 ```
 
@@ -52,6 +81,7 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -93,7 +123,8 @@ SELECT 'shell' AS component,
        'narrow' AS layout,
        true AS fixed_top_menu,
        './' AS link,
-    './footer-links.js' AS javascript,
+       './posthog-array.js' AS javascript,
+       './footer-links.js' AS javascript,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
@@ -351,7 +382,8 @@ SELECT 'shell' AS component,
        'narrow' AS layout,
        true AS fixed_top_menu,
        './' AS link,
-    './footer-links.js' AS javascript,
+       './posthog-array.js' AS javascript,
+       './footer-links.js' AS javascript,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
@@ -441,6 +473,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -615,6 +648,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -846,6 +880,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -1014,6 +1049,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -1103,6 +1139,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -1197,6 +1234,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -1317,6 +1355,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
@@ -1434,6 +1473,7 @@ SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
+       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../posthog-array.js' ELSE 'posthog-array.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
        CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
