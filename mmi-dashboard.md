@@ -63,8 +63,8 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
        '/' AS link,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       '../footer-links.js' AS javascript,
+       '../custom-dashboard.css' AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
        '{"link":"/","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
@@ -268,34 +268,36 @@ SET smtp_exec_command =
     'RECIP="' || $recipient_email || '"; ' ||
     'if [ -z "$RECIP" ]; then echo SKIPPED_NO_EMAIL_RECIPIENT; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
     'if [ -z "' || $smtp_host || '" ] || [ -z "' || $smtp_port || '" ] || [ -z "' || $smtp_username || '" ] || [ -z "' || $smtp_password || '" ] || [ -z "' || $smtp_from || '" ]; then echo SKIPPED_MISSING_SMTP_CONFIG; echo CURL_EXIT_CODE:0; exit 0; fi; ' ||
-    'MESSAGE="From: ' || $smtp_from ||
-    '\r\nTo: ' || $recipient_email ||
-    '\r\nSubject: New User Access Notification – Medigy Market Intelligence (MMI) Application Entry' ||
-    '\r\nMIME-Version: 1.0' ||
-    '\r\nContent-Type: text/html; charset=UTF-8' ||
-    '\r\n\r\n<html><body>' ||
-    '<p>Hi Team,</p>' ||
-    '<p>A new user has accessed Medigy Market Intelligence (MMI) Application and submitted their details.</p>' ||
-    '<p><strong>User Information:</strong></p>' ||
-    '<ul>' ||
-    '<li><strong>Full Name:</strong> ' || REPLACE($submitted_full_name, '"', '''') || '</li>' ||
-    '<li><strong>Email Address:</strong> ' || REPLACE($submitted_email_address, '"', '''') || '</li>' ||
-    '<li><strong>Phone Number:</strong> ' || REPLACE($submitted_phone_number, '"', '''') || '</li>' ||
-    '<li><strong>Organization / Company:</strong> ' || REPLACE($submitted_organization, '"', '''') || '</li>' ||
-    '<li><strong>Purpose of Visit:</strong> ' || REPLACE($submitted_purpose_of_visit, '"', '''') || '</li>' ||
-    '</ul>' ||
-    '<p><strong>Access Details:</strong></p>' ||
-    '<ul>' ||
-    '<li><strong>Date &amp; Time:</strong> ' || REPLACE($submitted_access_timestamp, '"', '''') || '</li>' ||
-    '<li><strong>IP Address:</strong> ' || REPLACE($submitted_ip_address, '"', '''') || '</li>' ||
-    '<li><strong>Device / Browser:</strong> ' || REPLACE($submitted_user_agent, '"', '''') || '</li>' ||
-    '</ul>' ||
-    '<p><strong>Notes:</strong><br>This notification is generated automatically when a user enters their details on the MMI Application entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' ||
-    '<p>Please reach out to the user if required.</p>' ||
-    '<p>Regards,<br>System Notification</p>' ||
-    '</body></html>' ||
-    '\r\n"; ' ||
-    'printf "%b" "$MESSAGE" > /tmp/smtp_msg_$$.txt; ' ||
+    'cat > /tmp/smtp_msg_$$.txt << ''EOF'' ' || CHAR(10) ||
+    'From: ' || $smtp_from || CHAR(10) ||
+    'To: ' || $recipient_email || CHAR(10) ||
+    'Subject: New User Access Notification – Medigy Market Intelligence (MMI) Application Entry' || CHAR(10) ||
+    'MIME-Version: 1.0' || CHAR(10) ||
+    'Content-Type: text/html; charset=UTF-8' || CHAR(10) || CHAR(10) ||
+    '<html><body>' || CHAR(10) ||
+    '<p>Hi Team,</p>' || CHAR(10) ||
+    '<p>A new user has accessed Medigy Market Intelligence (MMI) Application and submitted their details.</p>' || CHAR(10) ||
+    '<p><strong>User Information:</strong></p>' || CHAR(10) ||
+    '<ul>' || CHAR(10) ||
+    '<li><strong>Full Name:</strong> ' || REPLACE($submitted_full_name, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '<li><strong>Email Address:</strong> ' || REPLACE($submitted_email_address, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '<li><strong>Phone Number:</strong> ' || REPLACE($submitted_phone_number, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '<li><strong>Organization / Company:</strong> ' || REPLACE($submitted_organization, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '<li><strong>Purpose of Visit:</strong> ' || REPLACE($submitted_purpose_of_visit, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '</ul>' || CHAR(10) ||
+    '<p><strong>Access Details:</strong></p>' || CHAR(10) ||
+    '<ul>' || CHAR(10) ||
+    '<li><strong>Date &amp; Time:</strong> ' || REPLACE($submitted_access_timestamp, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '<li><strong>IP Address:</strong> ' || REPLACE($submitted_ip_address, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '<li><strong>Device / Browser:</strong> ' || REPLACE($submitted_user_agent, '''', '&apos;') || '</li>' || CHAR(10) ||
+    '</ul>' || CHAR(10) ||
+    '<p><strong>Notes:</strong>
+This notification is generated automatically when a user enters their details on the MMI Application entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' || CHAR(10) ||
+    '<p>Please reach out to the user if required.</p>' || CHAR(10) ||
+    '<p>Regards,
+System Notification</p>' || CHAR(10) ||
+    '</body></html>' || CHAR(10) ||
+    'EOF' || CHAR(10) ||
     'CURLOUT=$(curl --no-progress-meter --verbose --url "smtp://' || $smtp_host || ':' || $smtp_port || '" --ssl-reqd --user "' || $smtp_username || ':' || $smtp_password || '" --mail-from "' || $smtp_from || '" --mail-rcpt "' || $recipient_email || '" --upload-file /tmp/smtp_msg_$$.txt 2>&1); ' ||
     'CURL_EXIT_CODE=$?; rm -f /tmp/smtp_msg_$$.txt; ' ||
     'echo "$CURLOUT" | grep -E "^[<*] " | tr -d "\r"; ' ||
@@ -373,7 +375,8 @@ SELECT 'shell' AS component,
        'narrow' AS layout,
        true AS fixed_top_menu,
        './' AS link,
-    '/footer-links.js' AS javascript,
+    '../footer-links.js' AS javascript,
+    '../custom-dashboard.css' AS css,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
