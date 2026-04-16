@@ -119,7 +119,7 @@ SELECT 'shell' AS component,
        'narrow' AS layout,
        true AS fixed_top_menu,
        './' AS link,
-    '/footer-links.js' AS javascript,
+    './footer-links.js' AS javascript,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
