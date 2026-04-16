@@ -66,6 +66,7 @@ SELECT 'shell' AS component,
        '../footer-links.js' AS javascript,
        '../custom-dashboard.css' AS css,
        '© 2026 Medigy Market Intelligence' AS footer,
+       'upgrade-insecure-requests' AS header_content_security_policy,
        '{"link":"/","title":"Home"}' AS menu_item,
        '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
        '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
@@ -110,7 +111,8 @@ SELECT 'cookie' AS component,
        'isVerified' AS name,
        'false' AS value,
        '/' AS path,
-       'lax' AS same_site
+       'lax' AS same_site,
+       TRUE AS secure
 WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
 
 SELECT 'shell' AS component,
@@ -120,6 +122,7 @@ SELECT 'shell' AS component,
        true AS fixed_top_menu,
        './' AS link,
     './footer-links.js' AS javascript,
+       'upgrade-insecure-requests' AS header_content_security_policy,
        '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
