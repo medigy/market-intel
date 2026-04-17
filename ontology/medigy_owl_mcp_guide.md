@@ -70,7 +70,7 @@ spry rb task ontology-setup mmi-dashboard.md
 
 1.**File not found during ingestion**
 
-* Ensure you are in the root directory: `/home/anitha/workspaces/github.com/medigy/market-intel/`
+* Ensure you are in the root directory
 * Check that the path `ontology/medigy_mcp.owl` is correct.
 
 2.**Ontology views are empty**
