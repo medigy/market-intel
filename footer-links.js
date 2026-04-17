@@ -149,13 +149,20 @@
   
   // Initialize isVerified cookie to false if it doesn't exist
   initializeIsVerifiedCookie();
-  
+
+  const hasAccessGrantedParam =
+    String(searchParams.get('mmi_access_granted') || '').trim().toLowerCase() === 'true';
+
   const isRegistrationPage =
     normalizedPath === normalizePath(REGISTRATION_PATH) ||
     normalizedPath === normalizePath(REGISTRATION_INDEX_PATH) ||
     normalizedPath === normalizePath(REGISTRATION_ALIAS_PATH);
   const isHomeOverviewPage = normalizedPath === normalizePath(HOME_PAGE_PATH);
   const isIndexPage = normalizedPath === '/';
+
+  if (isHomeOverviewPage && hasAccessGrantedParam) {
+    document.cookie = 'isVerified=true; Max-Age=31536000; Path=/; SameSite=Lax';
+  }
   const hasSubmittedRegistrationParams = () => {
     return Boolean(
       String(searchParams.get('first_name') || '').trim() &&
