@@ -158,8 +158,8 @@ SELECT
     true AS required;
 
 SELECT
-    'second_name' AS name,
-    'Second Name' AS label,
+    'last_name' AS name,
+    'Last Name' AS label,
     'text' AS type,
     true AS required;
 
@@ -217,7 +217,7 @@ SET smtp_password = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_APP
 SET smtp_from = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_FROM')), ''), '');
 SET recipient_email = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('RECEIVER_EMAIL')), ''), '');
 SET submitted_first_name = COALESCE(NULLIF($first_name, ''), '');
-SET submitted_second_name = COALESCE(NULLIF($second_name, ''), '');
+SET submitted_last_name = COALESCE(NULLIF($last_name, ''), '');
 SET submitted_email_address = COALESCE(NULLIF($email_address, ''), '');
 SET submitted_phone_number = TRIM(COALESCE(NULLIF(NULLIF(TRIM($phone_number), ''), '+1'), ''));
 SET submitted_phone_number_sanitized = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($submitted_phone_number, '+', ''), ' ', ''), '-', ''), '(', ''), ')', ''), '.', '');
@@ -225,7 +225,7 @@ SET submitted_phone_digits_stripped = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(RE
 SET submitted_organization = COALESCE(NULLIF($organization, ''), '');
 SET submitted_purpose_of_visit = COALESCE(NULLIF($purpose_of_visit, ''), '');
 SET submitted_consent_acknowledged = LOWER(TRIM(COALESCE(NULLIF($consent_acknowledged, ''), '')));
-SET submitted_full_name = TRIM($submitted_first_name || ' ' || $submitted_second_name);
+SET submitted_full_name = TRIM($submitted_first_name || ' ' || $submitted_last_name);
 SET submitted_access_timestamp = STRFTIME('%Y-%m-%d %H:%M:%S UTC', 'now');
 SET submitted_ip_address = COALESCE(
     NULLIF(TRIM($ip_address), ''),
@@ -414,8 +414,8 @@ SELECT
     true AS required;
 
 SELECT
-    'second_name' AS name,
-    'Second Name' AS label,
+    'last_name' AS name,
+    'Last Name' AS label,
     'text' AS type,
     true AS required;
 
