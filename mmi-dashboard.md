@@ -26,26 +26,48 @@ and all analytics update automatically — no SQL or page logic changes required
 
 ---
 
-```bash prepare-db-deploy-server --descr "Ingest raw files, build unified analytics, launch SQLPage UI."
+## Spry Axiom Configuration
+
+```code DEFAULTS
+sql * --interpolate --injectable
+```
+
+## Setup
+
+```bash prepare-db --descr "Ingest raw files, build unified analytics"
 #!/bin/bash
 set -euo pipefail
 
 rm -f resource-surveillance.sqlite.*
 
-surveilr ingest files -r medicare-ds/ --stream-large-files
+surveilr ingest files -r medicare-ds/ --stream-large-files #large data ingest post 3.43
 surveilr orchestrate transform-csv
 surveilr shell sql/medigy-unified-v2.sql
 surveilr shell sql/medigy-ddl.sql
+```
+
+```bash ontology-setup --descr "Ingest owl and generate ontology classes"
+#!/bin/bash
+surveilr ingest files -r ontology/medigy_mcp.owl
+surveilr orchestrate adapt-owl
+```
+
+```bash deploy-server --descr "Package and deploy server"
+#!/bin/bash
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
-echo "Medigy Market Intelligence (v3) is ready."
+echo "Medigy Market Intelligence is ready."
+
 ```
 
 ---
 
-## Global Shell Partial
+## Layout
 
-```sql PARTIAL global-layout.sql --inject *.sql --inject mmi/*.sql
+```sql PARTIAL global-layout.sql --inject mmi/*.sql
 
+-- BEGIN: PARTIAL global-layout.sql
+-- Using root-relative paths (starting with '/') ensures that these files 
+-- are resolved correctly by SQLPage regardless of the deployment base URL.
 SELECT 'shell' AS component,
        'Medigy Market Intelligence' AS title,
        NULL AS icon,
@@ -63,6 +85,21 @@ SELECT 'shell' AS component,
        '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
        '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
        '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
+
+
+SET resource_json = sqlpage.read_file_as_text('spry.d/auto/resource/${path}.auto.json');
+SET page_title  = json_extract($resource_json, '$.route.caption');
+SET page_description  = json_extract($resource_json, '$.route.description');
+SET page_path = json_extract($resource_json, '$.route.path');
+
+
+-- END: PARTIAL global-layout.sql
+
+```
+
+```contribute sqlpage_files --base .
+./footer-links.js .
+./custom-dashboard.css .
 ```
 
 ---
@@ -326,11 +363,6 @@ SELECT 'redirect' AS component,
 WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 ```
 
-```contribute sqlpage_files --base .
-./footer-links.js .
-./custom-dashboard.css .
-```
-
 ---
 
 ## Home Page
@@ -444,21 +476,6 @@ SELECT 'html' AS component,
 ```sql mmi/home-overview.sql { route: { caption: "Strategic Overview" } }
 -- @route.description "MMI landing page — portfolio KPIs, condition cards, navigation"
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
-
 -- Hero
 SELECT 'hero' AS component,
        'Medigy Market Intelligence' AS title,
@@ -570,7 +587,7 @@ SELECT 'divider' AS component, 'Strategic Execution & Growth Workflows' AS conte
 SELECT 'card' AS component, 3 AS columns;
 
 SELECT 'Executive Insights' AS title, 'Analyze total market size and patient volume trends.' AS description, '/mmi/executive-dashboard.sql' AS link, 'layout-dashboard' AS icon, 'teal' AS color;
-SELECT 'Opportunity Scoring' AS title, 'Identify the most promising clinical markets using 2023 evidence.' AS description, '/mmi/opportunity-scoring.sql' AS link, 'trophy' AS icon, 'azure' AS color;
+SELECT 'Market Priortization' AS title, 'Identify the most promising clinical markets using 2023 evidence.' AS description, '/mmi/opportunity-scoring.sql' AS link, 'trophy' AS icon, 'azure' AS color;
 SELECT 'Geographic Intelligence' AS title, 'Pinpoint high-growth regions and regional underserved markets.' AS description, '/mmi/geography.sql' AS link, 'map-pin' AS icon, 'indigo' AS color;
 SELECT 'Tactical Analytics' AS title, 'Deep-dive into care delivery patterns at the procedure level.' AS description, '/mmi/procedure-drilldown.sql' AS link, 'clipboard-list' AS icon, 'orange' AS color;
 SELECT 'Clinical Portfolio' AS title, 'Explore and compare the full catalog of healthcare markets.' AS description, '/mmi/conditions.sql' AS link, 'virus' AS icon, 'grape' AS color;
@@ -584,23 +601,8 @@ SELECT 'Data Provenance' AS title, 'Audit the 2023 CMS datasets, table schemas, 
 
 ```sql mmi/condition-hub.sql { route: { caption: "Condition Hub" } }
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
-
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 
 SELECT 'hero' AS component,
@@ -872,23 +874,8 @@ SELECT 'text' AS component,
 
 ```sql mmi/executive-dashboard.sql { route: { caption: "Executive Insights" } }
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
-
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
        'Executive Market Intelligence' AS title,
@@ -1087,23 +1074,9 @@ SELECT '
 
 ```sql mmi/opportunity-scoring.sql { route: { caption: "Market Prioritization" } }
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
        'Strategic Opportunity Scoring' AS title,
@@ -1205,23 +1178,9 @@ FROM mat_opportunity_score;
 ```sql mmi/conditions.sql { route: { caption: "Clinical Portfolio" } }
 -- @route.description "Clinical Portfolio Registry — Strategic Market Targets"
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 --
 --- 2. SALES HERO: THE CLINICAL PORTFOLIO
@@ -1336,27 +1295,13 @@ SELECT 'Once you have identified your clinical targets, proceed to the Opportuni
 
 ```sql mmi/procedure-drilldown.sql { route: { caption: "Tactical Analytics" } }
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
 SET limit = 20;
 SET current_page = COALESCE(CAST(:page AS INT), 1);
 SET offset = ($current_page - 1) * $limit;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 ---
 --- 2. SALES HERO: TACTICAL INTELLIGENCE
@@ -1499,23 +1444,10 @@ SELECT 'text' AS component, 'Strategic Next Steps' AS title,
 
 ```sql mmi/geography.sql { route: { caption: "Regional Intelligence" } }
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
+
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 ---
 --- 2. SALES HERO: REGIONAL GROWTH VISION
@@ -1685,23 +1617,8 @@ SELECT 'text' AS component, 'Strategic Next Step' AS title,
 
 ```sql mmi/data-dictionary.sql { route: { caption: "Data Provenance" } }
 
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon, 'fluid' AS layout, true AS fixed_top_menu,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END AS link,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
-       CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
-       '{"link":"' || CASE WHEN instr(sqlpage.path(), 'mmi/') > 0 THEN '../' ELSE './' END || '","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
-
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 ---
 --- 2. SALES HERO: THE ARCHITECTURE OF TRUST

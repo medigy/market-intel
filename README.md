@@ -29,7 +29,9 @@ The pipeline introduces a **unified extensible ELT architecture**: adding a new 
   - [Opportunity Scoring](#opportunity-scoring)
   - [SQLPage Dashboard](#sqlpage-dashboard)
     - [Navigation Menu](#navigation-menu)
-  - [Deploy](#deploy)
+  - [Task-Based Workflow (Spry)](#task-based-workflow-spry)
+    - [Command Execution Sequence](#command-execution-sequence)
+  - [Detailed Deployment Steps](#detailed-deployment-steps)
   - [Adding a New Disease Condition](#adding-a-new-disease-condition)
   - [Key Design Decisions](#key-design-decisions)
     - [Single registry drives everything](#single-registry-drives-everything)
@@ -312,7 +314,37 @@ Every condition card on the home overview links to a universal **Condition Hub**
 
 ---
 
-## Deploy
+## Task-Based Workflow (Spry)
+
+In addition to the manual deployment steps, the project utilizes `spry` tasks defined in `mmi-dashboard.md` to automate the database preparation, ontology setup, and server deployment. This ensures consistency across development and production environments.
+
+### Command Execution Sequence
+
+As seen in the terminal logs, the standard sequence for preparing a fresh environment is:
+
+1. **Prepare Database:** Initializes the RSSD and prepares the schema.
+
+    ```bash
+    spry rb task prepare-db mmi-dashboard.md
+    ```
+
+2. **Ontology Setup:** Ingests the `.owl` files and adapts them into the relational schema.
+
+    ```bash
+    spry rb task ontology-setup mmi-dashboard.md
+    ```
+
+3. **Deploy Server:** Compiles the Executable Markdown and launches the SQLPage UI.
+
+    ```bash
+    spry rb task deploy-server mmi-dashboard.md
+    ```
+
+---
+
+## Detailed Deployment Steps
+
+If you need to run the underlying commands individually, follow this sequence:
 
 ```bash
 # 1. Clean slate — remove any previous database
@@ -330,18 +362,24 @@ surveilr shell sql/medigy-unified-v2.sql
 # 5. Apply DDL overlay — data provenance, materialized mat_* tables, and indexes
 surveilr shell sql/medigy-ddl.sql
 
-# 6. Configure SMTP environment variables for registration welcome emails
+# 6. owl file ingestion
+surveilr ingest files -r ontology/medigy_mcp.owl
+
+# 7. generate ontology classes
+surveilr orchestrate adapt-owl
+
+# 8. Configure SMTP environment variables for registration welcome emails
 export EMAIL_HOST="<your-host>"
 export EMAIL_USERNAME="<your-user-name>"
 export EMAIL_APP_PASSWORD="<your-mailgun-app-password>"
 export EMAIL_FROM="<your-from-email>"
 export EMAIL_PORT="<your-port>"
 
-# 7. Compile the Executable Markdown UI and load it into the database
+# 9. Compile the Executable Markdown UI and load it into the database
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md \
   | sqlite3 resource-surveillance.sqlite.db
 
-echo "Medigy Market Intelligence (v3) is ready at http://localhost:9227"
+echo "Medigy Market Intelligence is ready at http://localhost:9227"
 ```
 
 > **Order matters:** `medigy-unified-v2.sql` must complete before `medigy-ddl.sql` because the materialized tables in Section 4 of the DDL read from `fact_utilization_unified` and the Layer 4 views produced by the pipeline.
