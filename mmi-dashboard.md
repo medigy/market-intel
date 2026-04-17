@@ -34,18 +34,29 @@ sql * --interpolate --injectable
 
 ## Setup
 
-```bash prepare-db-deploy-server --descr "Ingest raw files, build unified analytics, launch SQLPage UI."
+```bash prepare-db --descr "Ingest raw files, build unified analytics"
 #!/bin/bash
 set -euo pipefail
 
 rm -f resource-surveillance.sqlite.*
 
-surveilr ingest files -r medicare-ds/ --stream-large-files
+surveilr ingest files -r medicare-ds/ --stream-large-files #large data ingest post 3.43
 surveilr orchestrate transform-csv
 surveilr shell sql/medigy-unified-v2.sql
 surveilr shell sql/medigy-ddl.sql
+```
+
+```bash ontology-setup --descr "Ingest owl and generate ontology classes"
+#!/bin/bash
+surveilr ingest files -r ontology/medigy_mcp.owl
+surveilr orchestrate adapt-owl
+```
+
+```bash deploy-server --descr "Package and deploy server"
+#!/bin/bash
 spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
-echo "Medigy Market Intelligence (v2) is ready."
+echo "Medigy Market Intelligence is ready."
+
 ```
 
 ---
@@ -494,7 +505,6 @@ SELECT 'Data Provenance' AS title, 'Audit the 2023 CMS datasets, table schemas, 
 ```sql mmi/condition-hub.sql { route: { caption: "Condition Hub" } }
 
 SELECT 'button' AS component, 'start' AS justify;
--- SELECT 'Home' AS title, '../' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 
