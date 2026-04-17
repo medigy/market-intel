@@ -1,81 +1,79 @@
-# surveilr OWL Ingestion Guide
 
-> Ingest the generated `medigy_mcp.owl` TBox schema into surveilr for MCP chat.
+# Ontology Ingestion Guide
+
+> Ingest the `medigy_mcp.owl` schema into the local database to enable clinical intelligence in the chat
 
 ---
 
 ## Prerequisites
 
-```bash
-# Confirm surveilr is installed
-surveilr --version
+Ensure the following file exists in your workspace before proceeding:
 
-# Install surveilr (if not already installed)
-curl -sL https://raw.githubusercontent.com/surveilr/packages/main/surveilr/install.sh | bash
-```
-
-Ensure `medigy_mcp.owl` is present in your working directory before proceeding.
+* `ontology/medigy_mcp.owl`
 
 ---
 
-## Step 1 — Ingest the OWL File
+## Step 1 — Ingest the Schema File
+
+Run the following command in your terminal to load the ontology into your local instance:
 
 ```bash
-surveilr ingest files -r ./medigy_mcp.owl
+surveilr ingest files -r ontology/medigy_mcp.owl
 ```
 
-This command:
-- Reads `medigy_mcp.owl` from the current directory
+**What this does:**
+
+* Scans the `ontology/` directory for the RDF/XML schema
+* Populates the raw ingestion tables in `resource-surveillance.sqlite.db`
 
 ---
 
-## Step 2 — Adapt OWL for MCP
+## Step 2 — Transform for Clinical Intelligence
+
+Once ingested, the raw data must be structured into queryable views for the chat tools:
 
 ```bash
 surveilr orchestrate adapt-owl
 ```
 
-This command:
-- Parses the RDF/XML and extracts classes, properties, and relationships
-- Populates surveilr's orchestration tables to make the ontology queryable
-- Makes the schema available to the MCP chat interface
+**What this does:**
 
-**Verify adaptation:**
+* Parses the OWL properties and relationships
+* Creates and populates the `ontology_classes` view
+* Activates the clinical mapping used by your workspace instructions
+
+---
+
+## Step 3 — Verification
+
+Confirm the clinical classes are accessible by running this query in your terminal:
 
 ```bash
-  SELECT * FROM ontology_classes
+sqlite3 resource-surveillance.sqlite.db "SELECT * FROM ontology_classes LIMIT 5;"
 ```
 
 ---
 
-## Full Commands (copy-paste)
+## Dashboard Integration
+
+The ingestion of the OWL file and the generation of ontology classes have been packaged as an automated task within your dashboard documentation.
+
+**Direct Execution**: After completing the initial setup task block, you can execute the ontology workflow directly by running the following command in your terminal:
 
 ```bash
-# 1. Ingest
-surveilr ingest files -r ./medigy_mcp.owl
-
-# 2. Adapt for MCP
-surveilr orchestrate adapt-owl
+spry rb task ontology-setup mmi-dashboard.md
 ```
 
 ---
 
 ## Troubleshooting
 
-**`surveilr ingest files` — file not found**
+1.**File not found during ingestion**
 
-```bash
-# Run from the directory containing the OWL file
-cd /path/to/project
-surveilr ingest files -r ./medigy_mcp.owl
-```
+* Ensure you are in the root directory
+* Check that the path `ontology/medigy_mcp.owl` is correct.
 
-**`surveilr orchestrate adapt-owl` — no OWL found**
+2.**Ontology views are empty**
 
-Confirm ingestion completed successfully before running adapt:
-
-```bash
-SELECT * FROM ontology_classes
-```
-
-If empty, re-run Step 1.
+* Ensure the `adapt-owl` orchestration command finished without errors
+* If views are missing, re-run Step 1 and Step 2 in sequence.
