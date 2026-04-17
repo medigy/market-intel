@@ -151,7 +151,7 @@
   const hasSubmittedRegistrationParams = () => {
     return Boolean(
       String(searchParams.get('first_name') || '').trim() &&
-      String(searchParams.get('second_name') || '').trim() &&
+      String(searchParams.get('last_name') || '').trim() &&
       String(searchParams.get('email_address') || '').trim() &&
       String(searchParams.get('consent_acknowledged') || '').trim()
     );
@@ -163,8 +163,8 @@
   const persistSubmittedRegistration = () => {
     const payload = {
       firstName: String(searchParams.get('first_name') || '').trim(),
-      secondName: String(searchParams.get('second_name') || '').trim(),
-      fullName: `${String(searchParams.get('first_name') || '').trim()} ${String(searchParams.get('second_name') || '').trim()}`.trim(),
+      secondName: String(searchParams.get('last_name') || '').trim(),
+      fullName: `${String(searchParams.get('first_name') || '').trim()} ${String(searchParams.get('last_name') || '').trim()}`.trim(),
       emailAddress: String(searchParams.get('email_address') || '').trim(),
       phoneNumber: String(searchParams.get('phone_number') || '').trim()
         ? normalizePhoneNumberWithCountryCode(String(searchParams.get('phone_number') || '').trim())
@@ -240,7 +240,7 @@
     const rawPhone = String(searchParams.get('phone_number') || '').trim();
     const normalizedPhone = rawPhone ? normalizePhoneNumberWithCountryCode(rawPhone) : '';
     window.location.replace(
-      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&second_name=${encodeURIComponent(String(searchParams.get('second_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&phone_number=${encodeURIComponent(normalizedPhone)}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&purpose_of_visit=${encodeURIComponent(String(searchParams.get('purpose_of_visit') || '').trim())}&consent_acknowledged=${encodeURIComponent(String(searchParams.get('consent_acknowledged') || '').trim().toLowerCase())}&user_agent=${browserUserAgent}&ip_address=${encodeURIComponent(String(searchParams.get('ip_address') || '').trim())}`
+      `${REGISTRATION_SUBMIT_PATH}?first_name=${encodeURIComponent(String(searchParams.get('first_name') || '').trim())}&last_name=${encodeURIComponent(String(searchParams.get('last_name') || '').trim())}&email_address=${encodeURIComponent(String(searchParams.get('email_address') || '').trim())}&phone_number=${encodeURIComponent(normalizedPhone)}&organization=${encodeURIComponent(String(searchParams.get('organization') || '').trim())}&purpose_of_visit=${encodeURIComponent(String(searchParams.get('purpose_of_visit') || '').trim())}&consent_acknowledged=${encodeURIComponent(String(searchParams.get('consent_acknowledged') || '').trim().toLowerCase())}&user_agent=${browserUserAgent}&ip_address=${encodeURIComponent(String(searchParams.get('ip_address') || '').trim())}`
     );
     return;
   }
