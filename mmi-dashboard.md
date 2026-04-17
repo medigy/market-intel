@@ -40,7 +40,7 @@ set -euo pipefail
 
 rm -f resource-surveillance.sqlite.*
 
-surveilr ingest files -r medicare-ds/ 
+surveilr ingest files -r medicare-ds/ --stream-large-files
 surveilr orchestrate transform-csv
 surveilr shell sql/medigy-unified-v2.sql
 surveilr shell sql/medigy-ddl.sql
