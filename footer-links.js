@@ -2,9 +2,9 @@
   const COOKIE_NAME = 'medigy_mmi_registration_profile_v2';
   const SKIP_FOR_NOW_PARAM = 'skip_for_now';
   const SKIP_SESSION_KEY = 'mmi_registration_skip_once';
-  const ROUTE_SUFFIX_REGISTRATION = '/';
+  const ROUTE_SUFFIX_REGISTRATION = '/mmi/registration.sql';
   const ROUTE_SUFFIX_REGISTRATION_INDEX = '/index.sql';
-  const ROUTE_SUFFIX_REGISTRATION_ALIAS = '/registration.sql';
+  const ROUTE_SUFFIX_REGISTRATION_ALIAS = '/mmi/registration.sql';
   const ROUTE_SUFFIX_REGISTRATION_SUBMIT = '/registration-submit.sql';
   const ROUTE_SUFFIX_HOME = '/mmi/home-overview.sql';
 
@@ -45,12 +45,7 @@
 
   const BASE_PATH = resolveBasePath(window.location.pathname || '/');
 
-  const buildPath = (routeSuffix) => {
-    if (routeSuffix === ROUTE_SUFFIX_REGISTRATION) {
-      return BASE_PATH ? `${BASE_PATH}/` : '/';
-    }
-    return `${BASE_PATH}${routeSuffix}`;
-  };
+  const buildPath = (routeSuffix) => `${BASE_PATH}${routeSuffix}`;
 
   const REGISTRATION_PATH = buildPath(ROUTE_SUFFIX_REGISTRATION);
   const REGISTRATION_INDEX_PATH = buildPath(ROUTE_SUFFIX_REGISTRATION_INDEX);
@@ -90,6 +85,13 @@
       window.localStorage.setItem(COOKIE_NAME, encodedPayload);
     } catch {
       // Ignore localStorage errors and rely on the cookie.
+    }
+  };
+
+  const initializeIsVerifiedCookie = () => {
+    const currentValue = getCookie('isVerified');
+    if (!currentValue || currentValue === '') {
+      document.cookie = 'isVerified=false; Max-Age=31536000; Path=/; SameSite=Lax';
     }
   };
 
@@ -144,10 +146,23 @@
 
   const normalizedPath = normalizePath(window.location.pathname || '/');
   const searchParams = new URLSearchParams(window.location.search || '');
+  
+  // Initialize isVerified cookie to false if it doesn't exist
+  initializeIsVerifiedCookie();
+
+  const hasAccessGrantedParam =
+    String(searchParams.get('mmi_access_granted') || '').trim().toLowerCase() === 'true';
+
   const isRegistrationPage =
     normalizedPath === normalizePath(REGISTRATION_PATH) ||
     normalizedPath === normalizePath(REGISTRATION_INDEX_PATH) ||
     normalizedPath === normalizePath(REGISTRATION_ALIAS_PATH);
+  const isHomeOverviewPage = normalizedPath === normalizePath(HOME_PAGE_PATH);
+  const isIndexPage = normalizedPath === '/';
+
+  if (isHomeOverviewPage && hasAccessGrantedParam) {
+    document.cookie = 'isVerified=true; Max-Age=31536000; Path=/; SameSite=Lax';
+  }
   const hasSubmittedRegistrationParams = () => {
     return Boolean(
       String(searchParams.get('first_name') || '').trim() &&
@@ -235,6 +250,15 @@
     handler();
   };
 
+  const hasVerifiedCookie = (() => {
+    const rawValue = String(getCookie('isVerified') || '').trim().toLowerCase();
+    if (rawValue) {
+      return rawValue === 'true';
+    }
+    return hasRegistrationCookie();
+  })();
+  const hasSkippedForSession = hasSkippedRegistrationForSession();
+
   if (isRegistrationPage && hasSubmittedRegistrationParams() && persistSubmittedRegistration()) {
     const browserUserAgent = encodeURIComponent(navigator.userAgent || 'N/A');
     const rawPhone = String(searchParams.get('phone_number') || '').trim();
@@ -251,15 +275,13 @@
     return;
   }
 
-  const hasCookie = hasRegistrationCookie();
-  const hasSkippedForSession = hasSkippedRegistrationForSession();
-
-  if (!isRegistrationPage && !hasCookie && !hasSkippedForSession) {
+  // Page gating: redirect to registration only if user is not verified and not on exempt pages
+  if (!isRegistrationPage && !isHomeOverviewPage && !isIndexPage && !hasVerifiedCookie && !hasSkippedForSession) {
     window.location.replace(REGISTRATION_PATH);
     return;
   }
 
-  if (isRegistrationPage && (hasCookie || hasSkippedForSession)) {
+  if (isRegistrationPage && (hasVerifiedCookie || hasSkippedForSession)) {
     window.location.replace(HOME_PAGE_PATH);
     return;
   }

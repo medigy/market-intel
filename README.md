@@ -301,8 +301,9 @@ A global shell partial (`global-layout.sql`) is injected into every page and han
 
 | Page | Route | Description |
 |---|---|---|
-| Registration | `/` (`index.sql`) | User registration gate — collects name, email, organization, and consent before redirecting to the dashboard. Skipped on return visits via a session cookie. |
-| Home | `/mmi/home-overview.sql` | Pipeline health KPIs + dynamic disease condition cards (auto-generated from registry) |
+| Root | `/` (`index.sql`) | Redirect to home overview. |
+| Home | `/mmi/home-overview.sql` | Landing page — loads without registration requirement. Pipeline health KPIs + dynamic disease condition cards (auto-generated from registry). |
+| Registration | `/mmi/registration.sql` | User registration form — collects name, email, organization, and consent. Gated on redirect to any page (except `/` and `/mmi/home-overview.sql`) when `isVerified=false`. |
 | Executive Dashboard | `/mmi/executive-dashboard.sql` | Portfolio totals, cross-condition comparison charts, full summary table |
 | Disease Conditions | `/mmi/conditions.sql` | Full condition registry — cards and table view |
 | Opportunity Scores | `/mmi/opportunity-scoring.sql` | Composite ranked opportunity matrix |

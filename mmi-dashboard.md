@@ -106,35 +106,12 @@ SET page_path = json_extract($resource_json, '$.route.path');
 
 ## Registration Page
 
-```sql index.sql { route: { caption: "Registration" } }
--- @route.description "User registration gate before entering the dashboard"
+```sql index.sql { route: { caption: "Home" } }
+-- @route.description "Root redirect to home overview"
 
--- Early server-side redirect: if the registration profile cookie is already present,
--- skip the form immediately — this prevents the shell/hero/form from being rendered
--- and sent to the browser, eliminating the flicker that occurred when the JS redirect
--- in footer-links.js fired after the page was already painted.
--- Relative redirect: browser resolves against the current URL, so it works at any deployment base path.
 SELECT 'redirect' AS component,
-       'mmi/home-overview.sql' AS link
-WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
+       'mmi/home-overview.sql' AS link;
 
-SELECT 'cookie' AS component,
-       'isVerified' AS name,
-       'false' AS value,
-       '/' AS path,
-       'lax' AS same_site,
-       TRUE AS secure
-WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
-
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
-       NULL AS icon,
-       'narrow' AS layout,
-       true AS fixed_top_menu,
-       './' AS link,
-    './footer-links.js' AS javascript,
-       'upgrade-insecure-requests' AS header_content_security_policy,
-       '© 2026 Medigy Market Intelligence' AS footer;
 
 SELECT 'hero' AS component,
        'Welcome! Let’s Get You Started' AS title,
@@ -150,7 +127,7 @@ WHERE $error = 'invalid_email';
 
 SELECT 'alert' AS component,
        'Invalid Phone Number' AS title,
-    'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
+       'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
        'danger' AS color
 WHERE $error = 'invalid_phone';
 
@@ -159,58 +136,6 @@ SELECT 'alert' AS component,
        'Please review the consent text and confirm your agreement before continuing.' AS description,
        'danger' AS color
 WHERE $error = 'invalid_consent';
-
-SELECT 'form' AS component, 'Get' AS method, 'Continue to Application' AS validate;
-
-SELECT
-    'first_name' AS name,
-    'First Name' AS label,
-    'text' AS type,
-    true AS required;
-
-SELECT
-    'last_name' AS name,
-    'Last Name' AS label,
-    'text' AS type,
-    true AS required;
-
-SELECT
-    'email_address' AS name,
-    'Email Address' AS label,
-    'email' AS type,
-    true AS required;
-
-SELECT
-    'phone_number' AS name,
-    'Phone Number (with country code)' AS label,
-    'tel' AS type,
-    COALESCE(NULLIF($phone_number, ''), '') AS value,
-    false AS required;
-
-SELECT
-    'organization' AS name,
-    'Organization' AS label,
-    'text' AS type,
-    false AS required;
-
-SELECT
-    'purpose_of_visit' AS name,
-    'Purpose of Visit' AS label,
-    'select' AS type,
-    COALESCE(NULLIF($purpose_of_visit, ''), '') AS value,
-    '[{"value":"","label":"Select purpose (optional)"},{"value":"Exploring features","label":"Exploring features"},{"value":"Research / Study","label":"Research / Study"},{"value":"Business / Professional use","label":"Business / Professional use"},{"value":"Other","label":"Other"}]' AS options;
-
-SELECT
-    'consent_acknowledged' AS name,
-    'I agree to the consent and compliance statement' AS label,
-    'checkbox' AS type,
-    COALESCE(NULLIF($consent_acknowledged, ''), 'yes') AS value,
-    'By continuing, you agree that we may use your contact information to communicate updates, product information, and relevant notifications. We respect your privacy and will not share your data with third parties.' AS description,
-    true AS required;
-
-SELECT 'html' AS component,
-    '<p style="text-align:center; margin-top:8px;">Your information is safe and will be handled securely.</p>' AS html;
-
 ```
 
 ---
@@ -352,7 +277,7 @@ SET email_log_append_status = sqlpage.exec(
 
 SELECT 'cookie' AS component,
        'isVerified' AS name,
-       CASE WHEN $email_send_status = 'SUCCESS' THEN 'true' ELSE 'false' END AS value,
+       'true' AS value,
        '/' AS path,
        'lax' AS same_site
 WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
@@ -365,37 +290,15 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
 ---
 
-## Home Page
+## Registration Alias
 
-```sql registration.sql { route: { caption: "Registration Alias" } }
--- @route.description "Alias route for user registration gate"
-
--- Early server-side redirect: mirrors the same guard in index.sql.
--- Relative redirect: browser resolves against the current URL, so it works at any deployment base path.
-SELECT 'redirect' AS component,
-       'mmi/home-overview.sql' AS link
-WHERE COALESCE(sqlpage.cookie('medigy_mmi_registration_profile_v2'), '') != '';
-
-SELECT 'cookie' AS component,
-       'isVerified' AS name,
-       'false' AS value,
-       '/' AS path,
-       'lax' AS same_site
-WHERE COALESCE(sqlpage.cookie('isVerified'), '') = '';
-
-SELECT 'shell' AS component,
-       'Medigy Market Intelligence — Registration' AS title,
-       NULL AS icon,
-       'narrow' AS layout,
-       true AS fixed_top_menu,
-       './' AS link,
-    '../footer-links.js' AS javascript,
-    '../custom-dashboard.css' AS css,
-       '© 2026 Medigy Market Intelligence' AS footer;
+```sql mmi/registration.sql { route: { caption: "Registration" } }
+-- @route.description "User registration form — collects name, email, organization, and consent"
 
 SELECT 'hero' AS component,
        'Welcome! Let’s Get You Started' AS title,
-       'To provide you with a better experience and keep you updated, we’d like to collect a few basic details. This will only take a few seconds.' AS description,
+       'To provide you with a better experience and keep you updated, we’d like to collect a few basic details.
+This will only take a few seconds.' AS description,
        'azure' AS color;
 
 SELECT 'alert' AS component,
@@ -406,7 +309,7 @@ WHERE $error = 'invalid_email';
 
 SELECT 'alert' AS component,
        'Invalid Phone Number' AS title,
-    'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
+       'Please enter a valid phone number with country code (e.g. +14155552671).' AS description,
        'danger' AS color
 WHERE $error = 'invalid_phone';
 
