@@ -33,3 +33,4 @@ pnpm-lock.yaml
 *.log
 *.db
 dev-src.auto
+**/dist/

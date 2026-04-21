@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+:host {
+  --aui-thread-max-width: 700px;
+  font-family: inherit;
+}
+
+/* Fix for specific styles seen missing in screenshots */
+button.flex.flex-col {
+  border: 1px solid var(--border, rgba(0,0,0,0.1)) !important;
+}
+
+/* Ensure the fixed positioning within shadow root works */
+.fixed {
+    position: fixed;
+}

@@ -1,4 +1,4 @@
-"use client";
+
 
 import { type FC } from "react";
 import { SUGGESTIONS } from "@/lib/suggestions";
@@ -102,12 +102,12 @@ const SuggestionCard: FC<{ suggestion: any }> = ({ suggestion }) => {
       prompt={suggestion.prompt}
       asChild
     >
-      <button className="w-full flex flex-col gap-2 rounded-xl border border-border/50 bg-muted/20 p-3 text-left transition-all hover:bg-muted/40 hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30 group">
-        <span className="text-sm font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
+      <button className="flex flex-col gap-2 rounded-[24px] border border-border/40 bg-background/30 p-5 text-left transition-all hover:bg-muted/80 hover:border-primary/20 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-primary/20 group h-full">
+        <span className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">
           {suggestion.title}
         </span>
         {suggestion.description && (
-          <span className="text-xs text-muted-foreground leading-relaxed opacity-70 group-hover:opacity-90 transition-opacity">
+          <span className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed group-hover:text-muted-foreground transition-colors overflow-hidden">
             {suggestion.description}
           </span>
         )}
@@ -118,15 +118,15 @@ const SuggestionCard: FC<{ suggestion: any }> = ({ suggestion }) => {
 
 const ThreadWelcome: FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-6 text-center w-full">
-      <h2 className="text-2xl font-bold tracking-tight mb-2">
+    <div className="flex flex-col items-center justify-center py-6 px-4 text-center max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-700">
+      <h2 className="text-3xl font-extrabold tracking-tight mb-3 selection:bg-primary/20">
         How can I help you today?
       </h2>
-      <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto leading-relaxed opacity-80">
-        I can assist with analysis and insights. Ask me anything!
+      <p className="text-muted-foreground text-lg mb-6 max-w-lg mx-auto leading-relaxed opacity-70">
+        I'm your intelligence partner for Medicare market data and clinical registries.
       </p>
 
-      <div className="flex flex-col gap-2 w-full max-w-2xl">
+      <div className="grid w-full grid-cols-1 gap-4 max-w-2xl px-2">
         {SUGGESTIONS.map((suggestion, idx) => (
           <SuggestionCard key={idx} suggestion={suggestion} />
         ))}
