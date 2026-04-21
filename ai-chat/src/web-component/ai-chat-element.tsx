@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { createRoot, Root } from 'react-dom/client';
-import React, { useState, forwardRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // Your existing assistant-ui pieces
 import { AssistantRuntimeProvider } from '@assistant-ui/react';
@@ -8,7 +8,7 @@ import { useChatRuntime, AssistantChatTransport } from '@assistant-ui/react-ai-s
 import { Thread } from '../components/assistant-ui/thread';
 import { TooltipProvider } from '../components/ui/tooltip';
 import { TooltipIconButton } from '../components/assistant-ui/tooltip-icon-button';
-import { XIcon } from 'lucide-react';
+import { XIcon, MessageCircleIcon } from 'lucide-react';
 
 // Vite ?inline trick: converts CSS into a string for shadow DOM injection
 import indexStyles from '../index.css?inline';
@@ -19,74 +19,84 @@ const ShadowAssistantModal = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-4">
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      right: 0,
+      zIndex: 50000,
+      display: 'flex',
+      flexDirection: 'column-reverse',
+      alignItems: 'flex-end',
+      gap: '16px',
+      pointerEvents: 'none',
+    }}>
       {/* Modal Content */}
       {isOpen && (
-        <div 
-          className="h-[700px] w-[400px] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200"
-        >
-          <div className="flex items-center gap-3 p-4 border-b border-border/50 bg-background/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
-            <div className="size-11 rounded-xl overflow-hidden shadow-xl shadow-primary/10 border border-border/50 bg-white p-1">
-              <img 
-                src="https://qualityfolio.dev/favicon.png" 
-                alt="Medigy Market Intelligence Logo" 
-                className="size-full object-contain scale-125"
-              />
+        <div style={{
+          marginRight: '16px',
+          marginBottom: '8px',
+          height: '700px',
+          width: '400px',
+          overflow: 'hidden',
+          borderRadius: '1rem',
+          border: '1px solid rgba(0,0,0,0.1)',
+          background: '#ffffff',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+          pointerEvents: 'auto',
+          animation: 'fadeIn 0.2s ease',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 10, flexShrink: 0 }}>
+            <div style={{ width: 44, height: 44, borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.1)', background: '#fff', padding: 4, flexShrink: 0 }}>
+              <img src="https://qualityfolio.dev/favicon.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.25)' }} />
             </div>
-            <div className="flex flex-col">
-              <h3 className="text-[15px] font-bold tracking-tight text-foreground leading-tight">Ask AI</h3>
-              <div className="flex items-center gap-1.5 pt-0.5">
-                <div className="relative flex size-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full size-1.5 bg-green-500"></span>
-                </div>
-                <span className="text-[11px] text-muted-foreground/90 font-semibold tracking-wide uppercase">active</span>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#111' }}>Ask AI</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingTop: 2 }}>
+                <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }}></span>
+                <span style={{ fontSize: 11, color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>active</span>
               </div>
             </div>
-            <div className="ml-auto">
-              <TooltipIconButton 
-                tooltip="Close" 
-                variant="ghost" 
-                className="size-9 rounded-xl text-muted-foreground hover:text-foreground"
-                onClick={() => setIsOpen(false)}
-              >
-                 <XIcon className="size-4" />
-              </TooltipIconButton>
-            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8, color: '#888', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              title="Close"
+            >
+              <XIcon style={{ width: 18, height: 18 }} />
+            </button>
           </div>
-          
-          <div className="flex-1 overflow-hidden">
+          <div style={{ flex: 1, overflow: 'hidden' }}>
             <Thread />
           </div>
         </div>
       )}
 
-      {/* Trigger Button */}
-      <TooltipIconButton
-        variant="default"
-        tooltip="Chat Assistant"
-        className="size-14 rounded-full shadow-lg bg-gradient-to-br from-[#2f10a0] to-[#7c3aed] hover:shadow-xl transition-all overflow-hidden p-0 flex items-center justify-center pointer-events-auto"
+      {/* Trigger Tab — solid purple, white icon, no border */}
+      <button
         onClick={() => setIsOpen(!isOpen)}
+        style={{
+          position: 'relative',
+          height: '58px',
+          width: '72px',
+          borderRadius: '1rem 0 0 1rem',
+          background: '#7c3aed',
+          border: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          boxShadow: '-4px 4px 24px rgba(124,58,237,0.4)',
+          transition: 'width 0.3s ease, background 0.2s ease',
+          pointerEvents: 'auto',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.width = '80px'; e.currentTarget.style.background = '#6d28d9'; }}
+        onMouseLeave={e => { e.currentTarget.style.width = '72px'; e.currentTarget.style.background = '#7c3aed'; }}
       >
-        {isOpen ? (
-          <XIcon className="size-6 text-white" />
-        ) : (
-          <svg 
-            width="26" 
-            height="26" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="white" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          >
-            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
-            <path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/>
-          </svg>
-        )}
-      </TooltipIconButton>
+        <MessageCircleIcon style={{ width: 28, height: 28, color: '#ffffff' }} strokeWidth={2.5} />
+      </button>
     </div>
+
   );
 };
 
@@ -94,6 +104,36 @@ function AssistantApp({ apiUrl }: { apiUrl: string }) {
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({ api: apiUrl }),
   });
+
+  const STORAGE_KEY = "assistant-messages";
+  const loadedRef = useRef(false);
+
+  // Restore history from localStorage on first mount
+  useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const state = JSON.parse(saved);
+        runtime.thread.importExternalState(state);
+      }
+    } catch {
+      // ignore corrupted state
+    }
+  }, [runtime]);
+
+  // Persist to localStorage on every change
+  useEffect(() => {
+    return runtime.thread.subscribe(() => {
+      try {
+        const state = runtime.thread.exportExternalState();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {
+        // ignore write errors
+      }
+    });
+  }, [runtime]);
 
   return (
     <TooltipProvider>
@@ -183,6 +223,16 @@ class AiChatElement extends LitElement {
         <AssistantApp apiUrl={this.apiUrl} />
       </React.StrictMode>
     );
+  }
+
+  updated(changedProperties: Map<string, any>) {
+    if (changedProperties.has('theme') && this.shadowRoot) {
+      const mountPoint = this.shadowRoot.querySelector('div');
+      if (mountPoint) mountPoint.className = this.theme;
+    }
+    if (changedProperties.has('apiUrl') || changedProperties.has('theme')) {
+      this._renderReact();
+    }
   }
 
   render() {

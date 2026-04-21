@@ -1,6 +1,6 @@
 
 
-import { BotIcon, XIcon, SparklesIcon } from "lucide-react";
+import { BotIcon, XIcon, MessageCircleIcon } from "lucide-react";
 import { forwardRef } from "react";
 import { AssistantModalPrimitive } from "@assistant-ui/react";
 import { Thread } from "@/components/assistant-ui/thread";
@@ -9,12 +9,12 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 const AssistantModal = () => {
   return (
     <AssistantModalPrimitive.Root>
-      <AssistantModalPrimitive.Anchor className="fixed bottom-4 right-4 z-50">
+      <AssistantModalPrimitive.Anchor className="fixed bottom-0 right-0 z-50 pointer-events-none">
         <AssistantModalTrigger />
       </AssistantModalPrimitive.Anchor>
       <AssistantModalPrimitive.Content
         sideOffset={16}
-        className="z-50 h-[700px] w-[400px] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 flex flex-col"
+        className="z-50 mr-4 mb-2 h-[700px] w-[400px] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 flex flex-col"
       >
         <AssistantModalHeader />
         <Thread />
@@ -60,29 +60,26 @@ const AssistantModalTrigger = forwardRef<
 >((props, ref) => {
   return (
     <AssistantModalPrimitive.Trigger asChild>
-      <TooltipIconButton
+      <button
         {...props}
-        variant="default"
-        tooltip="Chat Assistant"
         ref={ref}
-        className="size-14 rounded-full shadow-lg bg-gradient-to-br from-[#2f10a0] to-[#7c3aed] hover:shadow-xl transition-all overflow-hidden p-0 flex items-center justify-center"
+        className="group relative flex items-center justify-center transition-all duration-300 ease-out pointer-events-auto
+                   h-[58px] w-[72px] rounded-l-2xl bg-gradient-to-br from-[#2f10a0] to-[#7c3aed] text-white shadow-[-4px 4px 20px rgba(47,16,160,0.25)] hover:w-[80px]
+                   data-[state=open]:mr-4 data-[state=open]:size-14 data-[state=open]:rounded-full data-[state=open]:bg-background data-[state=open]:border data-[state=open]:border-border data-[state=open]:text-foreground data-[state=open]:shadow-lg data-[state=open]:hover:bg-muted"
       >
-        <svg 
-          width="26" 
-          height="26" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="white" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        >
-          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
-          <path d="M8 12h.01"/>
-          <path d="M12 12h.01"/>
-          <path d="M16 12h.01"/>
-        </svg>
-      </TooltipIconButton>
+        <div 
+          className="absolute -top-[12px] right-0 w-[14px] h-[12px] bg-[#2f10a0] brightness-75 group-data-[state=open]:opacity-0 transition-opacity duration-300"
+          style={{ clipPath: 'polygon(0% 100%, 100% 0%, 100% 100%)' }}
+        />
+        
+        <div className="group-data-[state=open]:hidden flex items-center justify-center relative">
+          <MessageCircleIcon className="size-8" strokeWidth={2.5} />
+        </div>
+        
+        <div className="hidden group-data-[state=open]:block">
+          <XIcon className="size-6" />
+        </div>
+      </button>
     </AssistantModalPrimitive.Trigger>
   );
 });

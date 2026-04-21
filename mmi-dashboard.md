@@ -91,7 +91,7 @@ SELECT 'html' AS component, '
   <script type="module" src="/ai-chat.js"></script>
   <ai-chat
     id="chat"
-    api-url="http://localhost:3001/api/chat"
+    api-url="' || COALESCE(sqlpage.environment_variable('AI_CHAT_API_URL'), 'http://localhost:3001/api/chat') || '"
     theme="light">
   </ai-chat>
 ' AS html;

@@ -267,10 +267,10 @@ Behavioral Rules:
   }
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log("\n" + "=".repeat(50));
-  console.log("✅ Backend on http://localhost:" + PORT);
+  console.log(`✅ Backend on http://localhost:${PORT}`);
   console.log("🔧 Configuration:");
   console.log("   - LITELLM:", process.env.LITELLM_BASE_URL);
   console.log("   - Model:", process.env.AI_MODEL);

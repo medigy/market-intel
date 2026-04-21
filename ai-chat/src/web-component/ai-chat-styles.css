@@ -2,7 +2,11 @@
 
 :host {
   --aui-thread-max-width: 700px;
-  font-family: inherit;
+  font-family: "Times New Roman", Times, serif !important;
+}
+
+* {
+  font-family: "Times New Roman", Times, serif !important;
 }
 
 /* Fix for specific styles seen missing in screenshots */

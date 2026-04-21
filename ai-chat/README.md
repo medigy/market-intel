@@ -101,12 +101,14 @@ source .env && litellm --config litellm_config.yaml
 Install dependencies and run the React dev server:
 
 ```bash
-cd assistant-ui-chat
+cd ai-chat
 npm install
+npm run build:wc 
 npm run dev
 ```
 
-The frontend will be available at `http://localhost:3000` (or as configured).
+The frontend will be available at `http://localhost:5173` (or as configured).
+api will be availible in  `http://localhost:3001`
 
 ---
 
