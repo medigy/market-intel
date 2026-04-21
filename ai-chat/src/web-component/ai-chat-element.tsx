@@ -32,41 +32,41 @@ const ShadowAssistantModal = () => {
     }}>
       {/* Modal Content */}
       {isOpen && (
-        <div style={{
-          marginRight: '16px',
-          marginBottom: '8px',
-          height: '700px',
-          width: '400px',
-          overflow: 'hidden',
-          borderRadius: '1rem',
-          border: '1px solid rgba(0,0,0,0.1)',
-          background: '#ffffff',
-          boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
-          display: 'flex',
-          flexDirection: 'column',
-          pointerEvents: 'auto',
-          animation: 'fadeIn 0.2s ease',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 10, flexShrink: 0 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.1)', background: '#fff', padding: 4, flexShrink: 0 }}>
-              <img src="https://qualityfolio.dev/favicon.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.25)' }} />
+        <div 
+          className="mr-4 mb-2 h-[700px] w-[400px] overflow-hidden rounded-[24px] border border-border/50 bg-background shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col animate-in fade-in zoom-in-95 duration-200 pointer-events-auto"
+          style={{ fontFamily: '"Outfit", "Times New Roman", sans-serif' }}
+        >
+          {/* Header */}
+          <div className="flex items-center gap-3 p-4 border-b border-border/30 bg-background/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
+            <div className="size-11 rounded-xl overflow-hidden shadow-lg shadow-primary/5 border border-border/50 bg-white p-1">
+              <img 
+                src="https://qualityfolio.dev/favicon.png" 
+                alt="Logo" 
+                className="size-full object-contain scale-125"
+              />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#111' }}>Ask AI</h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingTop: 2 }}>
-                <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }}></span>
-                <span style={{ fontSize: 11, color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>active</span>
+            <div className="flex flex-col">
+              <h3 className="text-[15px] font-bold tracking-tight text-foreground leading-tight">Ask AI</h3>
+              <div className="flex items-center gap-1.5 pt-0.5">
+                <div className="relative flex size-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-80"></span>
+                  <span className="relative inline-flex rounded-full size-1.5 bg-green-500"></span>
+                </div>
+                <span className="text-[11px] text-muted-foreground/90 font-bold tracking-wide uppercase">active</span>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8, color: '#888', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              title="Close"
-            >
-              <XIcon style={{ width: 18, height: 18 }} />
-            </button>
+            <div className="ml-auto">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="size-9 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center justify-center group"
+                title="Close"
+              >
+                <XIcon className="size-4.5 group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
           </div>
-          <div style={{ flex: 1, overflow: 'hidden' }}>
+          
+          <div className="flex-1 overflow-hidden bg-transparent">
             <Thread />
           </div>
         </div>

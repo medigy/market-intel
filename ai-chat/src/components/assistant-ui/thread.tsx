@@ -88,7 +88,7 @@ const Thread: FC = () => {
         <div className="min-h-12 flex-grow" />
       </ThreadPrimitive.Viewport>
 
-      <div className="sticky bottom-0 mt-4 flex w-full flex-col items-center justify-end pb-8 px-4 bg-transparent backdrop-blur-none">
+      <div className="sticky bottom-0 flex w-full flex-col items-center justify-end pb-6 px-4 bg-transparent backdrop-blur-none transition-all">
         <ThreadScrollToBottom />
         <Composer />
       </div>
@@ -141,9 +141,9 @@ const ThreadScrollToBottom: FC = () => {
       <TooltipIconButton
         tooltip="Scroll to bottom"
         variant="outline"
-        className="absolute -top-8 rounded-full disabled:invisible"
+        className="absolute -top-10 left-1/2 -translate-x-1/2 size-8 rounded-full border-border/50 bg-background/80 shadow-sm disabled:invisible hover:bg-background transition-all"
       >
-        <ArrowDownIcon />
+        <ArrowDownIcon className="size-4" />
       </TooltipIconButton>
     </ThreadPrimitive.ScrollToBottom>
   );
@@ -175,7 +175,7 @@ const ComposerAttachments: FC = () => {
 
 const Composer: FC = () => {
   return (
-    <ComposerPrimitive.Root className="flex w-full max-w-2xl mx-auto flex-col rounded-[32px] border border-border/60 bg-background transition-all duration-300 ease-out focus-within:border-primary/40 focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+    <ComposerPrimitive.Root className="flex w-full max-w-2xl mx-auto flex-col rounded-[32px] border border-border/30 bg-background shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out focus-within:border-primary/20 focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
       <ComposerAttachments />
       <ComposerPrimitive.Input
         autoFocus
@@ -201,9 +201,9 @@ const Composer: FC = () => {
               <TooltipIconButton
                 tooltip="Send"
                 variant="default"
-                className="size-10 rounded-full bg-primary/95 hover:bg-primary shadow-sm active:scale-95 transition-all duration-200 p-0"
+                className="size-10 rounded-full bg-[#a1a1aa] hover:bg-[#888] shadow-sm active:scale-95 transition-all duration-200 p-0 border-none"
               >
-                <ArrowUpIcon className="size-5 text-primary-foreground" strokeWidth={3} />
+                <ArrowUpIcon className="size-5 text-white" strokeWidth={2.5} />
               </TooltipIconButton>
             </ComposerPrimitive.Send>
           </ThreadPrimitive.If>
