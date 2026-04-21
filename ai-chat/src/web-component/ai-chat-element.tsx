@@ -6,8 +6,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AssistantRuntimeProvider } from '@assistant-ui/react';
 import { useChatRuntime, AssistantChatTransport } from '@assistant-ui/react-ai-sdk';
 import { Thread } from '../components/assistant-ui/thread';
+import { PortalContainerProvider } from '../components/ui/portal-container';
 import { TooltipProvider } from '../components/ui/tooltip';
-import { TooltipIconButton } from '../components/assistant-ui/tooltip-icon-button';
 import { XIcon, MessageCircleIcon } from 'lucide-react';
 
 // Vite ?inline trick: converts CSS into a string for shadow DOM injection
@@ -100,7 +100,13 @@ const ShadowAssistantModal = () => {
   );
 };
 
-function AssistantApp({ apiUrl }: { apiUrl: string }) {
+function AssistantApp({
+  apiUrl,
+  portalContainer,
+}: {
+  apiUrl: string;
+  portalContainer: Element | DocumentFragment | null;
+}) {
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({ api: apiUrl }),
   });
@@ -136,11 +142,13 @@ function AssistantApp({ apiUrl }: { apiUrl: string }) {
   }, [runtime]);
 
   return (
-    <TooltipProvider>
-      <AssistantRuntimeProvider runtime={runtime}>
-        <ShadowAssistantModal />
-      </AssistantRuntimeProvider>
-    </TooltipProvider>
+    <PortalContainerProvider container={portalContainer}>
+      <TooltipProvider>
+        <AssistantRuntimeProvider runtime={runtime}>
+          <ShadowAssistantModal />
+        </AssistantRuntimeProvider>
+      </TooltipProvider>
+    </PortalContainerProvider>
   );
 }
 
@@ -167,6 +175,7 @@ class AiChatElement extends LitElement {
   apiUrl: string;
   theme: string;
   private _reactRoot: Root | null = null;
+  private _mountPoint: HTMLDivElement | null = null;
 
   constructor() {
     super();
@@ -189,6 +198,7 @@ class AiChatElement extends LitElement {
       this._reactRoot.unmount();
       this._reactRoot = null;
     }
+    this._mountPoint = null;
   }
 
   private _mount() {
@@ -197,19 +207,23 @@ class AiChatElement extends LitElement {
 
     // 1. Inject Styles into Shadow DOM ONLY
     const styleEl = document.createElement('style');
-    // Map :root variables to :host so Tailwind bg-background etc works inside shadow
+    // Map global selectors to an internal shadow DOM root so page-level CSS variables
+    // and host styling cannot override the component theme tokens.
     const hostVars = indexStyles
-        .replace(/:root/g, ':host')
-        .replace(/body/g, ':host');
+        .replace(/:root/g, '[data-aui-root]')
+        .replace(/\bbody\b/g, '[data-aui-root]')
+        .replace(/\bhtml\b/g, '[data-aui-root]');
 
     styleEl.textContent = hostVars + '\n' + componentStyles;
     shadow.appendChild(styleEl);
 
     // 2. Create Mount Point
     const mountPoint = document.createElement('div');
+    mountPoint.setAttribute('data-aui-root', '');
     mountPoint.className = this.theme;
     mountPoint.style.cssText = 'pointer-events: auto;';
     shadow.appendChild(mountPoint);
+    this._mountPoint = mountPoint;
 
     // 3. Mount React
     this._reactRoot = createRoot(mountPoint);
@@ -220,14 +234,14 @@ class AiChatElement extends LitElement {
     if (!this._reactRoot) return;
     this._reactRoot.render(
       <React.StrictMode>
-        <AssistantApp apiUrl={this.apiUrl} />
+        <AssistantApp apiUrl={this.apiUrl} portalContainer={this._mountPoint} />
       </React.StrictMode>
     );
   }
 
   updated(changedProperties: Map<string, any>) {
     if (changedProperties.has('theme') && this.shadowRoot) {
-      const mountPoint = this.shadowRoot.querySelector('div');
+      const mountPoint = this.shadowRoot.querySelector('[data-aui-root]');
       if (mountPoint) mountPoint.className = this.theme;
     }
     if (changedProperties.has('apiUrl') || changedProperties.has('theme')) {

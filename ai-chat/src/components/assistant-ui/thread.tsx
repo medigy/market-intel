@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Button } from "@/components/ui/button";
+import { usePortalContainer } from "@/components/ui/portal-container";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const MarkdownText: FC<any> = () => {
@@ -175,7 +176,7 @@ const ComposerAttachments: FC = () => {
 
 const Composer: FC = () => {
   return (
-    <ComposerPrimitive.Root className="flex w-full max-w-2xl mx-auto flex-col rounded-[32px] border border-border/30 bg-background shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out focus-within:border-primary/20 focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+    <ComposerPrimitive.Root className="aui-composer-shell flex w-full max-w-2xl mx-auto flex-col rounded-[32px] border border-border/60 bg-background transition-all duration-300 ease-out focus-within:border-primary/40 focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
       <ComposerAttachments />
       <ComposerPrimitive.Input
         autoFocus
@@ -365,6 +366,8 @@ const AssistantMessageError: FC = () => {
 };
 
 const AssistantActionBar: FC = () => {
+  const portalContainer = usePortalContainer();
+
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
@@ -408,6 +411,7 @@ const AssistantActionBar: FC = () => {
         </ActionBarMorePrimitive.Trigger>
         <ActionBarMorePrimitive.Content
           align="start"
+          portalProps={portalContainer ? { container: portalContainer } : undefined}
           className="z-50 min-w-[120px] overflow-hidden rounded-xl border border-border/40 bg-background/95 backdrop-blur-md p-1.5 text-foreground shadow-lg animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
         >
           <ActionBarPrimitive.ExportMarkdown asChild>

@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import cssInjectedByJs from 'vite-plugin-css-injected-by-js';
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -10,9 +9,6 @@ export default defineConfig({
     tsconfigPaths(),
     react(),
     tailwindcss(),
-    // This plugin injects all CSS into the JS bundle automatically
-    // so the final output is ONE self-contained .js file
-    cssInjectedByJs(),
   ],
 
   build: {

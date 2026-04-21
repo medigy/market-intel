@@ -11,36 +11,27 @@
 
 /* Fix for specific styles seen missing in screenshots */
 button.flex.flex-col {
-  border: 1px solid var(--border, rgba(0,0,0,0.1)) !important;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1)) !important;
+}
+
+/* Keep the composer border visible even when host-page theme variables differ */
+.aui-composer-shell {
+  border-color: rgba(17, 24, 39, 0.18);
+}
+
+.aui-composer-shell:focus-within {
+  border-color: rgba(17, 24, 39, 0.28);
+}
+
+.dark .aui-composer-shell {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .aui-composer-shell:focus-within {
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 /* Fixed positioning for Shadow DOM */
 .fixed {
-    position: fixed !important;
-}
-
-/* 
-   FORCE styles for the web-component only.
-   Since this file is only injected into the Shadow DOM, 
-   these !important tags won't affect your main application.
-*/
-
-/* Composer (Input Area) Border & Background Fix */
-[role="form"], 
-.flex.w-full.max-w-2xl.mx-auto.flex-col {
-    border: 1px solid rgba(0,0,0,0.1) !important;
-    background-color: #ffffff !important;
-    border-radius: 32px !important;
-}
-
-/* Ensure the main modal container respects its styling */
-.rounded-\[24px\] {
-    border-radius: 24px !important;
-    border: 1px solid rgba(0,0,0,0.08) !important;
-    background-color: #ffffff !important;
-}
-
-/* Fix for buttons that might be stripped of borders by SQLPage resets */
-button {
-    border-color: inherit;
+  position: fixed;
 }
