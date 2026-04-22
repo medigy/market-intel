@@ -110,7 +110,7 @@ SET page_path = json_extract($resource_json, '$.route.path');
 ```contribute sqlpage_files --base .
 ./footer-links.js .
 ./custom-dashboard.css .
-./ai-chat.js .
+./ai-chat/dist/wc/ai-chat.js ai-chat.js
 ```
 
 ---

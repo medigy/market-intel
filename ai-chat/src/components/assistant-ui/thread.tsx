@@ -103,7 +103,7 @@ const SuggestionCard: FC<{ suggestion: any }> = ({ suggestion }) => {
       prompt={suggestion.prompt}
       asChild
     >
-      <button className="flex flex-col gap-2 rounded-[24px] border border-border/40 bg-background/30 p-5 text-left transition-all hover:bg-muted/80 hover:border-primary/20 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-primary/20 group h-full">
+      <button className="aui-suggestion-card flex flex-col gap-2 rounded-[24px] border border-border bg-background/30 p-5 text-left transition-all hover:bg-muted/50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 group h-full">
         <span className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">
           {suggestion.title}
         </span>

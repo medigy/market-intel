@@ -72,6 +72,11 @@
   color: #111827 !important;
 }
 
+/* Suggestion Cards: Visible borders matching documentation style */
+.aui-suggestion-card {
+  border: 1px solid oklch(0.922 0 0) !important;
+}
+
 /* Fixed positioning reset */
 .fixed {
   position: fixed;
