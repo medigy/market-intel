@@ -5,100 +5,15 @@ import React, { useEffect, useRef, useState } from 'react';
 // Your existing assistant-ui pieces
 import { AssistantRuntimeProvider } from '@assistant-ui/react';
 import { useChatRuntime, AssistantChatTransport } from '@assistant-ui/react-ai-sdk';
-import { Thread } from '../components/assistant-ui/thread';
+import { AssistantModal } from '../components/assistant-ui/assistant-modal';
 import { PortalContainerProvider } from '../components/ui/portal-container';
 import { TooltipProvider } from '../components/ui/tooltip';
-import { XIcon, MessageCircleIcon } from 'lucide-react';
 
 // Vite ?inline trick: converts CSS into a string for shadow DOM injection
 import indexStyles from '../index.css?inline';
 import componentStyles from './ai-chat-styles.css?inline';
 
-// ── Recreating AssistantModal Logic (Shadow-DOM Friendly) ───────────────────
-const ShadowAssistantModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div style={{
-      position: 'fixed',
-      bottom: 0,
-      right: 0,
-      zIndex: 50000,
-      display: 'flex',
-      flexDirection: 'column-reverse',
-      alignItems: 'flex-end',
-      gap: '16px',
-      pointerEvents: 'none',
-    }}>
-      {/* Modal Content */}
-      {isOpen && (
-        <div 
-          className="mr-4 mb-2 h-[700px] w-[400px] overflow-hidden rounded-[24px] border border-border/50 bg-background shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col animate-in fade-in zoom-in-95 duration-200 pointer-events-auto"
-          style={{ fontFamily: '"Outfit", "Times New Roman", sans-serif' }}
-        >
-          {/* Header */}
-          <div className="flex items-center gap-3 p-4 border-b border-border/30 bg-background/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
-            <div className="size-11 rounded-xl overflow-hidden shadow-lg shadow-primary/5 border border-border/50 bg-white p-1">
-              <img 
-                src="https://qualityfolio.dev/favicon.png" 
-                alt="Logo" 
-                className="size-full object-contain scale-125"
-              />
-            </div>
-            <div className="flex flex-col">
-              <h3 className="text-[15px] font-bold tracking-tight text-foreground leading-tight">Ask AI</h3>
-              <div className="flex items-center gap-1.5 pt-0.5">
-                <div className="relative flex size-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-80"></span>
-                  <span className="relative inline-flex rounded-full size-1.5 bg-green-500"></span>
-                </div>
-                <span className="text-[11px] text-muted-foreground/90 font-bold tracking-wide uppercase">active</span>
-              </div>
-            </div>
-            <div className="ml-auto">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="size-9 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center justify-center group"
-                title="Close"
-              >
-                <XIcon className="size-4.5 group-hover:scale-110 transition-transform" />
-              </button>
-            </div>
-          </div>
-          
-          <div className="flex-1 overflow-hidden bg-transparent">
-            <Thread />
-          </div>
-        </div>
-      )}
-
-      {/* Trigger Tab — solid purple, white icon, no border */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        style={{
-          position: 'relative',
-          height: '58px',
-          width: '72px',
-          borderRadius: '1rem 0 0 1rem',
-          background: '#7c3aed',
-          border: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '-4px 4px 24px rgba(124,58,237,0.4)',
-          transition: 'width 0.3s ease, background 0.2s ease',
-          pointerEvents: 'auto',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.width = '80px'; e.currentTarget.style.background = '#6d28d9'; }}
-        onMouseLeave={e => { e.currentTarget.style.width = '72px'; e.currentTarget.style.background = '#7c3aed'; }}
-      >
-        <MessageCircleIcon style={{ width: 28, height: 28, color: '#ffffff' }} strokeWidth={2.5} />
-      </button>
-    </div>
-
-  );
-};
+// Replaced custon ShadowAssistantModal with standard AssistantModal for minimal customization
 
 function AssistantApp({
   apiUrl,
@@ -145,7 +60,7 @@ function AssistantApp({
     <PortalContainerProvider container={portalContainer}>
       <TooltipProvider>
         <AssistantRuntimeProvider runtime={runtime}>
-          <ShadowAssistantModal />
+          <AssistantModal />
         </AssistantRuntimeProvider>
       </TooltipProvider>
     </PortalContainerProvider>
@@ -189,6 +104,7 @@ class AiChatElement extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.classList.add(this.theme); // Apply theme class to host
     this._mount();
   }
 
@@ -207,12 +123,12 @@ class AiChatElement extends LitElement {
 
     // 1. Inject Styles into Shadow DOM ONLY
     const styleEl = document.createElement('style');
-    // Map global selectors to an internal shadow DOM root so page-level CSS variables
-    // and host styling cannot override the component theme tokens.
+    // Map global selectors to :host and children so they work correctly in Shadow DOM.
+    // Tailwind v4 uses :root for variables, which we move to :host.
     const hostVars = indexStyles
-        .replace(/:root/g, '[data-aui-root]')
-        .replace(/\bbody\b/g, '[data-aui-root]')
-        .replace(/\bhtml\b/g, '[data-aui-root]');
+        .replace(/:root/g, ':host')
+        .replace(/\bbody\b/g, ':host')
+        .replace(/\bhtml\b/g, ':host');
 
     styleEl.textContent = hostVars + '\n' + componentStyles;
     shadow.appendChild(styleEl);
@@ -240,9 +156,15 @@ class AiChatElement extends LitElement {
   }
 
   updated(changedProperties: Map<string, any>) {
-    if (changedProperties.has('theme') && this.shadowRoot) {
-      const mountPoint = this.shadowRoot.querySelector('[data-aui-root]');
-      if (mountPoint) mountPoint.className = this.theme;
+    if (changedProperties.has('theme')) {
+      // Update theme class on host
+      this.classList.remove('light', 'dark');
+      this.classList.add(this.theme);
+      
+      if (this.shadowRoot) {
+        const mountPoint = this.shadowRoot.querySelector('[data-aui-root]');
+        if (mountPoint) mountPoint.className = this.theme;
+      }
     }
     if (changedProperties.has('apiUrl') || changedProperties.has('theme')) {
       this._renderReact();

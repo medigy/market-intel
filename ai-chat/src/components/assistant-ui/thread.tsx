@@ -86,10 +86,10 @@ const Thread: FC = () => {
             AssistantMessage,
           }}
         />
-        <div className="min-h-12 flex-grow" />
+        <div className="min-h-[140px] flex-grow" />
       </ThreadPrimitive.Viewport>
 
-      <div className="sticky bottom-0 flex w-full flex-col items-center justify-end pb-6 px-4 bg-transparent backdrop-blur-none transition-all">
+      <div className="sticky bottom-0 flex w-full flex-col items-center justify-end pb-6 px-4 bg-transparent !backdrop-blur-none transition-all">
         <ThreadScrollToBottom />
         <Composer />
       </div>
@@ -246,8 +246,8 @@ const MessageAttachments: FC = () => {
 
 const UserMessage: FC = () => {
   return (
-    <MessagePrimitive.Root className="grid w-full max-w-2xl auto-rows-auto grid-cols-[1fr_auto] gap-y-1 py-2 group">
-      <div className="bg-muted text-foreground max-w-xl break-words rounded-2xl px-4 py-2 col-start-1 text-sm">
+    <MessagePrimitive.Root className="grid w-full auto-rows-auto grid-cols-[1fr_auto] gap-y-1 py-3 group">
+      <div className="aui-user-message-bubble max-w-[85%] break-words rounded-[20px] px-4 py-2.5 col-start-1 text-sm leading-relaxed ml-auto mr-0">
         <MessagePrimitive.Content />
         <MessageAttachments />
       </div>
@@ -304,22 +304,22 @@ const AssistantMessageLoading: FC = () => {
   const isRunning = useAuiState((s) => s.message.status?.type === "running");
   if (!isRunning) return null;
   return (
-    <div className="flex items-center gap-2 py-1">
-      <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2 py-2 animate-in fade-in duration-500">
+      <div className="flex items-center gap-1.5">
         <span
-          className="inline-block size-1 rounded-full bg-muted-foreground animate-pulse"
-          style={{ animationDelay: "0ms", animationDuration: "1s" }}
+          className="inline-block size-1.5 rounded-full bg-muted-foreground animate-pulse"
+          style={{ animationDelay: "0ms", animationDuration: "1.2s" }}
         />
         <span
-          className="inline-block size-1 rounded-full bg-muted-foreground animate-pulse"
-          style={{ animationDelay: "200ms", animationDuration: "1s" }}
+          className="inline-block size-1.5 rounded-full bg-muted-foreground animate-pulse"
+          style={{ animationDelay: "200ms", animationDuration: "1.2s" }}
         />
         <span
-          className="inline-block size-1 rounded-full bg-muted-foreground animate-pulse"
-          style={{ animationDelay: "400ms", animationDuration: "1s" }}
+          className="inline-block size-1.5 rounded-full bg-muted-foreground animate-pulse"
+          style={{ animationDelay: "400ms", animationDuration: "1.2s" }}
         />
       </div>
-      <span className="text-xs text-muted-foreground leading-none">thinking...</span>
+      <span className="text-xs font-semibold text-muted-foreground italic tracking-wide whitespace-nowrap">thinking...</span>
     </div>
   );
 };
