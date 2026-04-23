@@ -1,4 +1,4 @@
-# Medigy Market Intelligence (MMI) — Unified
+# Medigy Opportunity Atlas (moa) — Unified
 
 A CMS Medicare analytics pipeline built with `surveilr` and `spry` that transforms raw public datasets into a navigable SQLPage business intelligence application. Designed to identify high-opportunity disease-specialty clusters through evidence-based commercial validation.
 
@@ -10,7 +10,7 @@ The pipeline introduces a **unified extensible ELT architecture**: adding a new 
 
 ## Table of Contents
 
-- [Medigy Market Intelligence (MMI) — Unified](#medigy-market-intelligence-mmi--unified)
+- [Medigy Opportunity Atlas (moa) — Unified](#medigy-market-intelligence-moa--unified)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [What's New in v3](#whats-new-in-v3)
@@ -45,7 +45,7 @@ The pipeline introduces a **unified extensible ELT architecture**: adding a new 
 
 ## Overview
 
-The pipeline ingests CMS public datasets, builds a normalized star schema in SQLite, runs a suite of condition-agnostic analytics and an opportunity scoring engine, then packages everything into a multi-page SQLPage UI — all from a single Executable Markdown file (`mmi-dashboard.md`) and one SQL script (`medigy-unified-v2.sql`), with a DDL overlay (`medigy-ddl.sql`) that materializes the heaviest analytics queries.
+The pipeline ingests CMS public datasets, builds a normalized star schema in SQLite, runs a suite of condition-agnostic analytics and an opportunity scoring engine, then packages everything into a multi-page SQLPage UI — all from a single Executable Markdown file (`moa-dashboard.md`) and one SQL script (`medigy-unified-v2.sql`), with a DDL overlay (`medigy-ddl.sql`) that materializes the heaviest analytics queries.
 
 The primary deliverable is `opportunity_score`: a composite ranking of every active disease condition, scored on patient volume, Medicare allowed spend, and strategic tier weighting.
 
@@ -63,9 +63,9 @@ The primary deliverable is `opportunity_score`: a composite ranking of every act
 - **External CSS (`custom-dashboard.css`)** — applied globally across all pages via the shell partial.
 - **New visualizations** — opportunity scatter plot, tier distribution donut, source-mix bar chart, top-state treemap equivalent, and data freshness timeline.
 - **Same-page anchor navigation** — HTML anchors on the Data Dictionary page allow card links to jump directly to the relevant section.
-- **User registration gate** — `index.sql` collects name, email, organization, and consent before redirecting to the dashboard. A server-side cookie check (`medigy_mmi_registration_profile_v2`) eliminates the post-render flicker that occurred with the previous JS redirect approach.
+- **User registration gate** — `index.sql` collects name, email, organization, and consent before redirecting to the dashboard. A server-side cookie check (`medigy_moa_registration_profile_v2`) eliminates the post-render flicker that occurred with the previous JS redirect approach.
 - **Welcome email on registration** — `registration-submit.sql` dispatches a transactional welcome email via SQLPage `exec` + SMTP environment variables.
-- **Executable Markdown renamed** — the UI definition file is now `mmi-dashboard.md` (previously `mmi-unified-dashboard.md`).
+- **Executable Markdown renamed** — the UI definition file is now `moa-dashboard.md` (previously `moa-unified-dashboard.md`).
 
 ---
 
@@ -103,7 +103,7 @@ CMS Public Datasets (CSV) + master reference data (ICD, CPT, HCPCS, GPCI, etc.)
 ├── sql/
 │   ├── medigy-unified-v2.sql           # Unified ELT pipeline — run after ingestion
 │   └── medigy-ddl.sql                  # DDL overlay: provenance, mat_* tables, indexes
-├── mmi-dashboard.md                    # Executable Markdown — UI definition + deploy script
+├── moa-dashboard.md                    # Executable Markdown — UI definition + deploy script
 └── resource-surveillance.sqlite.db     # Output RSSD (SQLite, generated at runtime)
 ```
 
@@ -293,31 +293,31 @@ Volume and spend are normalized against the maximum observed value across all co
 
 ## SQLPage Dashboard
 
-`mmi-dashboard.md` is the Executable Markdown file that defines both the deploy script and the full SQLPage UI. It runs on port `9227` against `resource-surveillance.sqlite.db`.
+`moa-dashboard.md` is the Executable Markdown file that defines both the deploy script and the full SQLPage UI. It runs on port `9227` against `resource-surveillance.sqlite.db`.
 
-A global shell partial (`global-layout.sql`) is injected into every page and handles the navigation menu, external CSS (`custom-dashboard.css`), and footer JavaScript (`footer-links.js`). Path detection (`instr(sqlpage.path(), 'mmi/')`) resolves relative asset paths correctly for both root-level and sub-directory pages.
+A global shell partial (`global-layout.sql`) is injected into every page and handles the navigation menu, external CSS (`custom-dashboard.css`), and footer JavaScript (`footer-links.js`). Path detection (`instr(sqlpage.path(), 'moa/')`) resolves relative asset paths correctly for both root-level and sub-directory pages.
 
 ### Navigation Menu
 
 | Page | Route | Description |
 |---|---|---|
 | Root | `/` (`index.sql`) | Redirect to home overview. |
-| Home | `/mmi/home-overview.sql` | Landing page — loads without registration requirement. Pipeline health KPIs + dynamic disease condition cards (auto-generated from registry). |
-| Registration | `/mmi/registration.sql` | User registration form — collects name, email, organization, and consent. Gated on redirect to any page (except `/` and `/mmi/home-overview.sql`) when `isVerified=false`. |
-| Executive Dashboard | `/mmi/executive-dashboard.sql` | Portfolio totals, cross-condition comparison charts, full summary table |
-| Disease Conditions | `/mmi/conditions.sql` | Full condition registry — cards and table view |
-| Opportunity Scores | `/mmi/opportunity-scoring.sql` | Composite ranked opportunity matrix |
-| Geography | `/mmi/geography.sql` | State-level market sizing, cost tiers, and GPCI factors |
-| Procedure Drilldown | `/mmi/procedure-drilldown.sql` | HCPCS-level analytics with condition and code filters, paginated |
-| Data Dictionary | `/mmi/data-dictionary.sql` | Schema reference: derived objects, materialized tables, source provenance, and performance indexes — all paginated with same-page anchor navigation |
+| Home | `/moa/home-overview.sql` | Landing page — loads without registration requirement. Pipeline health KPIs + dynamic disease condition cards (auto-generated from registry). |
+| Registration | `/moa/registration.sql` | User registration form — collects name, email, organization, and consent. Gated on redirect to any page (except `/` and `/moa/home-overview.sql`) when `isVerified=false`. |
+| Executive Dashboard | `/moa/executive-dashboard.sql` | Portfolio totals, cross-condition comparison charts, full summary table |
+| Disease Conditions | `/moa/conditions.sql` | Full condition registry — cards and table view |
+| Opportunity Scores | `/moa/opportunity-scoring.sql` | Composite ranked opportunity matrix |
+| Geography | `/moa/geography.sql` | State-level market sizing, cost tiers, and GPCI factors |
+| Procedure Drilldown | `/moa/procedure-drilldown.sql` | HCPCS-level analytics with condition and code filters, paginated |
+| Data Dictionary | `/moa/data-dictionary.sql` | Schema reference: derived objects, materialized tables, source provenance, and performance indexes — all paginated with same-page anchor navigation |
 
-Every condition card on the home overview links to a universal **Condition Hub** (`/mmi/condition-hub.sql?condition=<n>`) that shows national KPIs, data source breakdown, top procedures, and geographic breakdown for that condition — all driven by the `?condition=` URL parameter. No new page is needed when a condition is added.
+Every condition card on the home overview links to a universal **Condition Hub** (`/moa/condition-hub.sql?condition=<n>`) that shows national KPIs, data source breakdown, top procedures, and geographic breakdown for that condition — all driven by the `?condition=` URL parameter. No new page is needed when a condition is added.
 
 ---
 
 ## Task-Based Workflow (Spry)
 
-In addition to the manual deployment steps, the project utilizes `spry` tasks defined in `mmi-dashboard.md` to automate the database preparation, ontology setup, and server deployment. This ensures consistency across development and production environments.
+In addition to the manual deployment steps, the project utilizes `spry` tasks defined in `moa-dashboard.md` to automate the database preparation, ontology setup, and server deployment. This ensures consistency across development and production environments.
 
 ### Command Execution Sequence
 
@@ -326,19 +326,19 @@ As seen in the terminal logs, the standard sequence for preparing a fresh enviro
 1. **Prepare Database:** Initializes the RSSD and prepares the schema.
 
     ```bash
-    spry rb task prepare-db mmi-dashboard.md
+    spry rb task prepare-db moa-dashboard.md
     ```
 
 2. **Ontology Setup:** Ingests the `.owl` files and adapts them into the relational schema.
 
     ```bash
-    spry rb task ontology-setup mmi-dashboard.md
+    spry rb task ontology-setup moa-dashboard.md
     ```
 
 3. **Deploy Server:** Compiles the Executable Markdown and launches the SQLPage UI.
 
     ```bash
-    spry rb task deploy-server mmi-dashboard.md
+    spry rb task deploy-server moa-dashboard.md
     ```
 
 ---
@@ -377,10 +377,10 @@ export EMAIL_FROM="<your-from-email>"
 export EMAIL_PORT="<your-port>"
 
 # 9. Compile the Executable Markdown UI and load it into the database
-spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md \
+spry sp spc --package --conf sqlpage/sqlpage.json -m moa-dashboard.md \
   | sqlite3 resource-surveillance.sqlite.db
 
-echo "Medigy Market Intelligence is ready at http://localhost:9227"
+echo "Medigy Opportunity Atlas is ready at http://localhost:9227"
 ```
 
 > **Order matters:** `medigy-unified-v2.sql` must complete before `medigy-ddl.sql` because the materialized tables in Section 4 of the DDL read from `fact_utilization_unified` and the Layer 4 views produced by the pipeline.
