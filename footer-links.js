@@ -1,12 +1,12 @@
 (() => {
-  const COOKIE_NAME = 'medigy_mmi_registration_profile_v2';
+  const COOKIE_NAME = 'medigy_moa_registration_profile_v2';
   const SKIP_FOR_NOW_PARAM = 'skip_for_now';
-  const SKIP_SESSION_KEY = 'mmi_registration_skip_once';
-  const ROUTE_SUFFIX_REGISTRATION = '/mmi/registration.sql';
+  const SKIP_SESSION_KEY = 'moa_registration_skip_once';
+  const ROUTE_SUFFIX_REGISTRATION = '/moa/registration.sql';
   const ROUTE_SUFFIX_REGISTRATION_INDEX = '/index.sql';
-  const ROUTE_SUFFIX_REGISTRATION_ALIAS = '/mmi/registration.sql';
+  const ROUTE_SUFFIX_REGISTRATION_ALIAS = '/moa/registration.sql';
   const ROUTE_SUFFIX_REGISTRATION_SUBMIT = '/registration-submit.sql';
-  const ROUTE_SUFFIX_HOME = '/mmi/home-overview.sql';
+  const ROUTE_SUFFIX_HOME = '/moa/home-overview.sql';
 
   const normalizePath = (pathValue) => {
     const asString = String(pathValue || '').trim();
@@ -20,8 +20,8 @@
   const resolveBasePath = (pathname) => {
     const normalized = normalizePath(pathname);
 
-    if (normalized.includes('/mmi/')) {
-      return normalized.split('/mmi/')[0] || '';
+    if (normalized.includes('/moa/')) {
+      return normalized.split('/moa/')[0] || '';
     }
 
     const knownRouteSuffixes = [
@@ -151,7 +151,7 @@
   initializeIsVerifiedCookie();
 
   const hasAccessGrantedParam =
-    String(searchParams.get('mmi_access_granted') || '').trim().toLowerCase() === 'true';
+    String(searchParams.get('moa_access_granted') || '').trim().toLowerCase() === 'true';
 
   const isRegistrationPage =
     normalizedPath === normalizePath(REGISTRATION_PATH) ||
@@ -226,14 +226,14 @@
     }
 
     const submitContainer = submitButton.parentElement;
-    if (!submitContainer || submitContainer.querySelector('[data-mmi-skip-inline="true"]')) {
+    if (!submitContainer || submitContainer.querySelector('[data-moa-skip-inline="true"]')) {
       return;
     }
 
     const inlineSkipLink = document.createElement('a');
     inlineSkipLink.textContent = 'Skip for Now';
     inlineSkipLink.href = `${REGISTRATION_PATH}?skip_for_now=1`;
-    inlineSkipLink.setAttribute('data-mmi-skip-inline', 'true');
+    inlineSkipLink.setAttribute('data-moa-skip-inline', 'true');
     inlineSkipLink.className = 'btn btn-outline-secondary';
 
     const tabSpace = document.createTextNode('\u00A0\u00A0\u00A0\u00A0');

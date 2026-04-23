@@ -1,5 +1,5 @@
 -- =============================================================================
--- Medigy MARKET INTELLIGENCE — CONSOLIDATED ELT PIPELINE
+-- Medigy Opportunity Atlas — CONSOLIDATED ELT PIPELINE
 -- Database: SQLite (surveilr RSSD)
 -- =============================================================================
 

@@ -1,5 +1,5 @@
 -- =============================================================================
--- MEDIGY MARKET INTELLIGENCE — DDL v3 (Enhanced)
+-- Medigy Opportunity Atlas — DDL v3 (Enhanced)
 -- Adds:
 --   1. data_provenance table (unchanged)
 --   2. data_tables_derived view (unchanged)
