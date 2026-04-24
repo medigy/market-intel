@@ -53,7 +53,7 @@ export class MyCustomUploadAdapter implements AttachmentAdapter {
         }
       ],
       status: { type: "complete" },
-    };
+    } as any as CompleteAttachment;
   }
 
   async remove() {
