@@ -35,6 +35,7 @@ import {
   DownloadIcon,
 } from "lucide-react";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { ImagePart } from "@/components/assistant-ui/image-part";
 import { Button } from "@/components/ui/button";
 import { usePortalContainer } from "@/components/ui/portal-container";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -159,6 +160,7 @@ const ComposerAttachments: FC = () => {
             key={attachment.attachment.id}
             className="flex items-center gap-2 rounded-xl border border-border/40 bg-muted/30 px-3 py-1.5 text-[11px] font-medium shadow-sm transition-all hover:border-border/60"
           >
+            <AttachmentPrimitive.unstable_Thumb className="size-6 shrink-0 overflow-hidden rounded-md border border-border/40 bg-background" />
             <div className="max-w-[150px] truncate">
               <AttachmentPrimitive.Name />
             </div>
@@ -234,6 +236,7 @@ const MessageAttachments: FC = () => {
           key={attachment.id}
           className="flex items-center gap-2 rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-[11px] font-medium transition-all hover:bg-background"
         >
+          <AttachmentPrimitive.unstable_Thumb className="size-8 shrink-0 overflow-hidden rounded-md border border-border/40 bg-background" />
           <div className="max-w-[200px] truncate italic text-muted-foreground">
             <AttachmentPrimitive.Name />
           </div>
@@ -331,6 +334,7 @@ const AssistantMessage: FC = () => {
         <MessagePrimitive.Content
           components={{
             Text: MarkdownText,
+            Image: ImagePart,
           }}
         />
         <MessageAttachments />

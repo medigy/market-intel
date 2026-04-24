@@ -8,6 +8,7 @@ import {
 } from "ai";
 import path from "path";
 import fs from "fs";
+import multer from "multer";
 import { createMCPClient } from "@ai-sdk/mcp";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
@@ -31,7 +32,55 @@ app.use(cors({
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
-app.use(express.json({ limit: "10mb" }));
+
+// Request logger
+app.use((req, res, next) => {
+  console.log(`📡 ${req.method} ${req.url}`);
+  next();
+});
+
+app.use(express.json({ limit: "20mb" }));
+
+// Configure multer to save files to an 'uploads' directory
+const upload = multer({ 
+  dest: "uploads/",
+  limits: { fileSize: 20 * 1024 * 1024 } // 20MB
+});
+
+// Cache for file metadata if needed, but we can just use the filesystem
+// Ensure uploads directory exists
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
+
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ error: "No file uploaded" });
+    return;
+  }
+
+  res.json({ 
+    ok: true, 
+    fileId: req.file.filename,
+    filename: req.file.originalname, 
+    mimeType: req.file.mimetype
+  });
+});
+
+// Alias for compatibility
+app.post("/upload-csv", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ error: "No file uploaded" });
+    return;
+  }
+
+  res.json({ 
+    ok: true, 
+    fileId: req.file.filename,
+    filename: req.file.originalname, 
+    mimeType: req.file.mimetype
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("Assistant UI Backend is running. Access the frontend at http://localhost:5173");
@@ -206,35 +255,119 @@ Behavioral Rules:
 9. Empty results: If a query returns no rows, suggest possible reasons.
 10. Silent execution: Never narrate tool calls or intermediate findings.${tableHint}`;
 
-    const convertedMessages = await convertToModelMessages(messages);
-    const sanitizedMessages = convertedMessages.map((m: any) => {
-      if (!m.content || !Array.isArray(m.content)) return m;
-      return {
-        ...m,
-        content: m.content.map((c: any) => {
-          const imageValue = c.image ?? c.url ?? c.data;
-          if (
-            (c.type === "image" || c.type === "image_url") &&
-            typeof imageValue === "string" &&
-            imageValue.startsWith("data:")
-          ) {
-            try {
-              const [header, base64] = imageValue.split(",");
-              const mimeType = header.match(/:(.*?);/)?.[1] || "image/jpeg";
+    // Robust sanitization and attachment handling
+    const processedMessages = messages.map((m: any) => {
+      const experimental_attachments = m.experimental_attachments || [];
+      let contentParts = Array.isArray(m.content) ? [...m.content] : (typeof m.content === 'string' ? [{ type: 'text', text: m.content }] : []);
+
+      // Function to process a data URI into a content part
+      const processAttachment = (name: string | undefined, contentType: string | undefined, dataUri: string) => {
+        if (!dataUri || typeof dataUri !== 'string') return null;
+
+        // Handle File References (not data URIs)
+        if (!dataUri.startsWith("data:")) {
+          console.log(`🔍 Processing file reference: ${dataUri} (Name: ${name}, Type: ${contentType})`);
+          const filePath = path.join("uploads", dataUri);
+          if (fs.existsSync(filePath)) {
+            const isImage = contentType?.includes("image") || name?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/);
+            
+            if (isImage) {
+              const mediaType = contentType || (name?.endsWith(".png") ? "image/png" : name?.endsWith(".webp") ? "image/webp" : name?.endsWith(".gif") ? "image/gif" : "image/jpeg");
+              const base64 = fs.readFileSync(filePath).toString("base64");
+              console.log(`🖼️ Loading image reference: ${dataUri} (Media: ${mediaType}, Size: ${Math.round(base64.length / 1024)}KB)`);
               return {
                 type: "image",
                 image: Buffer.from(base64, "base64"),
-                mimeType,
+                mediaType,
               };
-            } catch (e) {
-              console.error("Failed to sanitize image:", e);
-              return c;
+            } else {
+              // Assume text/CSV
+              const text = fs.readFileSync(filePath, "utf-8");
+              const truncated = text.length > 100000;
+              const displayText = truncated ? text.substring(0, 100000) : text;
+              console.log(`📄 Loading text reference: ${name || dataUri} (${text.length} chars)`);
+              return {
+                type: "text",
+                text: `\n\n[Attached File: ${name || 'document'}${truncated ? ' (TRUNCATED)' : ''}]\n${displayText}\n${truncated ? '... [Content truncated for length] ...\n' : ''}[End of File]\n`
+              };
             }
           }
-          return c;
-        }),
+          return null;
+        }
+
+        // Handle Data URIs (Legacy support)
+        if (dataUri.startsWith("data:")) {
+          // ... (existing data URI handling logic) ...
+          // I will keep the original logic here but simplified for the diff
+          if (dataUri.includes("text/csv") || dataUri.includes("text/plain") || dataUri.includes("application/octet-stream") || (contentType && (contentType.includes("text") || contentType.includes("csv")))) {
+            try {
+              const [header, base64] = dataUri.split(",");
+              const text = Buffer.from(base64, "base64").toString("utf-8");
+              return { type: "text", text: `\n\n[Attached File: ${name || 'document'}]\n${text}\n[End of File]\n` };
+            } catch (e) { console.error(e); }
+          }
+          if (dataUri.includes("image/") || (contentType && contentType.includes("image"))) {
+            try {
+              const [header, base64] = dataUri.split(",");
+              const mediaType = header.match(/:(.*?);/)?.[1] || contentType || "image/jpeg";
+              return { type: "image", image: `data:${mediaType};base64,${base64}`, mediaType };
+            } catch (e) { console.error(e); }
+          }
+        }
+        return null;
+      };
+
+      // 1. Process experimental_attachments and move them to content parts
+      const newFromAttachments = experimental_attachments
+        .map((a: any) => processAttachment(a.name || a.filename, a.contentType || a.mediaType, a.url))
+        .filter(Boolean);
+
+      // 2. Sanitize existing content parts and STRIP all data URIs
+      const sanitizedExistingContent = contentParts.map((c: any) => {
+        // Find if this part contains a data URI in any known property
+        let dataUri: string | null = null;
+        if (typeof c.image === 'string' && c.image.startsWith('data:')) dataUri = c.image;
+        else if (typeof c.url === 'string' && (c.url.startsWith('data:') || !c.url.includes(":"))) dataUri = c.url;
+        else if (c.image && typeof c.image.url === 'string' && (c.image.url.startsWith('data:') || !c.image.url.includes(":"))) dataUri = c.image.url;
+        else if (c.data && typeof c.data === 'string') dataUri = c.data;
+
+        if (dataUri) {
+          const name = c.name || c.filename || c.itemName;
+          const contentType = c.contentType || c.mimeType || c.mediaType;
+          
+          console.log(`📎 Found data reference in part: ${dataUri.substring(0, 50)}... (Type: ${c.type}, Name: ${name}, ContentType: ${contentType})`);
+          
+          const processed = processAttachment(name, contentType, dataUri);
+          if (processed) {
+            console.log(`✅ Successfully processed attachment part: ${dataUri.substring(0, 20)} -> ${processed.type}`);
+            return processed;
+          }
+          
+          console.log(`⚠️ Failed to process attachment part: ${dataUri.substring(0, 20)}, stripping data`);
+          // If we couldn't process it but it HAS a data URI/file reference, we MUST strip it to avoid errors
+          const { image, url, data, ...rest } = c;
+          return { ...rest, type: rest.type || 'text', text: rest.text || `[Attachment: ${name || 'unsupported'}]` };
+        }
+        return c;
+      });
+
+      // Combine and clear experimental_attachments to prevent AI SDK from downloading
+      return { 
+        ...m, 
+        content: [...sanitizedExistingContent, ...newFromAttachments],
+        experimental_attachments: [] 
       };
     });
+
+    const sanitizedMessages = await convertToModelMessages(processedMessages);
+    
+    // Log message structure for debugging (without the big image data)
+    console.log("📤 Sending messages to model:", JSON.stringify(sanitizedMessages.map(m => ({
+      role: m.role,
+      content: Array.isArray(m.content) 
+        ? m.content.map((c: any) => c.type === 'image' ? { type: 'image', mediaType: c.mediaType, size: c.image?.length } : c)
+        : (typeof m.content === 'string' ? m.content.substring(0, 100) + '...' : typeof m.content)
+    })), null, 2));
 
     const result = streamText({
       model: open_model(process.env.AI_MODEL!),

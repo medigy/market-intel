@@ -4,12 +4,19 @@ import { AssistantModal } from "@/components/assistant-ui/assistant-modal";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useRef } from "react";
 
+import { MyCustomUploadAdapter } from "@/lib/attachment-adapter";
+
 const STORAGE_KEY = "assistant-messages";
 const API_URL = import.meta.env.VITE_API_URL ?? "/api/chat";
 
 export default function RootPage() {
+  const uploadUrl = API_URL.replace("/api/chat", "/api/upload");
+
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({ api: API_URL }),
+    adapters: {
+      attachments: new MyCustomUploadAdapter(uploadUrl),
+    },
   });
 
   const loadedRef = useRef(false);

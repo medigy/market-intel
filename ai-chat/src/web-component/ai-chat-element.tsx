@@ -8,6 +8,7 @@ import { useChatRuntime, AssistantChatTransport } from '@assistant-ui/react-ai-s
 import { AssistantModal } from '../components/assistant-ui/assistant-modal';
 import { PortalContainerProvider } from '../components/ui/portal-container';
 import { TooltipProvider } from '../components/ui/tooltip';
+import { MyCustomUploadAdapter } from '../lib/attachment-adapter';
 
 // Vite ?inline trick: converts CSS into a string for shadow DOM injection
 import indexStyles from '../index.css?inline';
@@ -22,8 +23,13 @@ function AssistantApp({
   apiUrl: string;
   portalContainer: Element | DocumentFragment | null;
 }) {
+  const uploadUrl = apiUrl.replace("/api/chat", "/api/upload");
+
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({ api: apiUrl }),
+    adapters: {
+      attachments: new MyCustomUploadAdapter(uploadUrl),
+    },
   });
 
   const STORAGE_KEY = "assistant-messages";
@@ -94,7 +100,7 @@ class AiChatElement extends LitElement {
 
   constructor() {
     super();
-    this.apiUrl = '/api/chat';
+    this.apiUrl = import.meta.env.VITE_API_URL ?? '/api/chat';
     this.theme  = 'light';
   }
 
