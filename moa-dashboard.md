@@ -5,8 +5,7 @@ sqlpage-conf:
   allow_exec: true
   port: 9227
 ---
-
-# Medigy Market Intelligence — Unified SQLPage Application
+# Medigy Opportunity Atlas — Unified SQLPage Application 
 
 This application is built on the **unified extensible pipeline** (`medigy-unified-v2.sql`).
 
@@ -55,8 +54,8 @@ surveilr orchestrate adapt-owl
 
 ```bash deploy-server --descr "Package and deploy server"
 #!/bin/bash
-spry sp spc --package --conf sqlpage/sqlpage.json -m mmi-dashboard.md | sqlite3 resource-surveillance.sqlite.db
-echo "Medigy Market Intelligence is ready."
+spry sp spc --package --conf sqlpage/sqlpage.json -m moa-dashboard.md | sqlite3 resource-surveillance.sqlite.db
+echo "Medigy Opportunity Atlas is ready."
 
 ```
 
@@ -64,28 +63,28 @@ echo "Medigy Market Intelligence is ready."
 
 ## Layout
 
-```sql PARTIAL global-layout.sql --inject mmi/*.sql
+```sql PARTIAL global-layout.sql --inject moa/*.sql
 
 -- BEGIN: PARTIAL global-layout.sql
 -- Using root-relative paths (starting with '/') ensures that these files
 -- are resolved correctly by SQLPage regardless of the deployment base URL.
 SELECT 'shell' AS component,
-       'Medigy Market Intelligence' AS title,
+       'Medigy Opportunity Atlas' AS title,
        NULL AS icon,
        'fluid' AS layout,
        true AS fixed_top_menu,
        '/' AS link,
-       json_array('../footer-links.js') AS javascript,
-       json_array('../custom-dashboard.css') AS css,
-       '© 2026 Medigy Market Intelligence' AS footer,
+       '../footer-links.js' AS javascript,
+       '../custom-dashboard.css' AS css,
+       '© 2026 Medigy Opportunity Atlas' AS footer,
        'upgrade-insecure-requests' AS header_content_security_policy,
-       '{"link":"/mmi/home-overview.sql","title":"Home"}' AS menu_item,
-       '{"link":"/mmi/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
-       '{"link":"/mmi/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
-       '{"link":"/mmi/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
-       '{"link":"/mmi/geography.sql","title":"Regional Intelligence"}' AS menu_item,
-       '{"link":"/mmi/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
-       '{"link":"/mmi/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
+       '{"link":"/moa/home-overview.sql","title":"Home"}' AS menu_item,
+       '{"link":"/moa/executive-dashboard.sql","title":"Executive Insights"}' AS menu_item,
+       '{"link":"/moa/conditions.sql","title":"Clinical Portfolio"}' AS menu_item,
+       '{"link":"/moa/opportunity-scoring.sql","title":"Market Prioritization"}' AS menu_item,
+       '{"link":"/moa/geography.sql","title":"Regional Intelligence"}' AS menu_item,
+       '{"link":"/moa/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
+       '{"link":"/moa/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
 SELECT 'html' AS component, '
   <script type="module" src="/ai-chat.js"></script>
@@ -121,7 +120,7 @@ SET page_path = json_extract($resource_json, '$.route.path');
 -- @route.description "Root redirect to home overview"
 
 SELECT 'redirect' AS component,
-       'mmi/home-overview.sql' AS link;
+       'moa/home-overview.sql' AS link;
 
 
 SELECT 'hero' AS component,
@@ -156,7 +155,7 @@ WHERE $error = 'invalid_consent';
 ```sql registration-submit.sql { route: { caption: "Registration Submit Handler" } }
 -- @route.description "Sends a welcome email after registration submit using SQLPage exec + SMTP, then redirects"
 
-SET registration_profile_cookie = sqlpage.cookie('medigy_mmi_registration_profile_v2');
+SET registration_profile_cookie = sqlpage.cookie('medigy_moa_registration_profile_v2');
 SET smtp_host = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_HOST')), ''), '');
 SET smtp_port = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_PORT')), ''), '');
 SET smtp_username = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('EMAIL_USERNAME')), ''), '');
@@ -221,12 +220,12 @@ SET smtp_exec_command =
     'cat > /tmp/smtp_msg_$$.txt << ''EOF'' ' || CHAR(10) ||
     'From: ' || $smtp_from || CHAR(10) ||
     'To: ' || $recipient_email || CHAR(10) ||
-    'Subject: New User Access Notification – Medigy Market Intelligence (MMI) Application Entry' || CHAR(10) ||
+    'Subject: New User Access Notification – Medigy Opportunity Atlas (MOA) Application Entry' || CHAR(10) ||
     'MIME-Version: 1.0' || CHAR(10) ||
     'Content-Type: text/html; charset=UTF-8' || CHAR(10) || CHAR(10) ||
     '<html><body>' || CHAR(10) ||
     '<p>Hi Team,</p>' || CHAR(10) ||
-    '<p>A new user has accessed Medigy Market Intelligence (MMI) Application and submitted their details.</p>' || CHAR(10) ||
+    '<p>A new user has accessed Medigy Opportunity Atlas (MOA) Application and submitted their details.</p>' || CHAR(10) ||
     '<p><strong>User Information:</strong></p>' || CHAR(10) ||
     '<ul>' || CHAR(10) ||
     '<li><strong>Full Name:</strong> ' || REPLACE($submitted_full_name, '''', '&apos;') || '</li>' || CHAR(10) ||
@@ -242,7 +241,7 @@ SET smtp_exec_command =
     '<li><strong>Device / Browser:</strong> ' || REPLACE($submitted_user_agent, '''', '&apos;') || '</li>' || CHAR(10) ||
     '</ul>' || CHAR(10) ||
     '<p><strong>Notes:</strong>
-This notification is generated automatically when a user enters their details on the MMI Application entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' || CHAR(10) ||
+This notification is generated automatically when a user enters their details on the MOA Application entry screen. The information can be used for follow-up communication, support, or engagement purposes.</p>' || CHAR(10) ||
     '<p>Please reach out to the user if required.</p>' || CHAR(10) ||
     '<p>Regards,
 System Notification</p>' || CHAR(10) ||
@@ -295,7 +294,7 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
 -- Relative redirect: browser resolves against the current URL, so it works at any deployment base path.
 SELECT 'redirect' AS component,
-       'mmi/home-overview.sql' AS link
+       'moa/home-overview.sql' AS link
 WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 ```
 
@@ -303,7 +302,7 @@ WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
 ## Registration Alias
 
-```sql mmi/registration.sql { route: { caption: "Registration" } }
+```sql moa/registration.sql { route: { caption: "Registration" } }
 -- @route.description "User registration form — collects name, email, organization, and consent"
 
 SELECT 'hero' AS component,
@@ -387,12 +386,12 @@ SELECT 'html' AS component,
 
 ## Strategic Overview Page
 
-```sql mmi/home-overview.sql { route: { caption: "Strategic Overview" } }
--- @route.description "MMI landing page — portfolio KPIs, condition cards, navigation"
+```sql moa/home-overview.sql { route: { caption: "Strategic Overview" } }
+-- @route.description "moa landing page — portfolio KPIs, condition cards, navigation"
 
 -- Hero
 SELECT 'hero' AS component,
-       'Medigy Market Intelligence' AS title,
+       'Medigy Opportunity Atlas' AS title,
        'Empowering healthcare leadership with high-fidelity market analytics. Powered by the latest audited CMS datasets (2023) and multi-stream clinical registries to identify untapped growth with mathematical precision.' AS description,
        'https://kmgus.com/wp-content/uploads/2022/06/Data-Analytics-in-Healthcare-Edited.jpg' AS image,
        'primary' AS color;
@@ -410,30 +409,30 @@ SELECT 'text' AS component, 'Real-World Scale' AS title,
 SELECT 'card' AS component, 4 AS columns;
 
 -- Row 1: The High-Level Totals
-SELECT 'Active Disease Markets' AS title, printf('%,.0f', total_conditions) AS description,
-       '2023 Clinical Registry' AS footer, 'teal' AS color, 'activity' AS icon, 'kpi-card' AS class, '/mmi/conditions.sql' AS link FROM mat_executive_kpis;
+SELECT 'Active Disease Markets' AS title, printf('%,.0f', total_conditions) AS description, 
+       '2023 Clinical Registry' AS footer, 'teal' AS color, 'activity' AS icon, 'kpi-card' AS class, '/moa/conditions.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Patients Impacted' AS title, printf('%,.1f', total_beneficiaries / 1000000.0) || 'M' AS description,
-       'Medicare Part B Scope' AS footer, 'azure' AS color, 'users' AS icon, 'kpi-card kpi-azure' AS class, '/mmi/executive-dashboard.sql' AS link FROM mat_executive_kpis;
+SELECT 'Patients Impacted' AS title, printf('%,.1f', total_beneficiaries / 1000000.0) || 'M' AS description, 
+       'Medicare Part B Scope' AS footer, 'azure' AS color, 'users' AS icon, 'kpi-card kpi-azure' AS class, '/moa/executive-dashboard.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Total Market Spend ($)' AS title, '$' || printf('%,.1f', total_allowed_amt / 1000000000.0) || 'B' AS description,
-       'Annual Allowed Amount' AS footer, 'indigo' AS color, 'currency-dollar' AS icon, 'kpi-card kpi-indigo' AS class, '/mmi/executive-dashboard.sql' AS link FROM mat_executive_kpis;
+SELECT 'Total Market Spend ($)' AS title, '$' || printf('%,.1f', total_allowed_amt / 1000000000.0) || 'B' AS description, 
+       'Annual Allowed Amount' AS footer, 'indigo' AS color, 'currency-dollar' AS icon, 'kpi-card kpi-indigo' AS class, '/moa/executive-dashboard.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Data Sources Integrated' AS title, (SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source') || ' Sources' AS description,
-       'Multi-Stream Provenance' AS footer, 'orange' AS color, 'database' AS icon, 'kpi-card kpi-orange' AS class, '/mmi/data-dictionary.sql' AS link;
+SELECT 'Data Sources Integrated' AS title, (SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source') || ' Sources' AS description, 
+       'Multi-Stream Provenance' AS footer, 'orange' AS color, 'database' AS icon, 'kpi-card kpi-orange' AS class, '/moa/data-dictionary.sql' AS link;
 
 -- Row 2: Tactical Breadth
-SELECT 'Geographic Reach' AS title, printf('%,.0f', total_states) || ' States' AS description,
-       'Regional Intelligence' AS footer, 'blue' AS color, 'map-pin' AS icon, 'kpi-card kpi-blue' AS class, '/mmi/geography.sql' AS link FROM mat_executive_kpis;
+SELECT 'Geographic Reach' AS title, printf('%,.0f', total_states) || ' States' AS description, 
+       'Regional Intelligence' AS footer, 'blue' AS color, 'map-pin' AS icon, 'kpi-card kpi-blue' AS class, '/moa/geography.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Clinical Procedures' AS title, printf('%,.0f', total_procedures) AS description,
-       'CPT/HCPCS Tracking' AS footer, 'grape' AS color, 'clipboard-list' AS icon, 'kpi-card kpi-grape' AS class, '/mmi/procedure-drilldown.sql' AS link FROM mat_executive_kpis;
+SELECT 'Clinical Procedures' AS title, printf('%,.0f', total_procedures) AS description, 
+       'CPT/HCPCS Tracking' AS footer, 'grape' AS color, 'clipboard-list' AS icon, 'kpi-card kpi-grape' AS class, '/moa/procedure-drilldown.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Actual Medicare Payout' AS title, '$' || printf('%,.1f', total_medicare_payment / 1000000000.0) || 'B' AS description,
-       'Net Federal Expenditure' AS footer, 'teal' AS color, 'receipt' AS icon, 'kpi-card' AS class, '/mmi/executive-dashboard.sql#payment-section' AS link FROM mat_executive_kpis;
+SELECT 'Actual Medicare Payout' AS title, '$' || printf('%,.1f', total_medicare_payment / 1000000000.0) || 'B' AS description, 
+       'Net Federal Expenditure' AS footer, 'teal' AS color, 'receipt' AS icon, 'kpi-card' AS class, '/moa/executive-dashboard.sql#payment-section' AS link FROM mat_executive_kpis;
 
-SELECT 'Ranked Growth Targets' AS title, (SELECT COUNT(*) FROM mat_opportunity_score) || ' Targets' AS description,
-       'ROI-Driven Ranking' AS footer, 'orange' AS color, 'trophy' AS icon, 'kpi-card kpi-orange' AS class, '/mmi/opportunity-scoring.sql' AS link;
+SELECT 'Ranked Growth Targets' AS title, (SELECT COUNT(*) FROM mat_opportunity_score) || ' Targets' AS description, 
+       'ROI-Driven Ranking' AS footer, 'orange' AS color, 'trophy' AS icon, 'kpi-card kpi-orange' AS class, '/moa/opportunity-scoring.sql' AS link;
 
 ---
 --- 5. VISUAL INTELLIGENCE (Business Narration)
@@ -489,7 +488,7 @@ SELECT
     s.condition_name AS title,
     s.specialty_domain || ' | Tier ' || s.tier AS subtitle,
     '$' || printf('%,.0f', s.total_allowed_amt) || ' Allowed Spend' AS description,
-    '/mmi/condition-hub.sql?condition=' || REPLACE(s.condition_name, ' ', '%20') AS link,
+    '/moa/condition-hub.sql?condition=' || REPLACE(s.condition_name, ' ', '%20') AS link,
     s.icon AS icon, s.color AS color
 FROM mat_condition_national_summary s
 ORDER BY s.tier, s.opportunity_score DESC;
@@ -500,12 +499,12 @@ ORDER BY s.tier, s.opportunity_score DESC;
 SELECT 'divider' AS component, 'Strategic Execution & Growth Workflows' AS contents;
 SELECT 'card' AS component, 3 AS columns;
 
-SELECT 'Executive Insights' AS title, 'Analyze total market size and patient volume trends.' AS description, '/mmi/executive-dashboard.sql' AS link, 'layout-dashboard' AS icon, 'teal' AS color;
-SELECT 'Market Priortization' AS title, 'Identify the most promising clinical markets using 2023 evidence.' AS description, '/mmi/opportunity-scoring.sql' AS link, 'trophy' AS icon, 'azure' AS color;
-SELECT 'Geographic Intelligence' AS title, 'Pinpoint high-growth regions and regional underserved markets.' AS description, '/mmi/geography.sql' AS link, 'map-pin' AS icon, 'indigo' AS color;
-SELECT 'Tactical Analytics' AS title, 'Deep-dive into care delivery patterns at the procedure level.' AS description, '/mmi/procedure-drilldown.sql' AS link, 'clipboard-list' AS icon, 'orange' AS color;
-SELECT 'Clinical Portfolio' AS title, 'Explore and compare the full catalog of healthcare markets.' AS description, '/mmi/conditions.sql' AS link, 'virus' AS icon, 'grape' AS color;
-SELECT 'Data Provenance' AS title, 'Audit the 2023 CMS datasets, table schemas, and pipeline logic.' AS description, '/mmi/data-dictionary.sql' AS link, 'book' AS icon, 'blue' AS color;
+SELECT 'Executive Insights' AS title, 'Analyze total market size and patient volume trends.' AS description, '/moa/executive-dashboard.sql' AS link, 'layout-dashboard' AS icon, 'teal' AS color;
+SELECT 'Market Priortization' AS title, 'Identify the most promising clinical markets using 2023 evidence.' AS description, '/moa/opportunity-scoring.sql' AS link, 'trophy' AS icon, 'azure' AS color;
+SELECT 'Geographic Intelligence' AS title, 'Pinpoint high-growth regions and regional underserved markets.' AS description, '/moa/geography.sql' AS link, 'map-pin' AS icon, 'indigo' AS color;
+SELECT 'Tactical Analytics' AS title, 'Deep-dive into care delivery patterns at the procedure level.' AS description, '/moa/procedure-drilldown.sql' AS link, 'clipboard-list' AS icon, 'orange' AS color;
+SELECT 'Clinical Portfolio' AS title, 'Explore and compare the full catalog of healthcare markets.' AS description, '/moa/conditions.sql' AS link, 'virus' AS icon, 'grape' AS color;
+SELECT 'Data Provenance' AS title, 'Audit the 2023 CMS datasets, table schemas, and pipeline logic.' AS description, '/moa/data-dictionary.sql' AS link, 'book' AS icon, 'blue' AS color;
 
 ```
 
@@ -513,10 +512,10 @@ SELECT 'Data Provenance' AS title, 'Audit the 2023 CMS datasets, table schemas, 
 
 ## Condition Hub — Universal Disease Drilldown Page
 
-```sql mmi/condition-hub.sql { route: { caption: "Condition Hub" } }
+```sql moa/condition-hub.sql { route: { caption: "Condition Hub" } }
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/moa/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 
 SELECT 'hero' AS component,
@@ -613,7 +612,7 @@ SELECT 'Market Opportunity Score' AS title,
        'Strategic Priority Ranking' AS footer,
        color AS color, 'trophy' AS icon,
        'kpi-hub-card' AS class,
-       '/mmi/opportunity-scoring.sql' AS link
+       '/moa/opportunity-scoring.sql' AS link
 FROM mat_condition_national_summary
 WHERE LOWER(TRIM(condition_name)) = LOWER(TRIM($condition));
 
@@ -786,10 +785,10 @@ SELECT 'text' AS component,
 
 ## Executive Insights
 
-```sql mmi/executive-dashboard.sql { route: { caption: "Executive Insights" } }
+```sql moa/executive-dashboard.sql { route: { caption: "Executive Insights" } }
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/moa/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
        'Executive Market Intelligence' AS title,
@@ -847,7 +846,7 @@ SELECT 'Geographic Footprint' AS title,
        'National Coverage Map' AS footer,
        'blue' AS color, 'map-pin' AS icon,
        'kpi-card kpi-blue' AS class,
-       '/mmi/geography.sql' AS link
+       '/moa/geography.sql' AS link
 FROM mat_executive_kpis;
 
 SELECT 'Opportunity Index' AS title,
@@ -855,7 +854,7 @@ SELECT 'Opportunity Index' AS title,
        'Growth Priority Assets' AS footer,
        'orange' AS color, 'trophy' AS icon,
        'kpi-card kpi-orange' AS class,
-       '/mmi/opportunity-scoring.sql' AS link;
+       '/moa/opportunity-scoring.sql' AS link;
 
 -- ── Condition Comparison Charts ────────────────────────────────────────────────
 ---
@@ -957,7 +956,7 @@ SELECT 'table' AS component,
        'Condition' AS markdown;
 
 SELECT
-    '**[' || condition_name || '](/mmi/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",
+    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",    
     specialty_domain AS "Domain",
     'Tier ' || tier AS "Tier",
     b2b_tier_primary AS "Primary Specialty",
@@ -986,11 +985,11 @@ SELECT '
 
 ## Opportunity Scoring
 
-```sql mmi/opportunity-scoring.sql { route: { caption: "Market Prioritization" } }
+```sql moa/opportunity-scoring.sql { route: { caption: "Market Prioritization" } }
 
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/moa/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 SELECT 'hero' AS component,
        'Strategic Opportunity Scoring' AS title,
@@ -1014,7 +1013,7 @@ SELECT
     'Tier ' || tier || ' Focus' AS footer,
     color AS color, icon AS icon,
     'kpi-card' AS class,
-    '/mmi/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') AS link
+    '/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') AS link
 FROM mat_opportunity_score
 ORDER BY opportunity_score DESC
 LIMIT 3;
@@ -1074,8 +1073,8 @@ SELECT 'The following matrix translates our high-level strategy into tactical sa
 SELECT 'table' AS component, 'Full Market Priority Matrix' AS title, TRUE AS sort, TRUE AS search,
        'Condition' AS markdown;
 SELECT
-    ROW_NUMBER() OVER (ORDER BY opportunity_score DESC)  AS "Rank",
-    '**[' || condition_name || '](/mmi/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",
+    ROW_NUMBER() OVER (ORDER BY opportunity_score DESC)  AS "Rank",    
+    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",  
     specialty_domain AS "Domain",
     'Tier ' || tier AS "Tier",
     b2b_tier_primary AS "Primary Specialty",
@@ -1089,12 +1088,12 @@ FROM mat_opportunity_score;
 
 ## Clinical Portfolio Directory
 
-```sql mmi/conditions.sql { route: { caption: "Clinical Portfolio" } }
+```sql moa/conditions.sql { route: { caption: "Clinical Portfolio" } }
 -- @route.description "Clinical Portfolio Registry — Strategic Market Targets"
 
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/moa/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 --
 --- 2. SALES HERO: THE CLINICAL PORTFOLIO
@@ -1163,7 +1162,7 @@ SELECT
     r.condition_name AS title,
     r.specialty_domain AS subtitle,
     'Strategic Tier ' || r.tier || ' | Primary Target: ' || COALESCE(r.b2b_tier_primary, '—') AS description,
-    '/mmi/condition-hub.sql?condition=' || REPLACE(r.condition_name, ' ', '%20') AS link,
+    '/moa/condition-hub.sql?condition=' || REPLACE(r.condition_name, ' ', '%20') AS link,
     'Analyze Market' AS footer,
     r.icon AS icon,
     r.color AS color
@@ -1207,7 +1206,7 @@ SELECT 'Once you have identified your clinical targets, proceed to the Opportuni
 
 ## Tactical Analytics
 
-```sql mmi/procedure-drilldown.sql { route: { caption: "Tactical Analytics" } }
+```sql moa/procedure-drilldown.sql { route: { caption: "Tactical Analytics" } }
 
 
 SET limit = 20;
@@ -1215,7 +1214,7 @@ SET current_page = COALESCE(CAST(:page AS INT), 1);
 SET offset = ($current_page - 1) * $limit;
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/moa/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 ---
 --- 2. SALES HERO: TACTICAL INTELLIGENCE
@@ -1307,8 +1306,8 @@ SELECT 'table' AS component,
 SELECT
     '' || hcpcs_code || '' AS "HCPCS",
     COALESCE(procedure_description, 'DRG ' || hcpcs_code) AS "Description",
-    procedure_category AS "Category",
-    '[' || condition_name || '](/mmi/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')' AS "Condition",
+    procedure_category AS "Category",    
+    '[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')' AS "Condition",    
     source_type AS "Source",
     printf('%,.0f', total_services) AS "Services",
     printf('%,.0f', total_beneficiaries) AS "Patients",
@@ -1356,12 +1355,12 @@ SELECT 'text' AS component, 'Strategic Next Steps' AS title,
 
 ## Regional Intelligence
 
-```sql mmi/geography.sql { route: { caption: "Regional Intelligence" } }
+```sql moa/geography.sql { route: { caption: "Regional Intelligence" } }
 
 
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/moa/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 ---
 --- 2. SALES HERO: REGIONAL GROWTH VISION
@@ -1529,10 +1528,10 @@ SELECT 'text' AS component, 'Strategic Next Step' AS title,
 
 ## Data Provenance
 
-```sql mmi/data-dictionary.sql { route: { caption: "Data Provenance" } }
+```sql moa/data-dictionary.sql { route: { caption: "Data Provenance" } }
 
 SELECT 'button' AS component, 'start' AS justify;
-SELECT 'Home' AS title, '/mmi/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
+SELECT 'Home' AS title, '/moa/home-overview.sql' AS link, 'chevron-left' AS icon, 'outline-secondary' AS outline;
 
 ---
 --- 2. SALES HERO: THE ARCHITECTURE OF TRUST

@@ -61,7 +61,7 @@ The ingestion of the OWL file and the generation of ontology classes have been p
 **Direct Execution**: After completing the initial setup task block, you can execute the ontology workflow directly by running the following command in your terminal:
 
 ```bash
-spry rb task ontology-setup mmi-dashboard.md
+spry rb task ontology-setup moa-dashboard.md
 ```
 
 ---

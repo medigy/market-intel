@@ -1,5 +1,5 @@
 -- =============================================================================
--- MEDIGY MARKET INTELLIGENCE — UNIFIED EXTENSIBLE ELT PIPELINE v2
+-- Medigy Opportunity Atlas — UNIFIED EXTENSIBLE ELT PIPELINE v2
 -- Database: SQLite (surveilr RSSD)
 --
 -- ARCHITECTURE PRINCIPLE:
