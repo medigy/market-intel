@@ -39,7 +39,7 @@ pip install 'litellm[proxy]'
 
 ### Node Packages (Frontend)
 
-Installed automatically via `npm install` inside `assistant-ui-chat/`.
+Installed automatically via `npm install` inside `ai-chat/`.
 
 ---
 
@@ -47,17 +47,13 @@ Installed automatically via `npm install` inside `assistant-ui-chat/`.
 
 ```
 ai-chat/
-├── assistant-ui-chat/        # React frontend (Assistant UI)
+├── ai-chat/        # React frontend (Assistant UI)
 │   └── ...
 ├── sqlpage/
 │   └── sqlpage.js            # SQLPage configuration
 ├── dev-src.auto/             # Auto-generated SQLPage sources
 ├── litellm_config.yaml       # LiteLLM model & routing config
-├── spryfile.md           # Spry source definition
-├── chat-widget-react.js      # Compiled React chat widget
-├── chat-widget-react-index.css
-├── .env                      # Environment variables (API keys, etc.)
-├── .env.example              # Example environment file
+├── spryfile.md               # Spry source definition
 └── poly.sql                  # SQL definitions
 ```
 
@@ -91,7 +87,7 @@ SQLPage will serve from the `dev-src.auto/` directory. Visit `http://localhost:9
 Load environment variables and start the LiteLLM proxy:
 
 ```bash
-source .env && litellm --config litellm_config.yaml
+set +a && source .env && set -a && litellm --config litellm_config.yaml
 ```
 
 > **Note:** Ensure `.env` contains all required API keys or model endpoint URLs. See `.env.example` for reference.
@@ -107,7 +103,7 @@ npm run build:wc
 npm run dev
 ```
 
-The frontend will be available at `http://localhost:5173` (or as configured).
+The frontend will be available at `http://localhost:5173` (or as configured) and the
 api will be availible in  `http://localhost:3001`
 
 ---
@@ -126,7 +122,8 @@ Key variables to configure:
 |---|---|
 | `OPENAI_API_KEY` | OpenAI API key (if using OpenAI models) |
 | `OLLAMA_BASE_URL` | Ollama base URL (default: `http://localhost:11434`) |
-| `DATABASE_URL` | Path or connection string for the RSSD database |
+| `RSSD_PATH` | Path or connection string for the RSSD database |
+| `AI_MODEL` | Model name |
 
 ---
 
