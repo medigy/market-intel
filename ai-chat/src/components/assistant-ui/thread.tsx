@@ -188,7 +188,7 @@ const Composer: FC = () => {
       />
       <div className="flex items-center justify-between px-4 pb-4">
         <div className="flex items-center">
-          <ComposerPrimitive.AddAttachment asChild>
+          {/* <ComposerPrimitive.AddAttachment asChild>
             <TooltipIconButton
               tooltip="Attach"
               variant="ghost"
@@ -196,7 +196,7 @@ const Composer: FC = () => {
             >
               <PlusIcon className="size-5" strokeWidth={2.5} />
             </TooltipIconButton>
-          </ComposerPrimitive.AddAttachment>
+          </ComposerPrimitive.AddAttachment> */}
         </div>
         <div className="flex items-center gap-2">
           <ThreadPrimitive.If running={false}>
