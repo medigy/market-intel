@@ -5,7 +5,8 @@ sqlpage-conf:
   allow_exec: true
   port: 9227
 ---
-# Medigy Opportunity Atlas — Unified SQLPage Application 
+
+# Medigy Opportunity Atlas — Unified SQLPage Application
 
 This application is built on the **unified extensible pipeline** (`medigy-unified-v2.sql`).
 
@@ -87,10 +88,10 @@ SELECT 'shell' AS component,
        '{"link":"/moa/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
 SELECT 'html' AS component, '
-  <script type="module" src="/ai-chat.js"></script>
+  <script type="module" src="../ai-chat.js"></script>
   <ai-chat
     id="chat"
-    api-url="' || COALESCE(sqlpage.environment_variable('AI_CHAT_API_URL'), 'http://localhost:3001/api/chat') || '"
+    api-url="' || COALESCE(sqlpage.environment_variable('AI_CHAT_API_URL'), '') || '"
     theme="light">
   </ai-chat>
 ' AS html;
@@ -409,29 +410,29 @@ SELECT 'text' AS component, 'Real-World Scale' AS title,
 SELECT 'card' AS component, 4 AS columns;
 
 -- Row 1: The High-Level Totals
-SELECT 'Active Disease Markets' AS title, printf('%,.0f', total_conditions) AS description, 
+SELECT 'Active Disease Markets' AS title, printf('%,.0f', total_conditions) AS description,
        '2023 Clinical Registry' AS footer, 'teal' AS color, 'activity' AS icon, 'kpi-card' AS class, '/moa/conditions.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Patients Impacted' AS title, printf('%,.1f', total_beneficiaries / 1000000.0) || 'M' AS description, 
+SELECT 'Patients Impacted' AS title, printf('%,.1f', total_beneficiaries / 1000000.0) || 'M' AS description,
        'Medicare Part B Scope' AS footer, 'azure' AS color, 'users' AS icon, 'kpi-card kpi-azure' AS class, '/moa/executive-dashboard.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Total Market Spend ($)' AS title, '$' || printf('%,.1f', total_allowed_amt / 1000000000.0) || 'B' AS description, 
+SELECT 'Total Market Spend ($)' AS title, '$' || printf('%,.1f', total_allowed_amt / 1000000000.0) || 'B' AS description,
        'Annual Allowed Amount' AS footer, 'indigo' AS color, 'currency-dollar' AS icon, 'kpi-card kpi-indigo' AS class, '/moa/executive-dashboard.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Data Sources Integrated' AS title, (SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source') || ' Sources' AS description, 
+SELECT 'Data Sources Integrated' AS title, (SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source') || ' Sources' AS description,
        'Multi-Stream Provenance' AS footer, 'orange' AS color, 'database' AS icon, 'kpi-card kpi-orange' AS class, '/moa/data-dictionary.sql' AS link;
 
 -- Row 2: Tactical Breadth
-SELECT 'Geographic Reach' AS title, printf('%,.0f', total_states) || ' States' AS description, 
+SELECT 'Geographic Reach' AS title, printf('%,.0f', total_states) || ' States' AS description,
        'Regional Intelligence' AS footer, 'blue' AS color, 'map-pin' AS icon, 'kpi-card kpi-blue' AS class, '/moa/geography.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Clinical Procedures' AS title, printf('%,.0f', total_procedures) AS description, 
+SELECT 'Clinical Procedures' AS title, printf('%,.0f', total_procedures) AS description,
        'CPT/HCPCS Tracking' AS footer, 'grape' AS color, 'clipboard-list' AS icon, 'kpi-card kpi-grape' AS class, '/moa/procedure-drilldown.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Actual Medicare Payout' AS title, '$' || printf('%,.1f', total_medicare_payment / 1000000000.0) || 'B' AS description, 
+SELECT 'Actual Medicare Payout' AS title, '$' || printf('%,.1f', total_medicare_payment / 1000000000.0) || 'B' AS description,
        'Net Federal Expenditure' AS footer, 'teal' AS color, 'receipt' AS icon, 'kpi-card' AS class, '/moa/executive-dashboard.sql#payment-section' AS link FROM mat_executive_kpis;
 
-SELECT 'Ranked Growth Targets' AS title, (SELECT COUNT(*) FROM mat_opportunity_score) || ' Targets' AS description, 
+SELECT 'Ranked Growth Targets' AS title, (SELECT COUNT(*) FROM mat_opportunity_score) || ' Targets' AS description,
        'ROI-Driven Ranking' AS footer, 'orange' AS color, 'trophy' AS icon, 'kpi-card kpi-orange' AS class, '/moa/opportunity-scoring.sql' AS link;
 
 ---
@@ -956,7 +957,7 @@ SELECT 'table' AS component,
        'Condition' AS markdown;
 
 SELECT
-    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",    
+    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",
     specialty_domain AS "Domain",
     'Tier ' || tier AS "Tier",
     b2b_tier_primary AS "Primary Specialty",
@@ -1073,8 +1074,8 @@ SELECT 'The following matrix translates our high-level strategy into tactical sa
 SELECT 'table' AS component, 'Full Market Priority Matrix' AS title, TRUE AS sort, TRUE AS search,
        'Condition' AS markdown;
 SELECT
-    ROW_NUMBER() OVER (ORDER BY opportunity_score DESC)  AS "Rank",    
-    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",  
+    ROW_NUMBER() OVER (ORDER BY opportunity_score DESC)  AS "Rank",
+    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",
     specialty_domain AS "Domain",
     'Tier ' || tier AS "Tier",
     b2b_tier_primary AS "Primary Specialty",
@@ -1306,8 +1307,8 @@ SELECT 'table' AS component,
 SELECT
     '' || hcpcs_code || '' AS "HCPCS",
     COALESCE(procedure_description, 'DRG ' || hcpcs_code) AS "Description",
-    procedure_category AS "Category",    
-    '[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')' AS "Condition",    
+    procedure_category AS "Category",
+    '[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')' AS "Condition",
     source_type AS "Source",
     printf('%,.0f', total_services) AS "Services",
     printf('%,.0f', total_beneficiaries) AS "Patients",
