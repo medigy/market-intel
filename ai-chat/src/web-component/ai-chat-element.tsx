@@ -18,17 +18,33 @@ import componentStyles from './ai-chat-styles.css?inline';
 
 function AssistantApp({
   apiUrl,
+  tenantId,
+  chatToken,
   portalContainer,
 }: {
   apiUrl: string;
+  tenantId?: string;
+  chatToken?: string;
   portalContainer: Element | DocumentFragment | null;
 }) {
-  const uploadUrl = apiUrl.replace("/api/chat", "/api/upload");
+  const uploadUrl = new URL(apiUrl.replace("/api/chat", "/api/upload"), window.location.origin);
+  if (tenantId) uploadUrl.searchParams.append("tenantId", tenantId);
+  if (chatToken) uploadUrl.searchParams.append("chatToken", chatToken);
+
+  const apiEndpoint = new URL(apiUrl, window.location.origin);
+  if (tenantId) apiEndpoint.searchParams.append("tenantId", tenantId);
+  if (chatToken) apiEndpoint.searchParams.append("chatToken", chatToken);
 
   const runtime = useChatRuntime({
-    transport: new AssistantChatTransport({ api: apiUrl }),
+    transport: new AssistantChatTransport({ 
+      api: apiEndpoint.toString(),
+      headers: {
+        ...(tenantId ? { "x-tenant-id": tenantId } : {}),
+        ...(chatToken ? { "x-chat-token": chatToken } : {})
+      }
+    }),
     adapters: {
-      attachments: new MyCustomUploadAdapter(uploadUrl),
+      attachments: new MyCustomUploadAdapter(uploadUrl.toString()),
     },
   });
 
@@ -78,6 +94,8 @@ class AiChatElement extends LitElement {
   static properties = {
     apiUrl: { type: String, attribute: 'api-url' },
     theme:  { type: String, attribute: 'theme' },
+    tenantId: { type: String, attribute: 'tenant-id' },
+    chatToken: { type: String, attribute: 'chat-token' }
   };
 
   static styles = css`
@@ -95,6 +113,8 @@ class AiChatElement extends LitElement {
 
   apiUrl: string;
   theme: string;
+  tenantId?: string;
+  chatToken?: string;
   private _reactRoot: Root | null = null;
   private _mountPoint: HTMLDivElement | null = null;
 
@@ -156,7 +176,12 @@ class AiChatElement extends LitElement {
     if (!this._reactRoot) return;
     this._reactRoot.render(
       <React.StrictMode>
-        <AssistantApp apiUrl={this.apiUrl} portalContainer={this._mountPoint} />
+        <AssistantApp 
+          apiUrl={this.apiUrl} 
+          tenantId={this.tenantId}
+          chatToken={this.chatToken}
+          portalContainer={this._mountPoint} 
+        />
       </React.StrictMode>
     );
   }
@@ -172,7 +197,7 @@ class AiChatElement extends LitElement {
         if (mountPoint) mountPoint.className = this.theme;
       }
     }
-    if (changedProperties.has('apiUrl') || changedProperties.has('theme')) {
+    if (changedProperties.has('apiUrl') || changedProperties.has('theme') || changedProperties.has('tenantId') || changedProperties.has('chatToken')) {
       this._renderReact();
     }
   }

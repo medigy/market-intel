@@ -92,7 +92,9 @@ SELECT 'html' AS component, '
   <ai-chat
     id="chat"
     api-url="' || COALESCE(sqlpage.environment_variable('AI_CHAT_API_URL'), '') || '"
-    theme="light">
+    theme="light"
+    tenant-id="' || COALESCE($tenantId, 'default') || '"
+    chat-token="' || COALESCE($chatToken, '') || '">
   </ai-chat>
 ' AS html;
 

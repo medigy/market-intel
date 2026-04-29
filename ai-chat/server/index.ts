@@ -52,6 +52,15 @@ if (!fs.existsSync("uploads")) {
 }
 
 app.post("/api/upload", upload.single("file"), (req, res) => {
+  const tenantId = (req.headers["x-tenant-id"] || req.query.tenantId) as string;
+  const chatToken = (req.headers["x-chat-token"] || req.query.chatToken) as string;
+  
+  if (!tenantId || !chatToken) {
+    console.warn("⚠️ Upload Unauthorized: Missing tenantId or chatToken");
+    res.status(401).json({ error: "Unauthorized: Missing tenantId or chatToken" });
+    return;
+  }
+
   if (!req.file) {
     res.status(400).json({ error: "No file uploaded" });
     return;
@@ -84,10 +93,10 @@ app.get("/", (req, res) => {
   res.send("Assistant UI Backend is running. Access the frontend at http://localhost:5173");
 });
 
-let cachedTableNames: string[] | null = null;
+const cachedTableNamesByTenant = new Map<string, string[]>();
 
-async function getKnownTables(mcpTools: Record<string, { execute?: Function }>): Promise<string[]> {
-  if (cachedTableNames) return cachedTableNames;
+async function getKnownTables(mcpTools: Record<string, { execute?: Function }>, tenantId: string): Promise<string[]> {
+  if (cachedTableNamesByTenant.has(tenantId)) return cachedTableNamesByTenant.get(tenantId)!;
 
   const querySqlTool = mcpTools.query_sql;
   if (!querySqlTool?.execute) return [];
@@ -114,12 +123,13 @@ async function getKnownTables(mcpTools: Record<string, { execute?: Function }>):
       rows?: Array<{ name?: string }>;
     };
 
-    cachedTableNames =
+    const tables =
       parsed.rows
         ?.map((row) => row.name)
         .filter((name): name is string => Boolean(name)) ?? [];
 
-    return cachedTableNames;
+    cachedTableNamesByTenant.set(tenantId, tables);
+    return tables;
   } catch {
     return [];
   }
@@ -131,32 +141,46 @@ const open_model = createOpenAICompatible({
   apiKey: process.env.LITELLM_API_KEY!,
 });
 
-let tools: any;
-let mcpClient: any;
+const mcpClients = new Map<string, any>();
+const mcpToolsMap = new Map<string, any>();
 
-async function initMCP() {
-  if (!mcpClient) {
-    console.log("🔌 Initializing MCP Client...");
-    console.log("📁 RSSD Path:", path.resolve(process.cwd(), process.env.RSSD_PATH!));
+async function initMCP(tenantId: string) {
+  if (!mcpClients.has(tenantId)) {
+    console.log(`🔌 Initializing MCP Client for tenant: ${tenantId}`);
+    
+    let dbPath = process.env.RSSD_PATH || "../resource-surveillance.sqlite.db";
+    let finalDbPath = path.resolve(process.cwd(), dbPath);
+    
+    if (tenantId && tenantId !== "default") {
+      if (dbPath.includes("[tenantId]")) {
+        finalDbPath = path.resolve(process.cwd(), dbPath.replace("[tenantId]", tenantId));
+      } else {
+        const parsed = path.parse(dbPath);
+        finalDbPath = path.resolve(process.cwd(), parsed.dir, tenantId, parsed.base);
+      }
+    }
+    
+    console.log(`📁 RSSD Path for ${tenantId}:`, finalDbPath);
     
     try {
-      mcpClient = await createMCPClient({
+      const mcpClient = await createMCPClient({
         transport: new StdioClientTransport({
           command: "surveilr",
-          args: ["mcp", "server", "-d", path.resolve(process.cwd(), process.env.RSSD_PATH!)],
+          args: ["mcp", "server", "-d", finalDbPath],
         }),
       });
-      console.log("✅ MCP Client created successfully");
+      console.log(`✅ MCP Client created successfully for ${tenantId}`);
       
-      tools = await mcpClient.tools();
-      console.log("✅ Tools loaded:", Object.keys(tools).length, "tools available");
-      console.log("📋 Available tools:", Object.keys(tools).join(", "));
+      const tools = await mcpClient.tools();
+      mcpClients.set(tenantId, mcpClient);
+      mcpToolsMap.set(tenantId, tools);
+      console.log(`✅ Tools loaded for ${tenantId}:`, Object.keys(tools).length, "tools available");
     } catch (err) {
-      console.error("❌ MCP Initialization failed:", err);
+      console.error(`❌ MCP Initialization failed for ${tenantId}:`, err);
       throw err;
     }
   }
-  return tools;
+  return mcpToolsMap.get(tenantId);
 }
 
 function getFriendlyErrorMessage(err: unknown): string {
@@ -252,21 +276,28 @@ function resolveAttachment(
 
 app.post("/api/chat", async (req, res) => {
   try {
-    console.log("📨 Chat request received");
-    const currentTools = await initMCP();
-    console.log("✅ MCP initialized for this request");
+    const tenantId = (req.headers["x-tenant-id"] || req.query.tenantId) as string;
+    const chatToken = (req.headers["x-chat-token"] || req.query.chatToken) as string;
+    
+    if (!tenantId || !chatToken) {
+      console.warn("⚠️ Unauthorized: Missing tenantId or chatToken");
+      res.status(401).json({ error: "Unauthorized: Missing tenantId or chatToken" });
+      return;
+    }
+
+    console.log(`📨 Chat request received [Tenant: ${tenantId}]`);
+    const currentTools = await initMCP(tenantId);
+    console.log(`✅ MCP initialized for request [Tenant: ${tenantId}]`);
     
     const { messages } = req.body;
     console.log("📝 Messages count:", messages?.length || 0);
-    console.log("📥 Raw incoming messages:", JSON.stringify(messages, (key, value) => 
-      (typeof value === "string" && value.length > 100) ? value.substring(0, 50) + "..." : value, 2));
 
     if (!messages || !Array.isArray(messages)) {
       res.status(400).json({ error: "Invalid messages" });
       return;
     }
     
-    const knownTables = await getKnownTables(currentTools as Record<string, { execute?: Function }>);
+    const knownTables = await getKnownTables(currentTools as Record<string, { execute?: Function }>, tenantId);
     console.log("📊 Known tables:", knownTables.length);
 
     const tableHint = knownTables.length
