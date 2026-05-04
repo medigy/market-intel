@@ -26,6 +26,9 @@ export default defineConfig({
     },
   },
 
+  envDir: '../',
+  envPrefix: ['VITE_', 'AI_CHAT_', 'TENENT_ID'],
+
   // Ensure env vars are handled if needed
   define: {
     'process.env.NODE_ENV': JSON.stringify('production'),

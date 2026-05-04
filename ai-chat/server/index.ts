@@ -29,7 +29,7 @@ const app = express();
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-tenant-id", "x-chat-token"],
 }));
 
 // Request logger
@@ -52,8 +52,8 @@ if (!fs.existsSync("uploads")) {
 }
 
 app.post("/api/upload", upload.single("file"), (req, res) => {
-  const tenantId = (req.headers["x-tenant-id"] || req.query.tenantId) as string;
-  const chatToken = (req.headers["x-chat-token"] || req.query.chatToken) as string;
+  const tenantId = (req.headers["x-tenant-id"] || req.query.tenantId || req.body.tenantId) as string;
+  const chatToken = (req.headers["x-chat-token"] || req.query.chatToken || req.body.chatToken) as string;
   
   if (!tenantId || !chatToken) {
     console.warn("⚠️ Upload Unauthorized: Missing tenantId or chatToken");
@@ -209,7 +209,7 @@ function resolveAttachment(
   name: string | undefined,
   contentType: string | undefined,
   dataUri: string
-): { type: string; image?: string; mediaType?: string; text?: string } | null {
+): { type: string; image?: string | Buffer; mediaType?: string; text?: string } | null {
   if (!dataUri || typeof dataUri !== "string") return null;
 
   // ── File reference (multer hash, not a data URI or http URL) ──
@@ -276,8 +276,8 @@ function resolveAttachment(
 
 app.post("/api/chat", async (req, res) => {
   try {
-    const tenantId = (req.headers["x-tenant-id"] || req.query.tenantId) as string;
-    const chatToken = (req.headers["x-chat-token"] || req.query.chatToken) as string;
+    const tenantId = (req.headers["x-tenant-id"] || req.query.tenantId || req.body.tenantId) as string;
+    const chatToken = (req.headers["x-chat-token"] || req.query.chatToken || req.body.chatToken) as string;
     
     if (!tenantId || !chatToken) {
       console.warn("⚠️ Unauthorized: Missing tenantId or chatToken");

@@ -87,14 +87,18 @@ SELECT 'shell' AS component,
        '{"link":"/moa/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
        '{"link":"/moa/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
+SET moa_api_url   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_API_URL')), ''), NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_API_URL=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+SET moa_tenant_id = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('TENENT_ID')), ''),       NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^TENENT_ID=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+SET moa_chat_tk   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_TOKEN')), ''),     NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_TOKEN=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+
 SELECT 'html' AS component, '
   <script type="module" src="../ai-chat.js"></script>
   <ai-chat
     id="chat"
-    api-url="' || COALESCE(sqlpage.environment_variable('AI_CHAT_API_URL'), '') || '"
+    api-url="' || $moa_api_url || '"
     theme="light"
-    tenant-id="' || COALESCE($tenantId, 'default') || '"
-    chat-token="' || COALESCE($chatToken, '') || '">
+    tenant-id="' || $moa_tenant_id || '"
+    chat-token="' || $moa_chat_tk || '">
   </ai-chat>
 ' AS html;
 

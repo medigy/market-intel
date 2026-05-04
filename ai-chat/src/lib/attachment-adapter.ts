@@ -3,9 +3,13 @@ import { AttachmentAdapter, PendingAttachment, CompleteAttachment } from "@assis
 export class MyCustomUploadAdapter implements AttachmentAdapter {
   accept = "*";
   private uploadUrl: string;
+  private tenantId?: string;
+  private chatToken?: string;
 
-  constructor(uploadUrl: string = "/api/upload") {
+  constructor(uploadUrl: string = "/api/upload", tenantId?: string, chatToken?: string) {
     this.uploadUrl = uploadUrl;
+    this.tenantId = tenantId;
+    this.chatToken = chatToken;
   }
 
   async *add({ file }: { file: File }) {
@@ -23,6 +27,8 @@ export class MyCustomUploadAdapter implements AttachmentAdapter {
     console.log("📤 Attempting to upload file to:", this.uploadUrl, attachment.name);
     const formData = new FormData();
     formData.append("file", attachment.file);
+    if (this.tenantId) formData.append("tenantId", this.tenantId);
+    if (this.chatToken) formData.append("chatToken", this.chatToken);
 
     const response = await fetch(this.uploadUrl, {
       method: "POST",

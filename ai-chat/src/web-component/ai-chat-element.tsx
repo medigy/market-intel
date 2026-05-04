@@ -27,36 +27,40 @@ function AssistantApp({
   chatToken?: string;
   portalContainer: Element | DocumentFragment | null;
 }) {
-  const uploadUrl = new URL(apiUrl.replace("/api/chat", "/api/upload"), window.location.origin);
-  if (tenantId) uploadUrl.searchParams.append("tenantId", tenantId);
-  if (chatToken) uploadUrl.searchParams.append("chatToken", chatToken);
+  const effectiveApiUrl = apiUrl || "/api/chat";
+  const uploadUrl = new URL(effectiveApiUrl.replace("/api/chat", "/api/upload"), window.location.origin);
 
-  const apiEndpoint = new URL(apiUrl, window.location.origin);
-  if (tenantId) apiEndpoint.searchParams.append("tenantId", tenantId);
-  if (chatToken) apiEndpoint.searchParams.append("chatToken", chatToken);
+  const apiEndpoint = new URL(effectiveApiUrl, window.location.origin);
+  
+  const effectiveTenantId = tenantId;
+  const effectiveChatToken = chatToken;
 
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({ 
       api: apiEndpoint.toString(),
       headers: {
-        ...(tenantId ? { "x-tenant-id": tenantId } : {}),
-        ...(chatToken ? { "x-chat-token": chatToken } : {})
+        ...(effectiveTenantId ? { "x-tenant-id": effectiveTenantId } : {}),
+        ...(effectiveChatToken ? { "x-chat-token": effectiveChatToken } : {})
+      },
+      body: {
+        ...(effectiveTenantId ? { tenantId: effectiveTenantId } : {}),
+        ...(effectiveChatToken ? { chatToken: effectiveChatToken } : {})
       }
     }),
     adapters: {
-      attachments: new MyCustomUploadAdapter(uploadUrl.toString()),
+      attachments: new MyCustomUploadAdapter(uploadUrl.toString(), effectiveTenantId, effectiveChatToken),
     },
   });
 
-  const STORAGE_KEY = "assistant-messages";
+  const storageKey = effectiveTenantId ? `assistant-messages-${effectiveTenantId}` : "assistant-messages";
   const loadedRef = useRef(false);
 
-  // Restore history from localStorage on first mount
+  // Restore history from localStorage on first mount or when tenant changes
   useEffect(() => {
-    if (loadedRef.current) return;
-    loadedRef.current = true;
+    // If we changed tenants and loaded it, we should probably restore specific state
+    // But realistically SQLPage reloads the whole page.
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(storageKey);
       if (saved) {
         const state = JSON.parse(saved);
         runtime.thread.importExternalState(state);
@@ -64,19 +68,20 @@ function AssistantApp({
     } catch {
       // ignore corrupted state
     }
-  }, [runtime]);
+    loadedRef.current = true;
+  }, [runtime, storageKey]);
 
   // Persist to localStorage on every change
   useEffect(() => {
     return runtime.thread.subscribe(() => {
       try {
         const state = runtime.thread.exportExternalState();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem(storageKey, JSON.stringify(state));
       } catch {
         // ignore write errors
       }
     });
-  }, [runtime]);
+  }, [runtime, storageKey]);
 
   return (
     <PortalContainerProvider container={portalContainer}>
@@ -120,7 +125,7 @@ class AiChatElement extends LitElement {
 
   constructor() {
     super();
-    this.apiUrl = import.meta.env.VITE_API_URL ?? '/api/chat';
+    this.apiUrl = '/api/chat';
     this.theme  = 'light';
   }
 
