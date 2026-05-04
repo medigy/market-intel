@@ -39,9 +39,9 @@ sql * --interpolate --injectable
 #!/bin/bash
 set -euo pipefail
 
-rm -f resource-surveillance.sqlite.*
+export moa_tenant_id=$(grep "^TENENT_ID=" .env | cut -d= -f2- | tr -d "\r" | xargs)
 
-surveilr ingest files -r medicare-ds/ --stream-large-files #large data ingest post 3.43
+surveilr ingest files -r medicare-ds/ --stream-large-files --tenant-id "$moa_tenant_id" --tenant-name "$moa_tenant_id" #large data ingest post 3.43
 surveilr orchestrate transform-csv
 surveilr shell sql/medigy-unified-v2.sql
 surveilr shell sql/medigy-ddl.sql
@@ -88,8 +88,8 @@ SELECT 'shell' AS component,
        '{"link":"/moa/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
 SET moa_api_url   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_API_URL')), ''), NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_API_URL=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
-SET moa_tenant_id = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('TENENT_ID')), ''),       NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^TENENT_ID=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
 SET moa_chat_tk   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_TOKEN')), ''),     NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_TOKEN=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+SET moa_tenant_id = COALESCE((SELECT party_name FROM party LIMIT 1));
 
 SELECT 'html' AS component, '
   <script type="module" src="../ai-chat.js"></script>
