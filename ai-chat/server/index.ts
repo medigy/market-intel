@@ -489,7 +489,7 @@ Behavioral Rules:
   }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.SERVICE_PORT || 3001;
 app.listen(PORT, () => {
   console.log("\n" + "=".repeat(50));
   console.log(`✅ Backend on http://localhost:${PORT}`);
