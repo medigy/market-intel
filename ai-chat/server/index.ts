@@ -152,7 +152,9 @@ async function initMCP(tenantId: string) {
     let finalDbPath = path.resolve(process.cwd(), dbPath);
     
     if (tenantId && tenantId !== "default") {
-      if (dbPath.includes("[tenantId]")) {
+      if (dbPath.includes("[TENANT_ID]")) {
+        finalDbPath = path.resolve(process.cwd(), dbPath.replace("[TENANT_ID]", tenantId));
+      } else if (dbPath.includes("[tenantId]")) {
         finalDbPath = path.resolve(process.cwd(), dbPath.replace("[tenantId]", tenantId));
       } else {
         const parsed = path.parse(dbPath);
