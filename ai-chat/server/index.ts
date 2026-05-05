@@ -289,6 +289,7 @@ app.post("/api/chat", async (req, res) => {
 
     console.log(`📨 Chat request received [Tenant: ${tenantId}]`);
     const currentTools = await initMCP(tenantId);
+    console.log(`🔧 Tools ready for tenant ${tenantId}:`, Object.keys(currentTools).length, "tools available");
     console.log(`✅ MCP initialized for request [Tenant: ${tenantId}]`);
     
     const { messages } = req.body;
