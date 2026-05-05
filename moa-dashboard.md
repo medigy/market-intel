@@ -38,10 +38,16 @@ sql * --interpolate --injectable
 ```bash prepare-db --descr "Ingest raw files, build unified analytics"
 #!/bin/bash
 set -euo pipefail
+set -a
+source .env
+set +a
+TENANT_ID="${TENANT_ID}"
+echo $TENANT_ID
 
-export moa_tenant_id=$(grep "^TENENT_ID=" .env | cut -d= -f2- | tr -d "\r" | xargs)
+# Optional: fail early if not set
+: "${TENANT_ID:?TENANT_ID is not set}"
 
-surveilr ingest files -r medicare-ds/ --stream-large-files --tenant-id "$moa_tenant_id" --tenant-name "$moa_tenant_id" #large data ingest post 3.43
+surveilr ingest files -r medicare-ds/ --stream-large-files --tenant-id "$TENANT_ID" --tenant-name "$TENANT_ID" #large data ingest post 3.43
 surveilr orchestrate transform-csv
 surveilr shell sql/medigy-unified-v2.sql
 surveilr shell sql/medigy-ddl.sql
@@ -87,9 +93,21 @@ SELECT 'shell' AS component,
        '{"link":"/moa/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
        '{"link":"/moa/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
-SET moa_api_url   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_API_URL')), ''), NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_API_URL=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
-SET moa_chat_tk   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_TOKEN')), ''),     NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_TOKEN=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
-SET moa_tenant_id = COALESCE((SELECT party_name FROM party LIMIT 1));
+-- SET moa_api_url   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_API_URL')), ''), NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_API_URL=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+-- SET moa_chat_tk   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_TOKEN')), ''),     NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_TOKEN=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+SET moa_api_url = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_API_URL')), ''),
+    ''
+);
+
+SET moa_chat_tk = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_TOKEN')), ''),
+    ''
+);
+SET moa_tenant_id = COALESCE(
+    (SELECT party_name FROM party LIMIT 1),
+    'default_tenant'
+);
 
 SELECT 'html' AS component, '
   <script type="module" src="../ai-chat.js"></script>

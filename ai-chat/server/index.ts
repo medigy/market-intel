@@ -152,7 +152,9 @@ async function initMCP(tenantId: string) {
     let finalDbPath = path.resolve(process.cwd(), dbPath);
     
     if (tenantId && tenantId !== "default") {
-      if (dbPath.includes("[tenantId]")) {
+      if (dbPath.includes("[TENANT_ID]")) {
+        finalDbPath = path.resolve(process.cwd(), dbPath.replace("[TENANT_ID]", tenantId));
+      } else if (dbPath.includes("[tenantId]")) {
         finalDbPath = path.resolve(process.cwd(), dbPath.replace("[tenantId]", tenantId));
       } else {
         const parsed = path.parse(dbPath);
@@ -287,6 +289,7 @@ app.post("/api/chat", async (req, res) => {
 
     console.log(`📨 Chat request received [Tenant: ${tenantId}]`);
     const currentTools = await initMCP(tenantId);
+    console.log(`🔧 Tools ready for tenant ${tenantId}:`, Object.keys(currentTools).length, "tools available");
     console.log(`✅ MCP initialized for request [Tenant: ${tenantId}]`);
     
     const { messages } = req.body;
@@ -489,7 +492,7 @@ Behavioral Rules:
   }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.SERVICE_PORT || 3001;
 app.listen(PORT, () => {
   console.log("\n" + "=".repeat(50));
   console.log(`✅ Backend on http://localhost:${PORT}`);
