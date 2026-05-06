@@ -149,6 +149,7 @@ async function initMCP(tenantId: string) {
     console.log(`🔌 Initializing MCP Client for tenant: ${tenantId}`);
     
     let dbPath = process.env.RSSD_PATH || "../resource-surveillance.sqlite.db";
+    let defaultDbPath = process.env.DEFAULT_RSSD_PATH || "../resource-surveillance.sqlite.db";
     let finalDbPath = path.resolve(process.cwd(), dbPath);
     
     if (tenantId && tenantId !== "default") {
@@ -161,7 +162,9 @@ async function initMCP(tenantId: string) {
         finalDbPath = path.resolve(process.cwd(), parsed.dir, tenantId, parsed.base);
       }
     }
-    
+    else {
+      finalDbPath = path.resolve(process.cwd(), defaultDbPath);
+    }
     console.log(`📁 RSSD Path for ${tenantId}:`, finalDbPath);
     
     try {
