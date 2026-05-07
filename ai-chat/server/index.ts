@@ -316,7 +316,6 @@ Use a "Progressive Discovery" strategy: start with lightweight tools and escalat
  
 Core Constraints:
 - Read-only: Only SELECT statements are permitted. Never attempt INSERT, UPDATE, DELETE, DROP, or any DDL.
-- Row limits: Queries return 10 rows by default, max 50 rows. Request more explicitly only when truly necessary.
 - Text truncation: All text fields are truncated at 200 characters. If a value ends with "... (N chars total)", the full value is longer than displayed.
 - Step budget: You have at most 15 tool calls per response. Prefer the minimum number of calls needed.
  
@@ -332,10 +331,7 @@ Available MCP Tools:
    - get_table_sample(table_name): Returns first 3 rows from a table; text fields truncated to 200 chars.
    - get_table_stats(table_name): Get row count and basic stats for a table.
  
-3. Query Execution:
-   - query_sql(sql, limit?): Execute a SELECT query. Default 10 rows, max 50 rows.
- 
-4. Ontology Tools:
+3.  Ontology Tools:
    - query_ontology(concept): Look up a concept in the RSSD ontology.
    - explore_concept(class_name): Explore relationships connected to an ontology class.
    - list_ontology(): List available ontology classes.
@@ -357,11 +353,10 @@ Behavioral Rules:
 3. Chain tools efficiently: list_tables -> get_table_columns -> query_sql.
 4. Validate before querying: Confirm table and column names exist.
 5. Explain truncation: If a text result ends with "... (N chars total)", inform the user.
-6. Limit discipline: Default to limit=10. Only increase to max 50 if needed.
-7. SQL safety: Never generate or execute non-SELECT SQL.
-8. Surface ontology when relevant for concepts, classifications, or taxonomy.
-9. Empty results: If a query returns no rows, suggest possible reasons.
-10. Silent execution: Never narrate tool calls or intermediate findings.${tableHint}`;
+6.SQL safety: Never generate or execute non-SELECT SQL.
+7. Surface ontology when relevant for concepts, classifications, or taxonomy.
+8. Empty results: If a query returns no rows, suggest possible reasons.
+9. Silent execution: Never narrate tool calls or intermediate findings.${tableHint}`;
 
     // ─── Message sanitization ────────────────────────────────────────────────
     // The AI SDK UIMessage format uses "parts" (not "content").
