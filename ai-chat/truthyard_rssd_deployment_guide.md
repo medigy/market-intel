@@ -23,7 +23,7 @@ Because of this limitation, each tenant must have its own folder containing:
 ```text
 cargo.d/
 └── medigy/
-    ├── opportunity_atlas/
+    ├── opportunity-atlas/
     │   ├── env
     │   └── dsd.db
     │
@@ -50,7 +50,7 @@ Examples:
 
 | Tenant | Folder |
 |---|---|
-| Default Medigy Opportunity Atlas | `opportunity_atlas` |
+| Default Medigy Opportunity Atlas | `opportunity-atlas` |
 | Tenant 1 | `tenant1` |
 | Tenant 2 | `tenant2` |
 
@@ -118,7 +118,7 @@ http://127.0.0.1:8080/medigy/tenant1/dsd
 ### Default Opportunity Atlas Tenant
 
 ```text
-http://127.0.0.1:8081/medigy/opportunity_atlas/dsd
+http://127.0.0.1:8081/medigy/opportunity-atlas/dsd
 ```
 
 ---
@@ -196,7 +196,7 @@ http://127.0.0.1:8080/medigy/tenant1/dsd
 ```text
 cargo.d/
 └── medigy/
-    ├── opportunity_atlas/
+    ├── opportunity-atlas/
     │   ├── env
     │   └── dsd.db
     │
