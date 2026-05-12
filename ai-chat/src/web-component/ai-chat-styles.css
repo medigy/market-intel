@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:host {
+  display: block;
+  --aui-thread-max-width: 700px;
+  /* Font set to Times New Roman as requested */
+  font-family: "Times New Roman", Times, serif;
+  
+  /* Standard colors - Reverted to neutral defaults */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --border: oklch(0.922 0 0);
+  --primary: oklch(0.205 0 0); /* Neutral black/gray */
+  --radius: 0.625rem;
+}
+
+:host(.dark) {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --primary: oklch(0.985 0 0);
+}
+
+* {
+  font-family: inherit;
+}
+
+/* Minimal Scrollbar - Neutral gray thumb */
+.aui-thread-viewport::-webkit-scrollbar {
+  width: 5px;
+}
+.aui-thread-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+.aui-thread-viewport::-webkit-scrollbar-thumb {
+  background: #d1d5db; 
+  border-radius: 10px;
+}
+
+/* Fix for Shadow DOM Border Visibility */
+[class*='border'] {
+  border-style: solid !important;
+}
+
+*, ::before, ::after {
+  border-width: 0;
+  border-style: solid;
+  border-color: var(--border);
+}
+
+/* UI Header: Subtle bottom border */
+.aui-header-section {
+  background-color: white !important;
+  border-bottom: 1px solid oklch(0.922 0 0) !important;
+  backdrop-filter: none !important;
+}
+
+/* Composer Box (Input): Rounded border */
+.aui-composer-shell {
+  border: 1px solid oklch(0.922 0 0) !important;
+  background-color: white !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
+}
+
+/* Modal Outer Border */
+.aui-modal-content {
+  border: 1px solid oklch(0.922 0 0) !important;
+}
+
+.aui-user-message-bubble {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+/* Suggestion Cards: Visible borders matching documentation style */
+.aui-suggestion-card {
+  border: 1px solid oklch(0.922 0 0) !important;
+}
+
+/* Fixed positioning reset */
+.fixed {
+  position: fixed;
+}

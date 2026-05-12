@@ -5,7 +5,8 @@ sqlpage-conf:
   allow_exec: true
   port: 9227
 ---
-# Medigy Opportunity Atlas — Unified SQLPage Application 
+
+# Medigy Opportunity Atlas — Unified SQLPage Application
 
 This application is built on the **unified extensible pipeline** (`medigy-unified-v2.sql`).
 
@@ -37,10 +38,16 @@ sql * --interpolate --injectable
 ```bash prepare-db --descr "Ingest raw files, build unified analytics"
 #!/bin/bash
 set -euo pipefail
+set -a
+source .env
+set +a
+TENANT_ID="${TENANT_ID}"
+echo $TENANT_ID
 
-rm -f resource-surveillance.sqlite.*
+# Optional: fail early if not set
+: "${TENANT_ID:?TENANT_ID is not set}"
 
-surveilr ingest files -r medicare-ds/ --stream-large-files #large data ingest post 3.43
+surveilr ingest files -r medicare-ds/ --stream-large-files --tenant-id "$TENANT_ID" --tenant-name "$TENANT_ID" #large data ingest post 3.43
 surveilr orchestrate transform-csv
 surveilr shell sql/medigy-unified-v2.sql
 surveilr shell sql/medigy-ddl.sql
@@ -66,7 +73,7 @@ echo "Medigy Opportunity Atlas is ready."
 ```sql PARTIAL global-layout.sql --inject moa/*.sql
 
 -- BEGIN: PARTIAL global-layout.sql
--- Using root-relative paths (starting with '/') ensures that these files 
+-- Using root-relative paths (starting with '/') ensures that these files
 -- are resolved correctly by SQLPage regardless of the deployment base URL.
 SELECT 'shell' AS component,
        'Medigy Opportunity Atlas' AS title,
@@ -86,6 +93,33 @@ SELECT 'shell' AS component,
        '{"link":"/moa/procedure-drilldown.sql","title":"Tactical Analytics"}' AS menu_item,
        '{"link":"/moa/data-dictionary.sql","title":"Data Provenance"}' AS menu_item;
 
+-- SET moa_api_url   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_API_URL')), ''), NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_API_URL=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+-- SET moa_chat_tk   = COALESCE(NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_TOKEN')), ''),     NULLIF(TRIM(sqlpage.exec('sh', '-c', 'grep "^AI_CHAT_TOKEN=" .env | cut -d= -f2- | tr -d "\r"')), ''), '');
+SET moa_api_url = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_API_URL')), ''),
+    ''
+);
+
+SET moa_chat_tk = COALESCE(
+    NULLIF(TRIM(sqlpage.environment_variable('AI_CHAT_TOKEN')), ''),
+    ''
+);
+SET moa_tenant_id = COALESCE(
+    (SELECT party_name FROM party LIMIT 1),
+    'default_tenant'
+);
+
+SELECT 'html' AS component, '
+  <script type="module" src="../ai-chat.js"></script>
+  <ai-chat
+    id="chat"
+    api-url="' || $moa_api_url || '"
+    theme="light"
+    tenant-id="' || $moa_tenant_id || '"
+    chat-token="' || $moa_chat_tk || '">
+  </ai-chat>
+' AS html;
+
 
 SET resource_json = sqlpage.read_file_as_text('spry.d/auto/resource/${path}.auto.json');
 SET page_title  = json_extract($resource_json, '$.route.caption');
@@ -100,6 +134,7 @@ SET page_path = json_extract($resource_json, '$.route.path');
 ```contribute sqlpage_files --base .
 ./footer-links.js .
 ./custom-dashboard.css .
+./ai-chat/dist/wc/ai-chat.js ai-chat.js
 ```
 
 ---
@@ -393,51 +428,51 @@ SELECT 'alert' AS component,
        'info' AS color, 'database-check' AS icon;
 
 SELECT 'divider' AS component, '2023 Market Performance Indicators' AS label;
-SELECT 'text' AS component, 'Real-World Scale' AS title, 
+SELECT 'text' AS component, 'Real-World Scale' AS title,
        'These metrics represent the verified Medicare scale across patients, providers, and financial impact for the 2023 fiscal year.' AS contents;
 
 SELECT 'card' AS component, 4 AS columns;
 
 -- Row 1: The High-Level Totals
-SELECT 'Active Disease Markets' AS title, printf('%,.0f', total_conditions) AS description, 
+SELECT 'Active Disease Markets' AS title, printf('%,.0f', total_conditions) AS description,
        '2023 Clinical Registry' AS footer, 'teal' AS color, 'activity' AS icon, 'kpi-card' AS class, '/moa/conditions.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Patients Impacted' AS title, printf('%,.1f', total_beneficiaries / 1000000.0) || 'M' AS description, 
+SELECT 'Patients Impacted' AS title, printf('%,.1f', total_beneficiaries / 1000000.0) || 'M' AS description,
        'Medicare Part B Scope' AS footer, 'azure' AS color, 'users' AS icon, 'kpi-card kpi-azure' AS class, '/moa/executive-dashboard.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Total Market Spend ($)' AS title, '$' || printf('%,.1f', total_allowed_amt / 1000000000.0) || 'B' AS description, 
+SELECT 'Total Market Spend ($)' AS title, '$' || printf('%,.1f', total_allowed_amt / 1000000000.0) || 'B' AS description,
        'Annual Allowed Amount' AS footer, 'indigo' AS color, 'currency-dollar' AS icon, 'kpi-card kpi-indigo' AS class, '/moa/executive-dashboard.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Data Sources Integrated' AS title, (SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source') || ' Sources' AS description, 
+SELECT 'Data Sources Integrated' AS title, (SELECT COUNT(*) FROM data_provenance WHERE object_type = 'external_source') || ' Sources' AS description,
        'Multi-Stream Provenance' AS footer, 'orange' AS color, 'database' AS icon, 'kpi-card kpi-orange' AS class, '/moa/data-dictionary.sql' AS link;
 
 -- Row 2: Tactical Breadth
-SELECT 'Geographic Reach' AS title, printf('%,.0f', total_states) || ' States' AS description, 
+SELECT 'Geographic Reach' AS title, printf('%,.0f', total_states) || ' States' AS description,
        'Regional Intelligence' AS footer, 'blue' AS color, 'map-pin' AS icon, 'kpi-card kpi-blue' AS class, '/moa/geography.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Clinical Procedures' AS title, printf('%,.0f', total_procedures) AS description, 
+SELECT 'Clinical Procedures' AS title, printf('%,.0f', total_procedures) AS description,
        'CPT/HCPCS Tracking' AS footer, 'grape' AS color, 'clipboard-list' AS icon, 'kpi-card kpi-grape' AS class, '/moa/procedure-drilldown.sql' AS link FROM mat_executive_kpis;
 
-SELECT 'Actual Medicare Payout' AS title, '$' || printf('%,.1f', total_medicare_payment / 1000000000.0) || 'B' AS description, 
+SELECT 'Actual Medicare Payout' AS title, '$' || printf('%,.1f', total_medicare_payment / 1000000000.0) || 'B' AS description,
        'Net Federal Expenditure' AS footer, 'teal' AS color, 'receipt' AS icon, 'kpi-card' AS class, '/moa/executive-dashboard.sql#payment-section' AS link FROM mat_executive_kpis;
 
-SELECT 'Ranked Growth Targets' AS title, (SELECT COUNT(*) FROM mat_opportunity_score) || ' Targets' AS description, 
+SELECT 'Ranked Growth Targets' AS title, (SELECT COUNT(*) FROM mat_opportunity_score) || ' Targets' AS description,
        'ROI-Driven Ranking' AS footer, 'orange' AS color, 'trophy' AS icon, 'kpi-card kpi-orange' AS class, '/moa/opportunity-scoring.sql' AS link;
 
 ---
 --- 5. VISUAL INTELLIGENCE (Business Narration)
 ---
 SELECT 'divider' AS component, 'Market Opportunity Analysis' AS contents;
-SELECT 'text' AS component, 'Identifying the Growth Frontier' AS title, 
+SELECT 'text' AS component, 'Identifying the Growth Frontier' AS title,
        'We translate $B in claims into actionable insights. The charts below deconstruct the market by opportunity score, strategic tiering, and care-setting flow.' AS contents;
 
 -- Treemap for Opportunity: Professional, handles varying scales well
 SELECT 'chart' AS component, 'Top 10 Disease Markets by Opportunity' AS title, 'treemap' AS type, 8 AS width;
-SELECT 
+SELECT
     specialty_domain AS series,
-    condition_name AS label, 
+    condition_name AS label,
     opportunity_score AS value
-FROM mat_condition_national_summary 
+FROM mat_condition_national_summary
 ORDER BY opportunity_score DESC LIMIT 10;
 
 
@@ -447,25 +482,25 @@ SELECT 'Tier ' || tier || ' — ' || CASE tier WHEN 1 THEN 'Flagship' WHEN 2 THE
     SUM(total_allowed_amt) AS value FROM mat_condition_national_summary GROUP BY tier;
 
 -- Care Setting Spend: Treemap to handle the massive GEO vs DME scale difference
-SELECT 
-    'chart' AS component, 
-    'Market Spend Magnitude by Care Setting ($ Billions)' AS title, 
-    'bar' AS type, 
+SELECT
+    'chart' AS component,
+    'Market Spend Magnitude by Care Setting ($ Billions)' AS title,
+    'bar' AS type,
     TRUE AS horizontal,
     12 AS width;
 
-SELECT 
-    CASE 
+SELECT
+    CASE
         WHEN source_type LIKE '%DME%' THEN 'Medical Equipment'
         WHEN source_type LIKE '%GEO%' THEN 'Geographic Services'
         WHEN source_type LIKE '%HOSP%' THEN 'Hospital/Facility'
         ELSE 'Specialized Diagnostics'
     END AS series,
-    source_type AS label, 
+    source_type AS label,
     -- Scaling raw value to Billions for X-axis readability
     SUM(total_allowed_amt) / 1000000000.0 AS value
-FROM mat_condition_source_breakdown 
-GROUP BY source_type, series 
+FROM mat_condition_source_breakdown
+GROUP BY source_type, series
 ORDER BY value DESC;
 ---
 --- 6. EXPLORE MARKETS (Condition Cards)
@@ -536,7 +571,7 @@ SELECT 'html' AS component, '<div id="national-kpi-section"></div>' AS html;
 SELECT 'divider' AS component, 'National Market Magnitude' AS contents;
 
 SELECT 'text' AS component,
-'The following metrics summarize overall market scale and economic impact. High spend per patient combined with high service utilization typically indicates chronic management or device-driven care pathways.' 
+'The following metrics summarize overall market scale and economic impact. High spend per patient combined with high service utilization typically indicates chronic management or device-driven care pathways.'
 AS contents_md;
 
 SELECT 'card' AS component, 4 AS columns;
@@ -662,7 +697,7 @@ SELECT 'The following table identifies the specific HCPCS codes driving revenue 
 SET max_per_page = 10;
 SET current_page = COALESCE(CAST($page AS INT), 1);
 SET total_rows = (
-    SELECT COUNT(*) FROM mat_condition_hcpcs_detail 
+    SELECT COUNT(*) FROM mat_condition_hcpcs_detail
     WHERE LOWER(TRIM(condition_name)) = LOWER(TRIM($condition))
 );
 SET total_pages = ($total_rows + $max_per_page - 1) / $max_per_page;
@@ -713,7 +748,7 @@ SELECT 'Geographic intelligence reveals regional "hotspots" with high spending m
 SET geo_max_per_page = 10;
 SET geo_current_page = COALESCE(CAST($geo_page AS INT), 1);
 SET geo_total_rows = (
-    SELECT COUNT(*) FROM mat_condition_state_breakdown 
+    SELECT COUNT(*) FROM mat_condition_state_breakdown
     WHERE LOWER(TRIM(condition_name)) = LOWER(TRIM($condition))
 );
 SET geo_total_pages = ($geo_total_rows + $geo_max_per_page - 1) / $geo_max_per_page;
@@ -734,8 +769,8 @@ SELECT 'text' AS component,
        'The table below provides a deeper breakdown of state-level performance, including cost tiers and average spend per patient to identify high-value markets.' AS contents_md;
 
 
-SELECT 'table' AS component, 
-       'State-Level Strategic Matrix' AS title, 
+SELECT 'table' AS component,
+       'State-Level Strategic Matrix' AS title,
        TRUE AS sort, TRUE AS search,
        'State' AS markdown;
 
@@ -796,7 +831,7 @@ SELECT 'html' AS component, '<div id="kpi-top"></div>' AS html;
 SELECT 'divider' AS component, 'Core Performance Indicators' AS contents;
 SELECT 'card' AS component, 3 AS columns;
 
-SELECT 'Active Markets' AS title, 
+SELECT 'Active Markets' AS title,
        total_conditions AS description,
        'Verified Clinical Domains' AS footer,
        'teal' AS color, 'activity' AS icon,
@@ -804,7 +839,7 @@ SELECT 'Active Markets' AS title,
        '#condition-table-section' AS link
 FROM mat_executive_kpis;
 
-SELECT 'Total Patient Reach' AS title, 
+SELECT 'Total Patient Reach' AS title,
        printf('%,.1f', total_beneficiaries / 1000000.0) || 'M' AS description,
        'Medicare Part B Beneficiaries' AS footer,
        'azure' AS color, 'users' AS icon,
@@ -812,7 +847,7 @@ SELECT 'Total Patient Reach' AS title,
        '#condition-table-section' AS link
 FROM mat_executive_kpis;
 
-SELECT 'Addressable Market Value' AS title, 
+SELECT 'Addressable Market Value' AS title,
        '$' || printf('%,.1f', total_allowed_amt / 1000000000.0) || 'B' AS description,
        'Total Annual Allowed Spend' AS footer,
        'indigo' AS color, 'currency-dollar' AS icon,
@@ -823,7 +858,7 @@ FROM mat_executive_kpis;
 -- Row 2: Operational Depth
 SELECT 'card' AS component, 3 AS columns;
 
-SELECT 'Net Revenue Realized' AS title, 
+SELECT 'Net Revenue Realized' AS title,
        '$' || printf('%,.1f', total_medicare_payment / 1000000000.0) || 'B' AS description,
        'Actual Medicare Payout' AS footer,
        'teal' AS color, 'receipt' AS icon,
@@ -831,7 +866,7 @@ SELECT 'Net Revenue Realized' AS title,
        '#payment-section' AS link
 FROM mat_executive_kpis;
 
-SELECT 'Geographic Footprint' AS title, 
+SELECT 'Geographic Footprint' AS title,
        total_states || ' States' AS description,
        'National Coverage Map' AS footer,
        'blue' AS color, 'map-pin' AS icon,
@@ -839,7 +874,7 @@ SELECT 'Geographic Footprint' AS title,
        '/moa/geography.sql' AS link
 FROM mat_executive_kpis;
 
-SELECT 'Opportunity Index' AS title, 
+SELECT 'Opportunity Index' AS title,
        (SELECT COUNT(*) FROM mat_opportunity_score) || ' Targets' AS description,
        'Growth Priority Assets' AS footer,
        'orange' AS color, 'trophy' AS icon,
@@ -905,7 +940,7 @@ SELECT 'High ratios indicate high-payout stability, while lower ratios highlight
 SELECT 'chart' AS component,
        'Revenue Realization Ratio (%)' AS title,
        'bar' AS type, 12 AS width, 'orange' AS color;
-SELECT 
+SELECT
     condition_name AS label,
     ROUND(CAST(total_medicare_payment AS REAL) / NULLIF(total_allowed_amt, 0) * 100, 1) AS value
 FROM mat_condition_national_summary
@@ -940,13 +975,13 @@ ORDER BY value DESC;
 SELECT 'html' AS component, '<div id="condition-table-section"></div>' AS html;
 SELECT 'divider' AS component, 'Strategic Market Prioritization Registry' AS contents;
 
-SELECT 'table' AS component, 
-       'Market Intelligence Matrix' AS title, 
+SELECT 'table' AS component,
+       'Market Intelligence Matrix' AS title,
        TRUE AS sort, TRUE AS search,
        'Condition' AS markdown;
 
 SELECT
-    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",    
+    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",
     specialty_domain AS "Domain",
     'Tier ' || tier AS "Tier",
     b2b_tier_primary AS "Primary Specialty",
@@ -1009,7 +1044,7 @@ ORDER BY opportunity_score DESC
 LIMIT 3;
 
 -- ── Charts ────────────────────────────────────────────────────────────────────
---- 
+---
 --- 5. DATA VISUALIZATION & STRATEGIC ANALYSIS
 ---
 
@@ -1018,7 +1053,7 @@ SELECT 'Our Opportunity Magnitude index provides a singular point of truth for m
 
 SELECT 'chart' AS component,
        'Opportunity Magnitude by Condition' AS title,
-       'bar' AS type, 12 AS width, 
+       'bar' AS type, 12 AS width,
        'Score (0-100)' AS y_title;
 SELECT condition_name AS label, opportunity_score AS value, color AS color
 FROM mat_opportunity_score
@@ -1027,18 +1062,18 @@ ORDER BY opportunity_score DESC;
 -- Divider with Narration for Decomposition
 SELECT 'divider' AS component, 'Market Drivers: Volume vs. Spending Power' AS contents;
 
-SELECT 'alert' AS component, 
+SELECT 'alert' AS component,
        'Understanding Market Intensity' AS title,
        'The chart below deconstructs the opportunity score. A high "Financial Magnitude" suggests a premium specialty market, while high "Patient Reach" indicates a high-volume/utility play. The ideal expansion target sits at the intersection of both.' AS description,
        'info' AS color,
        'analyze' AS icon;
 
-SELECT 'chart' AS component, 
-       'Market Intensity Decomposition' AS title, 
+SELECT 'chart' AS component,
+       'Market Intensity Decomposition' AS title,
        'bar' AS type, 12 AS width;
 
 -- Series 1: Normalized Volume
-SELECT 
+SELECT
     condition_name AS label,
     ROUND(CAST(total_benes AS REAL) / NULLIF((SELECT MAX(total_benes) FROM mat_opportunity_score), 0) * 40, 1) AS value,
     'Patient Reach (Normalized)' AS series,
@@ -1046,14 +1081,14 @@ SELECT
 FROM mat_opportunity_score;
 
 -- Series 2: Normalized Spend
-SELECT 
+SELECT
     condition_name AS label,
     ROUND(CAST(total_allowed AS REAL) / NULLIF((SELECT MAX(total_allowed) FROM mat_opportunity_score), 0) * 40, 1) AS value,
     'Financial Magnitude (Normalized)' AS series,
     'indigo' AS color
 FROM mat_opportunity_score;
 
---- 
+---
 --- 6. TACTICAL EXECUTION MATRIX
 ---
 
@@ -1063,8 +1098,8 @@ SELECT 'The following matrix translates our high-level strategy into tactical sa
 SELECT 'table' AS component, 'Full Market Priority Matrix' AS title, TRUE AS sort, TRUE AS search,
        'Condition' AS markdown;
 SELECT
-    ROW_NUMBER() OVER (ORDER BY opportunity_score DESC)  AS "Rank",    
-    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",  
+    ROW_NUMBER() OVER (ORDER BY opportunity_score DESC)  AS "Rank",
+    '**[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')**' AS "Condition",
     specialty_domain AS "Domain",
     'Tier ' || tier AS "Tier",
     b2b_tier_primary AS "Primary Specialty",
@@ -1227,7 +1262,7 @@ SELECT 'alert' AS component,
 --- 4. VIBRANT KPI GRID (Strategic Magnitude)
 ---
 SELECT 'divider' AS component, 'HCPCS Market Magnitude' AS label;
-SELECT 'text' AS component, 'Market Surface Area' AS title, 
+SELECT 'text' AS component, 'Market Surface Area' AS title,
        'These indicators define the total addressable surface area for procedural interventions across our tracked 2023 clinical registry.' AS contents;
 
 SELECT 'card' AS component, 4 AS columns;
@@ -1268,7 +1303,7 @@ SELECT 'divider' AS component, 'Revenue Intensity Analysis' AS contents;
 SELECT 'chart' AS component,
        'Top 10 High-Impact Procedures by Spend ($)' AS title,
        'bar' AS type, 12 AS width, 'orange' AS color;
-SELECT 
+SELECT
     hcpcs_code || ' • ' || COALESCE(SUBSTR(procedure_description, 1, 40), '') AS label,
     SUM(total_allowed_amt) AS value
 FROM mat_condition_hcpcs_detail
@@ -1287,8 +1322,8 @@ SELECT 'html' AS component, '<div id="procedure-table"></div>' AS html;
 SELECT 'divider' AS component, 'Granular Procedure Portfolio' AS contents;
 
 -- Using markdown for links and bolding to ensure the 'SaaS' feel
-SELECT 'table' AS component, 
-       'Procedure Intelligence Matrix (HCPCS)' AS title, 
+SELECT 'table' AS component,
+       'Procedure Intelligence Matrix (HCPCS)' AS title,
        TRUE AS sort, TRUE AS search,
        'Condition' AS markdown,
        'HCPCS' AS markdown;
@@ -1296,8 +1331,8 @@ SELECT 'table' AS component,
 SELECT
     '' || hcpcs_code || '' AS "HCPCS",
     COALESCE(procedure_description, 'DRG ' || hcpcs_code) AS "Description",
-    procedure_category AS "Category",    
-    '[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')' AS "Condition",    
+    procedure_category AS "Category",
+    '[' || condition_name || '](/moa/condition-hub.sql?condition=' || REPLACE(condition_name, ' ', '%20') || ')' AS "Condition",
     source_type AS "Source",
     printf('%,.0f', total_services) AS "Services",
     printf('%,.0f', total_beneficiaries) AS "Patients",
@@ -1313,7 +1348,7 @@ OFFSET $offset;
 ---
 --- 7. PAGINATION LOGIC (Strictly Preserved)
 ---
-SET total_rows = (SELECT COUNT(*) FROM mat_condition_hcpcs_detail 
+SET total_rows = (SELECT COUNT(*) FROM mat_condition_hcpcs_detail
     WHERE ($condition IS NULL OR TRIM(LOWER(condition_name)) = TRIM(LOWER($condition))));
 SET total_pages = ($total_rows + $limit - 1) / $limit;
 
@@ -1373,7 +1408,7 @@ SELECT 'alert' AS component,
 --- 4. VIBRANT KPI GRID (Regional Magnitude)
 ---
 SELECT 'divider' AS component, 'Regional Market Footprint' AS contents;
-SELECT 'text' AS component, 'National Reach & Economic Magnitude' AS title, 
+SELECT 'text' AS component, 'National Reach & Economic Magnitude' AS title,
        'These indicators define the geographic breadth and financial magnitude of our clinical portfolio across the United States.' AS contents;
 
 SELECT 'card' AS component, 4 AS columns;
@@ -1416,28 +1451,28 @@ FROM mat_condition_state_breakdown;
 SELECT 'divider' AS component, 'Regional Density And Value Distribution' AS contents;
 
 SELECT 'chart' AS component, 'Top 10 Clinical Markets by Opportunity' AS title, 'treemap' AS type, 8 AS width, TRUE as labels;
-SELECT 
+SELECT
     specialty_domain AS series,
-    condition_name AS label, 
+    condition_name AS label,
     opportunity_score AS value
-FROM mat_condition_national_summary 
+FROM mat_condition_national_summary
 ORDER BY opportunity_score DESC LIMIT 10;
 
 -- Treemap handles the "Dominant Bar" issue by using area proportions.
-SELECT 'chart' AS component, 
-       'National Market Value Concentration' AS title, 
-       'bar' AS type, 
+SELECT 'chart' AS component,
+       'National Market Value Concentration' AS title,
+       'bar' AS type,
        TRUE AS horizontal,
        TRUE AS stacked,
        12 AS width;
 
-SELECT 
+SELECT
     state_abbr AS series,
-    state_abbr AS label, 
+    state_abbr AS label,
     SUM(total_allowed_amt) AS value
-FROM mat_condition_state_breakdown 
-GROUP BY state_abbr 
-ORDER BY value DESC 
+FROM mat_condition_state_breakdown
+GROUP BY state_abbr
+ORDER BY value DESC
 LIMIT 20;
 
 
@@ -1502,7 +1537,7 @@ SELECT 'pagination' AS component,
 WITH RECURSIVE page_numbers AS (
     SELECT 1 AS n UNION ALL SELECT n + 1 FROM page_numbers WHERE n < $pages_obj
 )
-SELECT n AS contents, 
+SELECT n AS contents,
        sqlpage.link(sqlpage.path(), json_object('page_obj', n, 'page_idx', $page_idx)) AS link,
        (n = $current_page_obj) AS active FROM page_numbers;
 
@@ -1549,7 +1584,7 @@ SELECT 'text' AS component, 'Database Scale & Performance' AS title,
 
 SELECT 'card' AS component, 4 AS columns;
 
-SELECT 'Total Schema Objects' AS title, 
+SELECT 'Total Schema Objects' AS title,
        COUNT(*) || ' Tables/Views' AS description,
        'Active Database Inventory' AS footer,
        'blue' AS color, 'database' AS icon,
@@ -1589,18 +1624,18 @@ SELECT 'text' AS component, 'External Source Lineage' AS title,
        'We ingest, clean, and standardize the following audited federal data streams to ensure a unified view of the Medicare landscape.' AS contents;
 
 SELECT 'list' AS component;
-SELECT 
+SELECT
     title,
-    description || 
-        CASE 
-            WHEN version_year IS NOT NULL 
-            THEN ' (Data Year: ' || version_year || ')' 
-            ELSE '' 
+    description ||
+        CASE
+            WHEN version_year IS NOT NULL
+            THEN ' (Data Year: ' || version_year || ')'
+            ELSE ''
         END AS description,
     link,
-    'external-link' AS icon, 
+    'external-link' AS icon,
     'blue' AS color
-FROM data_provenance 
+FROM data_provenance
 WHERE object_type = 'external_source'
 ORDER BY version_year DESC, title;
 
@@ -1615,13 +1650,13 @@ SET count_obj = (SELECT COUNT(*) FROM data_tables_derived);
 SET pages_obj = (CAST($count_obj AS INT) / $max_per_page_obj) + (CASE WHEN ($count_obj % $max_per_page_obj) = 0 THEN 0 ELSE 1 END);
 SET current_page_obj = COALESCE(CAST($page_obj AS INT), 1);
 
-SELECT 'table' AS component, 
+SELECT 'table' AS component,
        'Derived Schema Inventory' AS title,
        TRUE AS sort, TRUE AS search;
 
-SELECT 
-    object_name AS "Object Name", 
-    object_type AS "Object Type", 
+SELECT
+    object_name AS "Object Name",
+    object_type AS "Object Type",
     category AS "Clinical Category"
 FROM data_tables_derived
 ORDER BY category, object_name
@@ -1637,7 +1672,7 @@ SELECT 'pagination' AS component,
 WITH RECURSIVE page_numbers AS (
     SELECT 1 AS n UNION ALL SELECT n + 1 FROM page_numbers WHERE n < $pages_obj
 )
-SELECT n AS contents, 
+SELECT n AS contents,
        sqlpage.link(sqlpage.path(), json_object('page_obj', n, 'page_idx', $page_idx)) AS link,
        (n = $current_page_obj) AS active FROM page_numbers;
 
@@ -1653,7 +1688,7 @@ SET pages_idx = (CAST($count_idx AS INT) / $max_per_page_idx) + (CASE WHEN ($cou
 SET current_page_idx = COALESCE(CAST($page_idx AS INT), 1);
 
 SELECT 'table' AS component, 'Execution Performance Indexes' AS title, TRUE AS hover, TRUE AS striped_rows;
-SELECT 
+SELECT
     index_name AS "Index Descriptor",
     table_name AS "Target Entity",
     description AS "Performance Purpose"
@@ -1670,7 +1705,7 @@ SELECT 'pagination' AS component,
 WITH RECURSIVE idx_page_numbers AS (
     SELECT 1 AS n UNION ALL SELECT n + 1 FROM idx_page_numbers WHERE n < $pages_idx
 )
-SELECT n AS contents, 
+SELECT n AS contents,
        sqlpage.link(sqlpage.path(), json_object('page_idx', n, 'page_obj', $page_obj)) AS link,
        (n = $current_page_idx) AS active FROM idx_page_numbers;
 
@@ -1686,12 +1721,12 @@ SET pages_mat = (CAST($count_mat AS INT) / $max_per_page_mat) + (CASE WHEN ($cou
 SET current_page_mat = COALESCE(CAST($page_mat AS INT), 1);
 
 SELECT 'table' AS component, 'Materialized Growth Portfolios' AS title, TRUE AS hover;
-SELECT 
-    object_name AS "Table Identifier", 
+SELECT
+    object_name AS "Table Identifier",
     'Ready for Growth Briefing' AS "Status"
 FROM data_tables_derived
- WHERE category = 'Materialized Table' 
-ORDER BY object_name 
+ WHERE category = 'Materialized Table'
+ORDER BY object_name
 LIMIT $max_per_page_mat
 OFFSET ($current_page_mat - 1) * $max_per_page_mat;
 
@@ -1704,7 +1739,7 @@ SELECT 'pagination' AS component,
 WITH RECURSIVE mat_page_numbers AS (
     SELECT 1 AS n UNION ALL SELECT n + 1 FROM mat_page_numbers WHERE n < $pages_mat
 )
-SELECT n AS contents, 
+SELECT n AS contents,
        sqlpage.link(sqlpage.path(), json_object('page_mat', n, 'page_idx', $page_idx)) AS link,
        (n = $current_page_mat) AS active FROM mat_page_numbers;
 ```
