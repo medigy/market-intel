@@ -8,7 +8,7 @@
   'use strict';
 
   // ========== CONFIGURATION ==========
-  const API_KEY = window.POSTHOG_API_KEY || 'phc_uksMoWZsmCBxGLYSXD39cLCDQJ5bvve5RXCppoDmeQZt';
+  const API_KEY = window.POSTHOG_API_KEY || 'fallback_key';
   const API_HOST = window.POSTHOG_HOST || 'https://us.i.posthog.com';
 
   // ========== INIT POSTHOG ==========

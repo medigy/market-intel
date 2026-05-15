@@ -81,8 +81,10 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
        '/' AS link,
-       'window.POSTHOG_API_KEY = "' || COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_API_KEY')), ''), '') || '";' AS javascript,
-       'window.POSTHOG_HOST = "' || COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_HOST')), ''), '') || '";' AS javascript,
+       '<script type="text/javascript">' ||
+       'window.POSTHOG_API_KEY = "' || REPLACE(COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_API_KEY')), ''), ''), '"', '\"') || '";' ||
+       'window.POSTHOG_HOST = "' || REPLACE(COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_HOST')), ''), ''), '"', '\"') || '";' ||
+       '</script>' AS html,
        '/inject-user-data.js' AS javascript,  -- ✅ MUST BE FIRST
        '/posthog-lib.js' AS javascript,
        '/posthog-tracker.js' AS javascript,
