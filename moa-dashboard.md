@@ -85,11 +85,11 @@ SELECT 'shell' AS component,
        'window.POSTHOG_API_KEY = "' || REPLACE(COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_API_KEY')), ''), ''), '"', '\"') || '";' ||
        'window.POSTHOG_HOST = "' || REPLACE(COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_HOST')), ''), ''), '"', '\"') || '";' ||
        '</script>' AS html,
-       '/inject-user-data.js' AS javascript,  -- ✅ MUST BE FIRST
-       '/posthog-lib.js' AS javascript,
-       '/posthog-tracker.js' AS javascript,
-       '/footer-links.js' AS javascript,
-       '/custom-dashboard.css' AS css,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../inject-user-data.js' ELSE 'inject-user-data.js' END AS javascript,  -- ✅ MUST BE FIRST
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../posthog-lib.js' ELSE 'posthog-lib.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../posthog-tracker.js' ELSE 'posthog-tracker.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Opportunity Atlas' AS footer,
        'upgrade-insecure-requests' AS header_content_security_policy,
        '{"link":"/moa/home-overview.sql","title":"Home"}' AS menu_item,
@@ -139,11 +139,11 @@ SET page_path = json_extract($resource_json, '$.route.path');
 ```
 
 ```contribute sqlpage_files --base .
-./inject-user-data.js .
-./posthog-lib.js .
-./posthog-tracker.js .
-./footer-links.js .
-./custom-dashboard.css .
+../inject-user-data.js .
+../posthog-lib.js .
+../posthog-tracker.js .
+../footer-links.js .
+../custom-dashboard.css .
 ./ai-chat/dist/wc/ai-chat.js ai-chat.js
 ```
 
