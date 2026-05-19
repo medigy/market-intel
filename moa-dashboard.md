@@ -139,11 +139,11 @@ SET page_path = json_extract($resource_json, '$.route.path');
 ```
 
 ```contribute sqlpage_files --base .
-../inject-user-data.js .
-../posthog-lib.js .
-../posthog-tracker.js .
-../footer-links.js .
-../custom-dashboard.css .
+./inject-user-data.js .
+./posthog-lib.js .
+./posthog-tracker.js .
+./footer-links.js .
+./custom-dashboard.css .
 ./ai-chat/dist/wc/ai-chat.js ai-chat.js
 ```
 
