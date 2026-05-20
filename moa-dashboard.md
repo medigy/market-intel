@@ -81,8 +81,15 @@ SELECT 'shell' AS component,
        'fluid' AS layout,
        true AS fixed_top_menu,
        '/' AS link,
-       '../footer-links.js' AS javascript,
-       '../custom-dashboard.css' AS css,
+       '<script type="text/javascript">' ||
+       'window.POSTHOG_API_KEY = "' || REPLACE(COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_API_KEY')), ''), ''), '"', '\"') || '";' ||
+       'window.POSTHOG_HOST = "' || REPLACE(COALESCE(NULLIF(TRIM(sqlpage.environment_variable('POSTHOG_HOST')), ''), ''), '"', '\"') || '";' ||
+       '</script>' AS html,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../inject-user-data.js' ELSE 'inject-user-data.js' END AS javascript,  -- ✅ MUST BE FIRST
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../posthog-lib.js' ELSE 'posthog-lib.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../posthog-tracker.js' ELSE 'posthog-tracker.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../footer-links.js' ELSE 'footer-links.js' END AS javascript,
+       CASE WHEN instr(sqlpage.path(), '/moa/') > 0 THEN '../custom-dashboard.css' ELSE 'custom-dashboard.css' END AS css,
        '© 2026 Medigy Opportunity Atlas' AS footer,
        'upgrade-insecure-requests' AS header_content_security_policy,
        '{"link":"/moa/home-overview.sql","title":"Home"}' AS menu_item,
@@ -132,6 +139,9 @@ SET page_path = json_extract($resource_json, '$.route.path');
 ```
 
 ```contribute sqlpage_files --base .
+./inject-user-data.js .
+./posthog-lib.js .
+./posthog-tracker.js .
 ./footer-links.js .
 ./custom-dashboard.css .
 ./ai-chat/dist/wc/ai-chat.js ai-chat.js
@@ -315,6 +325,26 @@ SELECT 'cookie' AS component,
        'true' AS value,
        '/' AS path,
        'lax' AS same_site
+WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
+
+-- Set registration profile cookie with email and user details for PostHog tracking
+SELECT 'cookie' AS component,
+       'medigy_moa_registration_profile_v2' AS name,
+       CAST(json_object(
+           'user_id', sqlpage.random_string(16),
+           'emailAddress', $submitted_email_address,
+           'email', $submitted_email_address,
+           'firstName', $submitted_first_name,
+           'lastName', $submitted_last_name,
+           'fullName', $submitted_full_name,
+           'organization', $submitted_organization,
+           'purposeOfVisit', $submitted_purpose_of_visit,
+           'registeredAt', $submitted_access_timestamp,
+           'ipAddress', $submitted_ip_address
+       ) AS TEXT) AS value,
+       '/' AS path,
+       'lax' AS same_site,
+       86400 AS max_age
 WHERE $email_is_valid = 1 AND $phone_is_valid = 1 AND $consent_is_valid = 1;
 
 -- Relative redirect: browser resolves against the current URL, so it works at any deployment base path.
